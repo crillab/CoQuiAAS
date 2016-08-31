@@ -9,6 +9,9 @@
 #include "ExternalSatSolver.h"
 
 
+using namespace CoQuiAAS;
+
+
 ExternalSatSolver::ExternalSatSolver(std::string command) {
 	this->nVars = 0;
 	this->nCstrs = 0;

@@ -1,8 +1,6 @@
 #include "CommandLineHelper.h"
 
 
-using namespace std;
-
 #define CLH_MISS_FORMED_MSG "ERR:: WRONG USAGE: CoQuiAAS -p XX-YYY -fo ZZ -f instanceFile [-a variable] [OPTIONS]\n\
                        where XX in {SE, EE, DC, DS}\n\
                        where YY in {ST, CO, GR, PR, SST}\n\
@@ -31,6 +29,10 @@ Jean-Marie Lagniez, Emmanuel Lonca, Jean-Guy Mailly -- {lagniez,lonca}@cril.fr, 
 #define CLH_SUPPORTED_PROBLEMS_MSG "[SE-ST,SE-CO,SE-GR,SE-PR,SE-SST,EE-ST,EE-CO,EE-GR,EE-PR,EE-SST,DC-ST,DC-CO,DC-GR,DC-PR,DC-SST,DS-ST,DS-CO,DS-GR,DS-PR,DS-SST]"
 
 #define FLAG_SET "FLAG_SET"
+
+
+using namespace CoQuiAAS;
+
 
 CommandLineHelper::CommandLineHelper(int argc, char** argv) {
   mustExit = errorOccured = false;

@@ -15,6 +15,9 @@
 #include "mtl/Vec.h"
 
 
+namespace CoQuiAAS {
+
+
 class SatSolver {
 
 public:
@@ -53,6 +56,9 @@ protected:
 		}
 	}
 };
+
+
+}
 
 
 #endif /* SRC_SOLVERS_SATSOLVER_H_ */

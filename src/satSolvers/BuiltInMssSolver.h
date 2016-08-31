@@ -13,6 +13,9 @@
 #include "BuiltInSatSolver.h"
 
 
+namespace CoQuiAAS {
+
+
 class BuiltInMssSolver : public MssSolver, public BuiltInSatSolver {
 
 public:
@@ -55,5 +58,9 @@ private:
 
 	int nSoftCstrs;
 };
+
+
+}
+
 
 #endif /* SRC_SOLVERS_BUILTINMSSSOLVER_H_ */

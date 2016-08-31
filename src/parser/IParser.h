@@ -7,13 +7,15 @@
  *
  */
 
+
 #ifndef __IPARSER_H__
 #define __IPARSER_H__
 
 #include "Attacks.h"
 #include "VarMap.h"
 
-using namespace std;
+
+namespace CoQuiAAS {
 
 
 /** enumeration of the attacks input formats*/
@@ -50,5 +52,9 @@ class IParser {
   virtual ~IParser(){}
 
 };
+
+
+}
+
 
 #endif

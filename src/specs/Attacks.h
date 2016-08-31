@@ -16,7 +16,9 @@
 
 #include "VarMap.h"
 
-using namespace std;
+
+namespace CoQuiAAS {
+
 
 /**
  * \class Attacks
@@ -38,7 +40,7 @@ class Attacks {
    * \param from : the name of the attacking argument
    * \param to : the name of the attacked argument
    */
-  void addAttack(string from, string to);
+  void addAttack(std::string from, std::string to);
 
   /**
    * \fn getAttacksTo
@@ -46,7 +48,7 @@ class Attacks {
    * \param var : the variable
    * \return the attackers of var
    */
-  vector<int> *getAttacksTo(int var);
+  std::vector<int> *getAttacksTo(int var);
 
   /**
    * \fn nAttacks
@@ -67,12 +69,16 @@ class Attacks {
   VarMap& varMap;
 
   /** The mapping from the arguments to their attackers */
-  map<int,vector<int> > attacks;
+  std::map<int,std::vector<int> > attacks;
 
  private:
   unsigned int nbAttacks;
   unsigned int nMaxAttacks;
   
 };
+
+
+}
+
 
 #endif

@@ -8,6 +8,9 @@
 #include "TrivialGraphFormatParser.h"
 
 
+namespace CoQuiAAS {
+
+
 /** 
  * \class ParserFactory
  * \brief Class used to get a parser instance and that provides static methods related to instance formats
@@ -50,6 +53,9 @@ class ParserFactory {
   }
   
 };
+
+
+}
 
 
 #endif

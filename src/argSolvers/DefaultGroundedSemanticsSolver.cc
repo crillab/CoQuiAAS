@@ -8,6 +8,9 @@
 #include "DefaultGroundedSemanticsSolver.h"
 
 
+using namespace CoQuiAAS;
+
+
 DefaultGroundedSemanticsSolver::DefaultGroundedSemanticsSolver(SatSolver &satSolver, Attacks &attacks, VarMap &varMap, TaskType taskType) : SemanticsProblemSolver(attacks, varMap, taskType), solver(satSolver) {}
 
 

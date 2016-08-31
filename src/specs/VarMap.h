@@ -17,7 +17,9 @@
 #include <string>
 #include <cassert>
 
-using namespace std;
+
+namespace CoQuiAAS {
+
 
 /**
  * \class VarMap
@@ -37,7 +39,7 @@ class VarMap {
    * \brief Adds a new variables in the map
    * \param name : the name of the new variable
    */
-  void addEntry(string name);
+  void addEntry(std::string name);
 
   /**
    * \fn getName
@@ -45,7 +47,7 @@ class VarMap {
    * \param var : the Boolean variable
    * \return the name corresponding to var
    */
-  string getName(int var);
+  std::string getName(int var);
 
   /**
    * \fn getVar
@@ -53,7 +55,7 @@ class VarMap {
    * \param name : the name of the variable
    * \return the Boolean variable associated to name
    */
-  int getVar(string name);
+  int getVar(std::string name);
 
   /**
    * \fn contains
@@ -61,14 +63,14 @@ class VarMap {
    * \param name : the name to be checked
    * \return true iff name corresponds to a variable
    */
-  bool contains(string name);
+  bool contains(std::string name);
 
   /**
    * \fn intVars
    * \brief To iterate over the integer variables corresponding to the string variables
    * \return a vector containing the integer variables
    */
-  vector<int>* intVars();
+  std::vector<int>* intVars();
 
   /**
    * \fn nVars
@@ -86,12 +88,12 @@ class VarMap {
   bool isSelfAttacking(int var);
 
   /**
-   * \fn isSelfAttacking(string)
+   * \fn isSelfAttacking(std::string)
    * \brief To know if the argument is self-attacking
    * \param name : the name of the argument
    * \return true if name is self attacking
    */
-  bool isSelfAttacking(string name);
+  bool isSelfAttacking(std::string name);
 
 
  /**
@@ -103,12 +105,12 @@ class VarMap {
   void setSelfAttacking(int var, bool b);
 
   /**
-   * \fn setSelfAttacking(string, bool)
+   * \fn setSelfAttacking(std::string, bool)
    * \brief To know if the argument is self-attacking
    * \param name : the name of the argument
    * \param b : the boolean true if var is self-attacking
    */
-  void setSelfAttacking(string name, bool b);
+  void setSelfAttacking(std::string name, bool b);
 
   /**
    * \fn nSelfAttacking
@@ -119,12 +121,15 @@ class VarMap {
   
   
  private:
-  map<int, string> varToName; /**< Mapping from Boolean variables to their names */
-  map<string, int> nameToVar; /**< Mapping from the names to the Boolean variables */
+  std::map<int, std::string> varToName; /**< Mapping from Boolean variables to their names */
+  std::map<std::string, int> nameToVar; /**< Mapping from the names to the Boolean variables */
   int nvars; /**< The number of variables */
-  map<int,bool> selfAttacking; /**< Allows to know if an argument is self-attacking */
+  std::map<int, bool> selfAttacking; /**< Allows to know if an argument is self-attacking */
   unsigned int nbSelfAttacking; /**< Tells the nimber of variables which are self-attacking */
 };
+
+
+}
 
 
 #endif

@@ -7,6 +7,7 @@
  *
  */
 
+
 #ifndef __CNF_FORMAT_PARSER_H__
 #define __CNF_FORMAT_PARSER_H__
 
@@ -17,7 +18,9 @@
 #include "Attacks.h"
 #include "VarMap.h"
 
-using namespace std;
+
+namespace CoQuiAAS {
+
 
 /** 
  * \class CNFFormatParser
@@ -32,7 +35,7 @@ class CNFFormatParser : public IParser {
    * \brief Constructor
    * \param input : the stream corresponding to the file to parse
    */
-  CNFFormatParser(istream *input);
+  CNFFormatParser(std::istream *input);
 
   /**
    * \fn ~CNFFormatParser
@@ -47,7 +50,11 @@ class CNFFormatParser : public IParser {
  private:
   Attacks attacks; /*!< The attack relation corresponding to the parsed file  */
   VarMap varMap; /**< The mapping between arguments names and literals */
-  istream *is; /**< The stream to read the input AF */
+  std::istream *is; /**< The stream to read the input AF */
 };
+
+
+}
+
 
 #endif

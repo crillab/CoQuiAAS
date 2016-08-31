@@ -9,6 +9,9 @@
 #include "ExternalMssSolver.h"
 
 
+using namespace CoQuiAAS;
+
+
 ExternalMssSolver::ExternalMssSolver(std::string command) : ExternalSatSolver(command) {
 	this->nSoftCstrs = 0;
 	this->computingModel = false;

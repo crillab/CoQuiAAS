@@ -7,18 +7,23 @@
  *
  */
 
+
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
 #include <cctype>
 #include "AspartixFormatParser.h"
 
-AspartixFormatParser::AspartixFormatParser(istream *input) : attacks(&varMap) {
+
+using namespace CoQuiAAS;
+
+
+AspartixFormatParser::AspartixFormatParser(std::istream *input) : attacks(&varMap) {
   is = input;
 }
 
 
-static inline bool notOnlySpace(string line) {
+static inline bool notOnlySpace(std::string line) {
   for(unsigned int i=0; i<line.size(); ++i)
     if(!isblank(line[i])) return true;
   return false;
@@ -28,7 +33,7 @@ static inline bool notOnlySpace(string line) {
 void AspartixFormatParser::parseInstance() {
 
   if(*is){
-    string line ;
+    std::string line ;
     // Reading the args
     while(getline(*is,line)){
       if(!line.empty() && notOnlySpace(line)){
@@ -36,21 +41,21 @@ void AspartixFormatParser::parseInstance() {
 	  // adding an attack
 	  unsigned long commaIndex = line.find(",");
 	  unsigned long closingParIndex = line.find(")");
-	  if(commaIndex == string::npos || closingParIndex == string::npos){
-	    cerr << "The line " << line << " contains an error (comma/closing paranthesis)" << endl ;
+	  if(commaIndex == std::string::npos || closingParIndex == std::string::npos){
+	    std::cerr << "The line " << line << " contains an error (comma/closing paranthesis)" << std::endl ;
 	    exit(-3) ;
 	  }
-	  string attacking = line.substr(4,commaIndex-4);
-	  string attacked = line.substr(commaIndex+1,closingParIndex-commaIndex-1);
+	  std::string attacking = line.substr(4,commaIndex-4);
+	  std::string attacked = line.substr(commaIndex+1,closingParIndex-commaIndex-1);
 	  attacks.addAttack(attacking,attacked) ;
 	}else{
 	  // adding an argument if not already present
 	  unsigned long closingParIndex = line.find(")");
-	  if(closingParIndex == string::npos){
-	    cerr << "The line " << line << " contains an error (closing paranthesis)" << endl ;
+	  if(closingParIndex == std::string::npos){
+	    std::cerr << "The line " << line << " contains an error (closing paranthesis)" << std::endl ;
 	    exit(-3) ;
 	  }
-	  string argName = line.substr(4, closingParIndex-4) ;
+	  std::string argName = line.substr(4, closingParIndex-4) ;
 	  varMap.addEntry(argName);
 	}
       }

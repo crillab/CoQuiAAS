@@ -9,6 +9,9 @@
 #include "DefaultStableSemanticsSolver.h"
 
 
+using namespace CoQuiAAS;
+
+
 DefaultStableSemanticsSolver::DefaultStableSemanticsSolver(SatSolver &solver, Attacks &attacks, VarMap &varMap, TaskType taskType)  : SemanticsProblemSolver(attacks, varMap, taskType), solver(solver) {}
 
 

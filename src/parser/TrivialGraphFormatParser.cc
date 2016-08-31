@@ -7,16 +7,20 @@
  *
  */
 
+
 #include "TrivialGraphFormatParser.h"
 
 
-TrivialGraphFormatParser::TrivialGraphFormatParser(istream *input) : attacks(&varMap) {
+using namespace CoQuiAAS;
+
+
+TrivialGraphFormatParser::TrivialGraphFormatParser(std::istream *input) : attacks(&varMap) {
   is = input;
 }
 
 
 void TrivialGraphFormatParser::parseInstance() {
-  string word, secondWord;
+  std::string word, secondWord;
 
   while(*is >> word) {
     if(!word.compare("#")) break;

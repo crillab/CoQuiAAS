@@ -7,6 +7,10 @@
 
 #include "SatEncodingHelper.h"
 
+
+using namespace CoQuiAAS;
+
+
 SatEncodingHelper::SatEncodingHelper(SatSolver &solver, Attacks &attacks, VarMap &varMap) : solver(solver), attacks(attacks), varMap(varMap) {
 	this->nbVars = 0;
 	solver.addVariables(varMap.nVars());

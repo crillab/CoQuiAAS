@@ -15,7 +15,8 @@
 #include "BuiltInMssSolver.h"
 #include "ExternalMssSolver.h"
 
-using namespace std;
+
+namespace CoQuiAAS {
 
 
 /**
@@ -31,7 +32,7 @@ public:
 	 * \brief try to recognize a task in a string
 	 * \param str : the string to parse
 	 */
-	static TaskType getTaskType(string str) {
+	static TaskType getTaskType(std::string str) {
 		str = str.substr(0,2);
 		std::transform(str.begin(), str.end(), str.begin(), ::toupper);
 		if(!str.compare("SE")) return TASK_ONE_EXT;
@@ -46,7 +47,7 @@ public:
 	 * \brief try to recognize a semantic name in a string
 	 * \param str : the string to parse
 	 */
-	static SemanticName getSemanticName(string str) {
+	static SemanticName getSemanticName(std::string str) {
 		str = str.substr(3);
 		std::transform(str.begin(), str.end(), str.begin(), ::toupper);
 		if(!str.compare("ST")) return SEM_STABLE;
@@ -56,14 +57,14 @@ public:
 		return SEM_UNDEFINED;
 	}
 
-	static SatSolver *createSatSolver(map<string,string> *additionalParams) {
+	static SatSolver *createSatSolver(std::map<std::string,std::string> *additionalParams) {
 		if(additionalParams->find("-externalSatSolver") != additionalParams->end()) {
 			return new ExternalSatSolver((*additionalParams)["-externalSatSolver"]);
 		}
 		return new BuiltInSatSolver();
 	}
 
-	static MssSolver *createMssSolver(map<string,string> *additionalParams) {
+	static MssSolver *createMssSolver(std::map<std::string,std::string> *additionalParams) {
 		if(additionalParams->find("-externalCoMSSSolver") != additionalParams->end()) {
 			return new ExternalMssSolver((*additionalParams)["-externalCoMSSSolver"]);
 		}
@@ -71,13 +72,13 @@ public:
 	}
 
 	/**
-	 * \fn getProblemInstance(SemanticName,TaskType,string)
+	 * \fn getProblemInstance(SemanticName,TaskType,std::string)
 	 * \brief return a new problem instance given a semantic and a task ; also provide the additional parameter if necessary (case of DC or DS)
 	 * \param semantic : the semantic of the argumentation framework
 	 * \param task : the task that is required
 	 * \param additionalParams the additional parameters from the command line
 	 */
-	static SemanticsProblemSolver *getProblemInstance(SemanticName semantic, TaskType task, map<string,string> *additionalParams, Attacks &attacks, VarMap &varMap) {
+	static SemanticsProblemSolver *getProblemInstance(SemanticName semantic, TaskType task, std::map<std::string,std::string> *additionalParams, Attacks &attacks, VarMap &varMap) {
 		if(task == TASK_UNDEFINED) return NULL;
 		switch(semantic) {
 		case SEM_STABLE:
@@ -94,6 +95,9 @@ public:
 	}
 
 };
+
+
+}
 
 
 #endif

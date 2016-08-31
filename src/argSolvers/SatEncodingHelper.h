@@ -14,6 +14,9 @@
 #include "VarMap.h"
 
 
+namespace CoQuiAAS {
+
+
 class SatEncodingHelper {
 
 public:
@@ -42,5 +45,9 @@ protected:
 
 	int nbVars;
 };
+
+
+}
+
 
 #endif /* SRC_SOLVERS_SATENCODINGHELPER_H_ */

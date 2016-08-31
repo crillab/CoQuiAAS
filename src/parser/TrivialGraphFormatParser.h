@@ -12,12 +12,13 @@
 
 #include <iostream>
 
-
 #include "IParser.h"
 #include "Attacks.h"
 #include "VarMap.h"
 
-using namespace std;
+
+namespace CoQuiAAS {
+
 
 /** 
  * \class TrivialGraphFormatParser
@@ -32,7 +33,7 @@ class TrivialGraphFormatParser : public IParser {
    * \brief Constructor
    * \param input : the stream corresponding to the file to parse
    */
-  TrivialGraphFormatParser(istream *input);
+  TrivialGraphFormatParser(std::istream *input);
 
   /**
    * \fn ~TrivialGraphFormatParser()
@@ -47,7 +48,11 @@ class TrivialGraphFormatParser : public IParser {
  private:
   Attacks attacks;   /*!< The attack relation corresponding to the parsed file  */
   VarMap varMap; /**< The mapping between arguments names and literals */
-  istream *is; /**< The stream to read the input AF */
+  std::istream *is; /**< The stream to read the input AF */
 };
+
+
+}
+
 
 #endif

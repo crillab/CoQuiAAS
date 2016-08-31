@@ -9,6 +9,9 @@
 #include "BuiltInSatSolver.h"
 
 
+using namespace CoQuiAAS;
+
+
 BuiltInSatSolver::BuiltInSatSolver() {
 	this->nVars = 0;
 	this->nCstrs = 0;

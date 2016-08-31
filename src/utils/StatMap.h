@@ -5,7 +5,7 @@
 #include <iostream>
 
 
-using namespace std;
+namespace CoQuiAAS {
 
 
 /**
@@ -16,36 +16,36 @@ class StatMap {
 
  public:
   /**
-   * \fn setStat(string,string)
+   * \fn setStat(std::string,std::string)
    * \brief add or update a new stat, given its name and its string value
    * \param name : the stat name
    * \param value : the stat value
    */
-  virtual void setStat(string name, string value) = 0;
+  virtual void setStat(std::string name, std::string value) = 0;
 
   /**
-   * \fn setStat(string,int)
+   * \fn setStat(std::string,int)
    * \brief add or update a new stat, given its name and its integer value
    * \param name : the stat name
    * \param value : the stat value
    */
-  virtual void setStat(string name, int value) = 0;
+  virtual void setStat(std::string name, int value) = 0;
 
   /**
-   * \fn setStat(string,double)
+   * \fn setStat(std::string,double)
    * \brief add or update a new stat, given its name and its floating value
    * \param name : the stat name
    * \param value : the stat value
    */
-  virtual void setStat(string name, double value) = 0;
+  virtual void setStat(std::string name, double value) = 0;
 
   /**
-   * \fn incCounterStat(string,int)
+   * \fn incCounterStat(std::string,int)
    * \brief update a stat which value is an integer, given its name and the increment (default=1)
    * \param name : the stat name
    * \param value : the increment
    */
-  virtual void incCounterStat(string name, int value=1) = 0;
+  virtual void incCounterStat(std::string name, int value=1) = 0;
 
   /**
    * \fn printStats(FILE*)
@@ -57,6 +57,9 @@ class StatMap {
   virtual ~StatMap(){};
 
 };
+
+
+}
 
 
 #endif /* #ifndef __STAT_MAP_H__ */

@@ -9,6 +9,9 @@
 #include "SemanticsProblemSolver.h"
 
 
+using namespace CoQuiAAS;
+
+
 SemanticsProblemSolver::SemanticsProblemSolver(Attacks &attacks, VarMap &varMap, TaskType taskType) : attacks(attacks), varMap(varMap) {
 	this->taskType = taskType;
 }
@@ -40,8 +43,8 @@ void SemanticsProblemSolver::setAcceptanceQueryArgument(std::string arg) {
 }
 
 
-std::string SemanticsProblemSolver::modelToString(vector<bool>& model) {
-  string res;
+std::string SemanticsProblemSolver::modelToString(std::vector<bool>& model) {
+  std::string res;
 
   bool noneFoundYet = true;
   res = "[";
@@ -57,8 +60,8 @@ std::string SemanticsProblemSolver::modelToString(vector<bool>& model) {
 }
 
 
-std::string SemanticsProblemSolver::modelToString(vector<int>& model) {
-  string res;
+std::string SemanticsProblemSolver::modelToString(std::vector<int>& model) {
+  std::string res;
 
   bool noneFoundYet = true;
   res = "[";

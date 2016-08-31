@@ -5,6 +5,7 @@
  *      Author: lonca
  */
 
+
 #ifndef SRC_SOLVERS_SEMANTICSPROBLEMSOLVER_H_
 #define SRC_SOLVERS_SEMANTICSPROBLEMSOLVER_H_
 
@@ -14,6 +15,9 @@
 #include "Types.h"
 #include "Attacks.h"
 #include "VarMap.h"
+
+
+namespace CoQuiAAS {
 
 
 class SemanticsProblemSolver {
@@ -52,9 +56,13 @@ protected:
 
 	std::string answer;
 
-	std::string modelToString(vector<bool>& model);
+	std::string modelToString(std::vector<bool>& model);
 
-	std::string modelToString(vector<int>& model);
+	std::string modelToString(std::vector<int>& model);
 };
+
+
+}
+
 
 #endif /* SRC_SOLVERS_SEMANTICSPROBLEMSOLVER_H_ */

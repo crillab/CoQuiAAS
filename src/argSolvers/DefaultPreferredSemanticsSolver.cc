@@ -9,6 +9,9 @@
 #include "DefaultPreferredSemanticsSolver.h"
 
 
+using namespace CoQuiAAS;
+
+
 DefaultPreferredSemanticsSolver::DefaultPreferredSemanticsSolver(MssSolver &solver, Attacks &attacks, VarMap &varMap, TaskType taskType)  : SemanticsProblemSolver(attacks, varMap, taskType), solver(solver) {}
 
 

@@ -20,6 +20,10 @@
 #include "core/Solver.h"
 #include "core/SolverTypes.h"
 
+
+namespace CoQuiAAS {
+
+
 class BuiltInSatSolver: public SatSolver {
 
 public:
@@ -66,5 +70,9 @@ protected:
 
 	bool addBlockingClause();
 };
+
+
+}
+
 
 #endif /* SRC_SOLVERS_BUILTINSATSOLVER_H_ */

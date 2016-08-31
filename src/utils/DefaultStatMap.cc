@@ -1,33 +1,36 @@
 #include "DefaultStatMap.h"
 
 
+using namespace CoQuiAAS;
+
+
 DefaultStatMap::DefaultStatMap(){}
 
 
-void DefaultStatMap::setStat(string name, string value) {
+void DefaultStatMap::setStat(std::string name, std::string value) {
   
   stats[name] = value;
 }
 
 
-void DefaultStatMap::setStat(string name, int value) {
-  ostringstream converter;
+void DefaultStatMap::setStat(std::string name, int value) {
+  std::ostringstream converter;
 
   converter << value;  
   stats[name] = converter.str();
 }
 
 
-void DefaultStatMap::setStat(string name, double value) {
-  ostringstream converter;
+void DefaultStatMap::setStat(std::string name, double value) {
+  std::ostringstream converter;
 
   converter << value;  
   stats[name] = converter.str();
 }
 
 
-void DefaultStatMap::incCounterStat(string name, int value) {
-  ostringstream converter;
+void DefaultStatMap::incCounterStat(std::string name, int value) {
+  std::ostringstream converter;
   
   int newValue = value + (stats.find(name) == stats.end()) ? (0) : (atoi(stats[name].c_str()));
   converter << newValue;  
@@ -37,7 +40,7 @@ void DefaultStatMap::incCounterStat(string name, int value) {
 
 void DefaultStatMap::printStats(FILE *outputFile) {
 
-  map<string,string>::iterator it;
+  std::map<std::string,std::string>::iterator it;
   for(it = stats.begin(); it != stats.end(); ++it) {
     fprintf(outputFile, "c %s: %s\n", it->first.c_str(), it->second.c_str());
   }

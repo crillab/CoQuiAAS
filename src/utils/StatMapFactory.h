@@ -7,7 +7,8 @@
 #include "LogStatMap.h"
 
 
-using namespace std;
+namespace CoQuiAAS {
+
 
 class StatMapFactory {
 
@@ -34,6 +35,9 @@ class StatMapFactory {
 };
 
 StatMap *StatMapFactory::instance = NULL;
+
+
+}
 
 
 #endif /* #ifndef __STAT_MAP_FACTORY_H__ */

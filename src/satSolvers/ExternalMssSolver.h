@@ -18,6 +18,9 @@
 #include "ExternalSatSolver.h"
 
 
+namespace CoQuiAAS {
+
+
 class ExternalMssSolver: public MssSolver, public ExternalSatSolver {
 
 public:
@@ -68,5 +71,9 @@ private:
 
 	bool computingModel;
 };
+
+
+}
+
 
 #endif /* SRC_SOLVERS_EXTERNALMSSSOLVER_H_ */

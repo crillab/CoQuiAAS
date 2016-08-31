@@ -16,6 +16,9 @@
 #include "MssSolver.h"
 
 
+namespace CoQuiAAS {
+
+
 class DefaultPreferredSemanticsSolver : public SemanticsProblemSolver {
 
 public:
@@ -37,6 +40,9 @@ private:
 
 	MssSolver &solver;
 };
+
+
+}
 
 
 #endif /* SRC_SOLVERS_DEFAULTPREFERREDSEMANTICSSOLVER_H_ */

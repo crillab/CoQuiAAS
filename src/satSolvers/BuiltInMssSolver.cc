@@ -9,6 +9,9 @@
 #include "BuiltInMssSolver.h"
 
 
+using namespace CoQuiAAS;
+
+
 BuiltInMssSolver::BuiltInMssSolver() : BuiltInSatSolver() {
 	this->nSoftCstrs = 0;
 }

@@ -10,7 +10,7 @@
 #include "StatMap.h"
 
 
-using namespace std;
+namespace CoQuiAAS {
 
 
 class DefaultStatMap : public StatMap {
@@ -19,36 +19,36 @@ class DefaultStatMap : public StatMap {
   DefaultStatMap();
 
   /**
-   * \fn setStat(string,string)
+   * \fn setStat(std::string,std::string)
    * \brief add or update a new stat, given its name and its string value
    * \param name : the stat name
    * \param value : the stat value
    */
-  void setStat(string name, string value);
+  void setStat(std::string name, std::string value);
 
   /**
-   * \fn setStat(string,int)
+   * \fn setStat(std::string,int)
    * \brief add or update a new stat, given its name and its integer value
    * \param name : the stat name
    * \param value : the stat value
    */
-  void setStat(string name, int value);
+  void setStat(std::string name, int value);
 
   /**
-   * \fn setStat(string,double)
+   * \fn setStat(std::string,double)
    * \brief add or update a new stat, given its name and its floating value
    * \param name : the stat name
    * \param value : the stat value
    */
-  void setStat(string name, double value);
+  void setStat(std::string name, double value);
 
   /**
-   * \fn incCounterStat(string,int)
+   * \fn incCounterStat(std::string,int)
    * \brief update a stat which value is an integer, given its name and the increment (default=1)
    * \param name : the stat name
    * \param value : the increment
    */
-  void incCounterStat(string name, int value=1);
+  void incCounterStat(std::string name, int value=1);
 
   /**
    * \fn printStats(FILE*)
@@ -60,9 +60,12 @@ class DefaultStatMap : public StatMap {
   virtual ~DefaultStatMap();
 
  private:
-  map<string, string> stats;
+  std::map<std::string, std::string> stats;
 
 };
+
+
+}
 
 
 #endif /* #define __DEFAULT_STAT_MAP_H__ */

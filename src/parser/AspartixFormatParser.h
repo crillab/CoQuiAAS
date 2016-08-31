@@ -7,6 +7,7 @@
  *
  */
 
+
 #ifndef __ASPARTIX_FORMAT_PARSER_H__
 #define __ASPARTIX_FORMAT_PARSER_H__
 
@@ -17,7 +18,9 @@
 #include "Attacks.h"
 #include "VarMap.h"
 
-using namespace std;
+
+namespace CoQuiAAS {
+
 
 /** 
  * \class AspartixFormatParser
@@ -32,7 +35,7 @@ class AspartixFormatParser : public IParser {
    * \brief Constructor
    * \param input : the stream to parse
    */
-  AspartixFormatParser(istream *input);
+  AspartixFormatParser(std::istream *input);
 
   /**
    * \fn ~AspartixFormatParser
@@ -46,7 +49,11 @@ class AspartixFormatParser : public IParser {
  private:
   Attacks attacks;  /*!< The attack relation corresponding to the parsed file  */
   VarMap varMap; /**< The mapping between arguments names and literals */
-  istream *is; /**< The stream to read the input AF */
+  std::istream *is; /**< The stream to read the input AF */
 };
+
+
+}
+
 
 #endif

@@ -9,7 +9,8 @@
 #include "ParserFactory.h"
 
 
-using namespace std;
+namespace CoQuiAAS {
+
 
 /** 
  * \class CommandLineHelper
@@ -77,14 +78,14 @@ class CommandLineHelper {
   /**
    * \fn mustExitNow
    * \brief returns a boolean indicating if the solver must exist after parsing
-   * \return a boolean indicating if the solver must exit after parsing ; this occurs with some solver options or if an error occured
+   * \return a boolean indicating if the solver must exit after parsing ; this occurs with some solver options or if an error occurred
    */
   bool mustExitNow();
 
   /**
    * \fn errorInCommandLine
-   * \brief return a boolean indicating if an error occured while parsing the command line
-   * \return a boolean indicating if an error occured while parsing the command line ; this check may be done after mustExitNow() returned true
+   * \brief return a boolean indicating if an error occurred while parsing the command line
+   * \return a boolean indicating if an error occurred while parsing the command line ; this check may be done after mustExitNow() returned true
    */
   bool errorInCommandLine();
 
@@ -107,6 +108,9 @@ class CommandLineHelper {
 
   bool assertWellFormed(bool test);
 };
+
+
+}
 
 
 #endif

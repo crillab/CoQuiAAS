@@ -15,6 +15,9 @@
 #include "VarMap.h"
 
 
+namespace CoQuiAAS {
+
+
 class MssEncodingHelper : public SatEncodingHelper {
 
 public:
@@ -29,5 +32,9 @@ private:
 
 	MssSolver &solver;
 };
+
+
+}
+
 
 #endif /* SRC_SOLVERS_MSSENCODINGHELPER_H_ */

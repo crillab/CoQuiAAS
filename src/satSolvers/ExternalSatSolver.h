@@ -25,6 +25,9 @@
 #include "SatSolver.h"
 
 
+namespace CoQuiAAS {
+
+
 class ExternalSatSolver: public SatSolver {
 
 public:
@@ -79,5 +82,9 @@ private :
 
 	void addBlockingClause();
 };
+
+
+}
+
 
 #endif /* SRC_SOLVERS_EXTERNALSATSOLVER_H_ */

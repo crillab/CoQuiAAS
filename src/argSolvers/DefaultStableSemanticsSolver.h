@@ -14,6 +14,9 @@
 #include "SatEncodingHelper.h"
 
 
+namespace CoQuiAAS {
+
+
 class DefaultStableSemanticsSolver : public SemanticsProblemSolver {
 
 public:
@@ -36,5 +39,9 @@ private:
 
 	SatSolver &solver;
 };
+
+
+}
+
 
 #endif /* SRC_SOLVERS_STABLESEMANTICSSOLVER_H_ */

@@ -10,6 +10,10 @@
 
 #include "SatSolver.h"
 
+
+namespace CoQuiAAS {
+
+
 class MssSolver : public SatSolver {
 
 public:
@@ -44,6 +48,9 @@ public:
 		return mss;
 	}
 };
+
+
+}
 
 
 #endif /* SRC_SOLVERS_MSSSOLVER_H_ */

@@ -10,13 +10,16 @@
 #include "CNFFormatParser.h"
 
 
-CNFFormatParser::CNFFormatParser(istream *input) : attacks(&varMap) {
+using namespace CoQuiAAS;
+
+
+CNFFormatParser::CNFFormatParser(std::istream *input) : attacks(&varMap) {
   is = input;
 }
 
 
 void CNFFormatParser::parseInstance() {
-  string word, secondWord;
+  std::string word, secondWord;
   char buffer[1<<11];
   int nVars;
 
@@ -25,7 +28,7 @@ void CNFFormatParser::parseInstance() {
   *is >> nVars ;
   for(; nVars; --nVars) {
     snprintf(buffer,1<<11,"%d",nVars);
-    varMap.addEntry(string(buffer));
+    varMap.addEntry(std::string(buffer));
   }
   *is >> word ;
 

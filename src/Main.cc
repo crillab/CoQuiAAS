@@ -16,6 +16,7 @@
  *
  */
 
+
 #include <iostream>
 #include <fstream>
 #include <ctime>
@@ -29,20 +30,26 @@
 #include "IParser.h"
 #include "ParserFactory.h"
 
-using namespace std;
 
 #define MAIN_UNSUPPORTED_FILE_FORMAT_MSG "ERR:: UNSUPPORTED FILE FORMAT"
 
+
+using namespace CoQuiAAS;
+
+
 pthread_t timeoutTh;
 clock_t clk;
+
 
 inline bool undefinedArgument(string arg, VarMap* map){
 	return !map->contains(arg);
 }
 
+
 void setInitStats(CommandLineHelper *clh, IParser *p);
 void setFinalStats(CommandLineHelper *clh, IParser *p);
 void *handleTimeout(void *strSeconds);
+
 
 int main(int argc, char** argv){
 

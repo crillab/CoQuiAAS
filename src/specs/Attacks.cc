@@ -6,10 +6,11 @@
  * \date 7/11/2014
  */
 
-#include "Attacks.h"
-#include <iostream>
 
-using namespace std;
+#include "Attacks.h"
+
+
+using namespace CoQuiAAS;
 
 
 Attacks::Attacks(VarMap *vm) : varMap(*vm) {
@@ -18,7 +19,7 @@ Attacks::Attacks(VarMap *vm) : varMap(*vm) {
 }
 
 
-void Attacks::addAttack(string from, string to) {
+void Attacks::addAttack(std::string from, std::string to) {
   int fromVar = varMap.getVar(from);
   int toVar = varMap.getVar(to);
   attacks[toVar].push_back(fromVar);
@@ -28,7 +29,7 @@ void Attacks::addAttack(string from, string to) {
     varMap.setSelfAttacking(from,true);
 }
 
-vector<int> *Attacks::getAttacksTo(int var) {
+std::vector<int> *Attacks::getAttacksTo(int var) {
   return &attacks[var];
 }
 
