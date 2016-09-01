@@ -26,7 +26,8 @@ AM_INIT_AUTOMAKE(subdir-objects)
 
 AC_PROG_LIBTOOL
 
-: ${CXXFLAGS= -O3 -DCOQUIAAS_VERSION="2.0"}
+: ${CXXFLAGS= -std=c++11 -Wno-literal-suffix -O3 -DCOQUIAAS_VERSION="2.0"}
+dnl : ${CXXFLAGS= -std=c++11 -Wno-literal-suffix -g -O0 -DCOQUIAAS_VERSION="2.0"}
 AC_PROG_CXX
 
 AC_OUTPUT(Makefile resources/Makefile src/Makefile doc/Makefile)

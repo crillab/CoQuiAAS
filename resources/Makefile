@@ -127,7 +127,7 @@ CPPFLAGS =
 CXX = g++
 CXXCPP = g++ -E
 CXXDEPMODE = depmode=gcc3
-CXXFLAGS =  -O3 -DCOQUIAAS_VERSION=2.0
+CXXFLAGS =  -std=c++11 -Wno-literal-suffix -O3 -DCOQUIAAS_VERSION=2.0
 CYGPATH_W = echo
 DEFS = -DHAVE_CONFIG_H
 DEPDIR = .deps

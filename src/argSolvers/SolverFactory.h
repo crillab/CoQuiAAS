@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <string>
 #include <map>
+#include <initializer_list>
 
 #include "DefaultStableSemanticsSolver.h"
 #include "DefaultCompleteSemanticsSolver.h"
@@ -14,6 +15,7 @@
 #include "ExternalSatSolver.h"
 #include "BuiltInMssSolver.h"
 #include "ExternalMssSolver.h"
+#include "MultiSolver.h"
 
 
 namespace CoQuiAAS {
@@ -70,6 +72,16 @@ public:
 		}
 		return new BuiltInMssSolver();
 	}
+
+
+	static SemanticsProblemSolver *buildPortfolioBasedProblem(TaskType task, Attacks &attacks, VarMap &varMap, std::initializer_list<SemanticsProblemSolver*> solverList) {
+		std::vector<SemanticsProblemSolver*> *solvers = new std::vector<SemanticsProblemSolver*>;
+		for(auto solver : solverList) {
+			solvers->push_back(solver);
+		}
+		return new MultiSolver(attacks, varMap, task, *solvers);
+	}
+
 
 	/**
 	 * \fn getProblemInstance(SemanticName,TaskType,std::string)

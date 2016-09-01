@@ -11814,7 +11814,7 @@ CC="$lt_save_CC"
 
 
 
-: ${CXXFLAGS= -O3 -DCOQUIAAS_VERSION="2.0"}
+: ${CXXFLAGS= -std=c++11 -Wno-literal-suffix -O3 -DCOQUIAAS_VERSION="2.0"}
 ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
