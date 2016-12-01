@@ -23,13 +23,17 @@ public:
 
 	SatEncodingHelper(SatSolver &solver, Attacks& attacks, VarMap& varMap);
 
+	int reserveVars(int n);
+
+	int reserveDisjunctionVars();
+
 	void createAttackersDisjunctionVars(int startId);
 
-	void createCompleteEncodingConstraints(int attackersDisjunctionFirstVar);
+	void createCompleteEncodingConstraints(int startId);
 
 	void createStableEncodingConstraints();
 
-	void createStableEncodingConstraints(int attackersDisjunctionFirstVar);
+	void createStableEncodingConstraints(int startId);
 
 	virtual ~SatEncodingHelper();
 

@@ -33,11 +33,7 @@ void BuiltInMssSolver::computeMss() {
 
 void BuiltInMssSolver::computeMss(std::vector<int> &assumps) {
 	solver.setSoftInstance(true);
-	Minisat::vec<Minisat::Lit> minisatAssumps;
-	for(vector<int>::iterator itVars = assumps.begin(); itVars != assumps.end(); ++itVars) {
-		int var = *itVars;
-		minisatAssumps.push(*itVars > 0 ? Minisat::mkLit(var) : ~Minisat::mkLit(var));
-	}
+	solver.bigRestart();
 	solver.optSaveMCS = true;
 	solver.verbosity = 0;
 	solver.extractCoMSS();
@@ -54,11 +50,7 @@ void BuiltInMssSolver::computeAllMss() {
 
 void BuiltInMssSolver::computeAllMss(std::vector<int> &assumps) {
 	solver.setSoftInstance(true);
-	Minisat::vec<Minisat::Lit> minisatAssumps;
-	for(vector<int>::iterator itVars = assumps.begin(); itVars != assumps.end(); ++itVars) {
-		int var = *itVars;
-		minisatAssumps.push(*itVars > 0 ? Minisat::mkLit(var) : ~Minisat::mkLit(var));
-	}
+	solver.bigRestart();
 	solver.optSaveMCS = true;
 	solver.verbosity = 0;
 	solver.enumAllCoMssBlocked();
@@ -66,6 +58,7 @@ void BuiltInMssSolver::computeAllMss(std::vector<int> &assumps) {
 		vector<int> mss = extractMssFromCoMss(solver.computedMCS[i], this->nSoftCstrs);
 		this->mss.push_back(mss);
 	}
+	solver.foundUnsat = false;
 }
 
 
@@ -109,12 +102,15 @@ bool BuiltInMssSolver::isPropagatedAtDecisionLvlZero(int lit) {
 
 
 void BuiltInMssSolver::computeModel() {
+	solver.bigRestart();
 	solver.setSoftInstance(false);
+	solver.useAsCompleteSolver();
 	BuiltInSatSolver::computeModel();
 }
 
 
 void BuiltInMssSolver::computeModel(std::vector<int> &assumps) {
+	solver.bigRestart();
 	solver.setSoftInstance(false);
 	solver.useAsCompleteSolver();
 	BuiltInSatSolver::computeModel(assumps);
@@ -122,13 +118,20 @@ void BuiltInMssSolver::computeModel(std::vector<int> &assumps) {
 
 
 void BuiltInMssSolver::computeAllModels() {
+	solver.verbosity = 0;
+	//
+	solver.bigRestart();
 	solver.setSoftInstance(false);
+	solver.optSaveMCS = false;
+	solver.useAsCompleteSolver();
 	BuiltInSatSolver::computeAllModels();
 }
 
 
 void BuiltInMssSolver::computeAllModels(std::vector<int> &assumps) {
+	solver.bigRestart();
 	solver.setSoftInstance(false);
+	solver.useAsCompleteSolver();
 	BuiltInSatSolver::computeAllModels(assumps);
 }
 

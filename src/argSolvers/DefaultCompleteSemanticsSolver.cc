@@ -17,9 +17,9 @@ DefaultCompleteSemanticsSolver::DefaultCompleteSemanticsSolver(SatSolver &solver
 
 void DefaultCompleteSemanticsSolver::init() {
 	SatEncodingHelper helper(solver, attacks, varMap);
-	int nVars = varMap.nVars();
-	helper.createAttackersDisjunctionVars(nVars);
-	helper.createCompleteEncodingConstraints(nVars);
+	int disjId = helper.reserveDisjunctionVars();
+	helper.createAttackersDisjunctionVars(disjId);
+	helper.createCompleteEncodingConstraints(disjId);
 }
 
 

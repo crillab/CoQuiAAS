@@ -15,7 +15,6 @@
 #include "ExternalSatSolver.h"
 #include "BuiltInMssSolver.h"
 #include "ExternalMssSolver.h"
-#include "MultiSolver.h"
 
 
 namespace CoQuiAAS {
@@ -56,6 +55,7 @@ public:
 		if(!str.compare("CO")) return SEM_COMPLETE;
 		if(!str.compare("GR")) return SEM_GROUNDED;
 		if(!str.compare("PR")) return SEM_PREFERRED;
+		if(!str.compare("SST")) return SEM_SEMISTABLE;
 		return SEM_UNDEFINED;
 	}
 
@@ -67,20 +67,12 @@ public:
 	}
 
 	static MssSolver *createMssSolver(std::map<std::string,std::string> *additionalParams) {
-		if(additionalParams->find("-externalCoMSSSolver") != additionalParams->end()) {
-			return new ExternalMssSolver((*additionalParams)["-externalCoMSSSolver"]);
+		if(additionalParams->find("-externalCoMssSolver") != additionalParams->end()) {
+			return new ExternalMssSolver((*additionalParams)["-externalCoMssSolver"]);
 		}
 		return new BuiltInMssSolver();
 	}
 
-
-	static SemanticsProblemSolver *buildPortfolioBasedProblem(TaskType task, Attacks &attacks, VarMap &varMap, std::initializer_list<SemanticsProblemSolver*> solverList) {
-		std::vector<SemanticsProblemSolver*> *solvers = new std::vector<SemanticsProblemSolver*>;
-		for(auto solver : solverList) {
-			solvers->push_back(solver);
-		}
-		return new MultiSolver(attacks, varMap, task, *solvers);
-	}
 
 
 	/**

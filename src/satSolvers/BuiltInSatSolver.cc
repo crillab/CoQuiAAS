@@ -80,7 +80,9 @@ void BuiltInSatSolver::extractBuiltInSolverModel() {
 	std::vector<bool> newModel;
 	for(int i=0; i<this->nVars; ++i) {
 		newModel.push_back(solver.model[i] == MINISAT_LBOOL_TRUE);
+		std::cout << (solver.model[i] == MINISAT_LBOOL_TRUE) << " ";
 	}
+	std::cout << std::endl;
 	this->models.push_back(newModel);
 }
 
@@ -93,8 +95,11 @@ void BuiltInSatSolver::computeAllModels() {
 
 void BuiltInSatSolver::computeAllModels(vector<int> &assumps) {
 	unsigned int nbModels = 0;
+	this->models.clear();
 	for(;;) {
+		std::cout << "nclauses: " << solver.nClauses() << std::endl;
 		computeModel(assumps);
+		solver.bigRestart();
 		if(this->models.size() > nbModels) {
 			if(!addBlockingClause()) break;
 			++nbModels;
@@ -110,7 +115,9 @@ bool BuiltInSatSolver::addBlockingClause() {
 	vector<int> intCl;
 	for(int i=0; i<this->nVars; ++i) {
 		intCl.push_back(model[i] ? -(i+1) : i+1);
+		std::cout << (model[i] ? 0 : 1) << " ";
 	}
+	std::cout << "-" << std::endl;
 	return addClause(intCl);
 }
 

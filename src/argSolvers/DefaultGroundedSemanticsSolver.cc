@@ -16,9 +16,9 @@ DefaultGroundedSemanticsSolver::DefaultGroundedSemanticsSolver(SatSolver &satSol
 
 void DefaultGroundedSemanticsSolver::init() {
 	SatEncodingHelper helper(this->solver, this->attacks, this->varMap);
-	int nVars = varMap.nVars();
-	helper.createAttackersDisjunctionVars(nVars);
-	helper.createCompleteEncodingConstraints(nVars);
+	int disjId = helper.reserveDisjunctionVars();
+	helper.createAttackersDisjunctionVars(disjId);
+	helper.createCompleteEncodingConstraints(disjId);
 }
 
 

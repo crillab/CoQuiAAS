@@ -26,6 +26,10 @@ public:
 
 	void setMaxExtensionNeeded();
 
+	int setMaxRangeNeeded(int disjVarsStartId);
+
+	std::vector<int> getMaxRangeSelectorsInMss(int selectorsId, std::vector<int>& mss);
+
 	virtual ~MssEncodingHelper();
 
 private:
