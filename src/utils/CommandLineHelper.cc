@@ -3,7 +3,7 @@
 
 #define CLH_MISS_FORMED_MSG "ERR:: WRONG USAGE: CoQuiAAS -p XX-YYY -fo ZZ -f instanceFile [-a variable] [OPTIONS]\n\
                        where XX in {SE, EE, DC, DS}\n\
-                       where YY in {ST, CO, GR, PR, SST}\n\
+                       where YY in {ST, CO, GR, PR, SST, STG}\n\
                        where ZZ in {apx, cnf, tgf}\n\
                        where \"-a variable\" must be present if XX in {DC, DS}\n\
 \n\
@@ -26,7 +26,10 @@ Jean-Marie Lagniez, Emmanuel Lonca, Jean-Guy Mailly -- {lagniez,lonca}@cril.fr, 
 
 #define CLH_SUPPORTED_FORMATS_MSG "[apx,cnf,tgf]"
 
-#define CLH_SUPPORTED_PROBLEMS_MSG "[SE-ST,SE-CO,SE-GR,SE-PR,SE-SST,EE-ST,EE-CO,EE-GR,EE-PR,EE-SST,DC-ST,DC-CO,DC-GR,DC-PR,DC-SST,DS-ST,DS-CO,DS-GR,DS-PR,DS-SST]"
+#define CLH_SUPPORTED_PROBLEMS_MSG "[SE-ST,SE-CO,SE-GR,SE-PR,SE-SST,SE-STG,"\
+									"EE-ST,EE-CO,EE-GR,EE-PR,EE-SST,EE-STG,"\
+									"DC-ST,DC-CO,DC-GR,DC-PR,DC-SST,DC-STG,"\
+									"DS-ST,DS-CO,DS-GR,DS-PR,DS-SST,DS-STG]"
 
 #define FLAG_SET "FLAG_SET"
 

@@ -29,6 +29,8 @@ public:
 
 	void createAttackersDisjunctionVars(int startId);
 
+	void createConflictFreenessEncodingConstraints(int startId);
+
 	void createCompleteEncodingConstraints(int startId);
 
 	void createStableEncodingConstraints();

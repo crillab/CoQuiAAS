@@ -77,6 +77,23 @@ void SatEncodingHelper::createCompleteEncodingConstraints(int startId) {
 }
 
 
+void SatEncodingHelper::createConflictFreenessEncodingConstraints(int startId) {
+	std::vector<int> binaryCl;
+	std::vector<int, std::allocator<int> >* vars = varMap.intVars();
+	for(std::vector<int>::iterator itVars = vars->begin() ; itVars != vars->end(); ++itVars) {
+		int var = *itVars;
+		std::vector<int, std::allocator<int> >* attacksToCurrentVar = attacks.getAttacksTo(var);
+		for(std::vector<int>::iterator itAttackers = attacksToCurrentVar->begin(); itAttackers != attacksToCurrentVar->end(); ++itAttackers) {
+			int attacker = *itAttackers;
+			binaryCl.push_back(-var);
+			binaryCl.push_back(-attacker); // -a \lor -b
+			solver.addClause(binaryCl);
+			binaryCl.clear();
+		}
+	}
+}
+
+
 void SatEncodingHelper::createStableEncodingConstraints() {
 	std::vector<int> binaryCl, completeCl;
 	std::vector<int, std::allocator<int> >* vars = varMap.intVars();
