@@ -55,6 +55,14 @@ protected:
 			minisatCl.push(minisatLit);
 		}
 	}
+
+	static void printModel(std::vector<bool>& model) {
+		int size = (int) model.size();
+		for(int i=1; i<=size; ++i) {
+			std::cout << (model[i-1] ? i : -i) << " ";
+		}
+		std::cout << 0 << std::endl;
+	}
 };
 
 

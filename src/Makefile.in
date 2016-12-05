@@ -119,15 +119,18 @@ am__objects_2 = ./parser/AspartixFormatParser.$(OBJEXT) \
 	./parser/TrivialGraphFormatParser.$(OBJEXT)
 am__objects_3 = argSolvers/SatEncodingHelper.$(OBJEXT) \
 	argSolvers/MssEncodingHelper.$(OBJEXT) \
+	argSolvers/MaxSatEncodingHelper.$(OBJEXT) \
 	argSolvers/DefaultCompleteSemanticsSolver.$(OBJEXT) \
 	argSolvers/SemanticsProblemSolver.$(OBJEXT) \
 	argSolvers/DefaultGroundedSemanticsSolver.$(OBJEXT) \
 	argSolvers/DefaultPreferredSemanticsSolver.$(OBJEXT) \
-	argSolvers/DefaultStableSemanticsSolver.$(OBJEXT)
+	argSolvers/DefaultStableSemanticsSolver.$(OBJEXT) \
+	argSolvers/DefaultSemistableSemanticsSolver.$(OBJEXT)
 am__objects_4 = satSolvers/ExternalSatSolver.$(OBJEXT) \
 	satSolvers/BuiltInMssSolver.$(OBJEXT) \
 	satSolvers/BuiltInSatSolver.$(OBJEXT) \
-	satSolvers/ExternalMssSolver.$(OBJEXT)
+	satSolvers/ExternalMssSolver.$(OBJEXT) \
+	satSolvers/ExternalMaxSatSolver.$(OBJEXT)
 am__objects_5 = ./utils/DefaultStatMap.$(OBJEXT) \
 	./utils/FakeStatMap.$(OBJEXT) \
 	./utils/CommandLineHelper.$(OBJEXT) \
@@ -366,8 +369,8 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CPPFLAGS = -g -Wall -Wno-parentheses -D __STDC_LIMIT_MACROS -D __STDC_FORMAT_MACROS -I$(srcdir)/specs -I$(srcdir)/utils -I$(srcdir)/parser -I$(srcdir)/satSolvers -I$(srcdir)/argSolvers -I$(top_srcdir)/resources/comssextractor/
-satSolversDirSources = satSolvers/SatSolver.h satSolvers/MssSolver.h satSolvers/ExternalSatSolver.cc satSolvers/ExternalSatSolver.h satSolvers/BuiltInMssSolver.cc satSolvers/BuiltInMssSolver.h satSolvers/BuiltInSatSolver.cc satSolvers/BuiltInSatSolver.h satSolvers/ExternalMssSolver.cc satSolvers/ExternalMssSolver.h
-argSolversDirSources = argSolvers/SolverFactory.h argSolvers/SatEncodingHelper.cc argSolvers/SatEncodingHelper.h argSolvers/MssEncodingHelper.cc argSolvers/MssEncodingHelper.h argSolvers/DefaultCompleteSemanticsSolver.cc argSolvers/DefaultCompleteSemanticsSolver.h argSolvers/SemanticsProblemSolver.cc argSolvers/SemanticsProblemSolver.h argSolvers/DefaultGroundedSemanticsSolver.cc argSolvers/DefaultGroundedSemanticsSolver.h argSolvers/DefaultPreferredSemanticsSolver.cc argSolvers/DefaultPreferredSemanticsSolver.h argSolvers/DefaultStableSemanticsSolver.cc argSolvers/DefaultStableSemanticsSolver.h
+satSolversDirSources = satSolvers/SatSolver.h satSolvers/MssSolver.h satSolvers/ExternalSatSolver.cc satSolvers/ExternalSatSolver.h satSolvers/BuiltInMssSolver.cc satSolvers/BuiltInMssSolver.h satSolvers/BuiltInSatSolver.cc satSolvers/BuiltInSatSolver.h satSolvers/ExternalMssSolver.cc satSolvers/ExternalMssSolver.h satSolvers/MaxSatSolver.h satSolvers/ExternalMaxSatSolver.h satSolvers/ExternalMaxSatSolver.cc
+argSolversDirSources = argSolvers/SolverFactory.h argSolvers/SatEncodingHelper.cc argSolvers/SatEncodingHelper.h argSolvers/MssEncodingHelper.cc argSolvers/MssEncodingHelper.h argSolvers/MaxSatEncodingHelper.cc argSolvers/MaxSatEncodingHelper.h argSolvers/DefaultCompleteSemanticsSolver.cc argSolvers/DefaultCompleteSemanticsSolver.h argSolvers/SemanticsProblemSolver.cc argSolvers/SemanticsProblemSolver.h argSolvers/DefaultGroundedSemanticsSolver.cc argSolvers/DefaultGroundedSemanticsSolver.h argSolvers/DefaultPreferredSemanticsSolver.cc argSolvers/DefaultPreferredSemanticsSolver.h argSolvers/DefaultStableSemanticsSolver.cc argSolvers/DefaultStableSemanticsSolver.h argSolvers/DefaultSemistableSemanticsSolver.cc argSolvers/DefaultSemistableSemanticsSolver.h
 specsDirSources = ./specs/VarMap.cc ./specs/VarMap.h ./specs/Attacks.cc ./specs/Attacks.h ./specs/Types.h
 parserDirSources = ./parser/AspartixFormatParser.cc ./parser/AspartixFormatParser.h ./parser/CNFFormatParser.cc ./parser/CNFFormatParser.h ./parser/TrivialGraphFormatParser.cc ./parser/TrivialGraphFormatParser.h ./parser/IParser.h ./parser/ParserFactory.h
 utilsDirSources = ./utils/DefaultStatMap.cc ./utils/DefaultStatMap.h ./utils/FakeStatMap.cc ./utils/FakeStatMap.h ./utils/CommandLineHelper.cc ./utils/CommandLineHelper.h ./utils/LogStatMap.cc ./utils/LogStatMap.h ./utils/StatMap.h ./utils/StatMapFactory.h
@@ -463,6 +466,8 @@ argSolvers/SatEncodingHelper.$(OBJEXT): argSolvers/$(am__dirstamp) \
 	argSolvers/$(DEPDIR)/$(am__dirstamp)
 argSolvers/MssEncodingHelper.$(OBJEXT): argSolvers/$(am__dirstamp) \
 	argSolvers/$(DEPDIR)/$(am__dirstamp)
+argSolvers/MaxSatEncodingHelper.$(OBJEXT): argSolvers/$(am__dirstamp) \
+	argSolvers/$(DEPDIR)/$(am__dirstamp)
 argSolvers/DefaultCompleteSemanticsSolver.$(OBJEXT):  \
 	argSolvers/$(am__dirstamp) \
 	argSolvers/$(DEPDIR)/$(am__dirstamp)
@@ -478,6 +483,9 @@ argSolvers/DefaultPreferredSemanticsSolver.$(OBJEXT):  \
 argSolvers/DefaultStableSemanticsSolver.$(OBJEXT):  \
 	argSolvers/$(am__dirstamp) \
 	argSolvers/$(DEPDIR)/$(am__dirstamp)
+argSolvers/DefaultSemistableSemanticsSolver.$(OBJEXT):  \
+	argSolvers/$(am__dirstamp) \
+	argSolvers/$(DEPDIR)/$(am__dirstamp)
 satSolvers/$(am__dirstamp):
 	@$(MKDIR_P) satSolvers
 	@: > satSolvers/$(am__dirstamp)
@@ -491,6 +499,8 @@ satSolvers/BuiltInMssSolver.$(OBJEXT): satSolvers/$(am__dirstamp) \
 satSolvers/BuiltInSatSolver.$(OBJEXT): satSolvers/$(am__dirstamp) \
 	satSolvers/$(DEPDIR)/$(am__dirstamp)
 satSolvers/ExternalMssSolver.$(OBJEXT): satSolvers/$(am__dirstamp) \
+	satSolvers/$(DEPDIR)/$(am__dirstamp)
+satSolvers/ExternalMaxSatSolver.$(OBJEXT): satSolvers/$(am__dirstamp) \
 	satSolvers/$(DEPDIR)/$(am__dirstamp)
 utils/$(am__dirstamp):
 	@$(MKDIR_P) ./utils
@@ -603,12 +613,15 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@argSolvers/$(DEPDIR)/DefaultCompleteSemanticsSolver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@argSolvers/$(DEPDIR)/DefaultGroundedSemanticsSolver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@argSolvers/$(DEPDIR)/DefaultPreferredSemanticsSolver.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@argSolvers/$(DEPDIR)/DefaultSemistableSemanticsSolver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@argSolvers/$(DEPDIR)/DefaultStableSemanticsSolver.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@argSolvers/$(DEPDIR)/MaxSatEncodingHelper.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@argSolvers/$(DEPDIR)/MssEncodingHelper.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@argSolvers/$(DEPDIR)/SatEncodingHelper.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@argSolvers/$(DEPDIR)/SemanticsProblemSolver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@satSolvers/$(DEPDIR)/BuiltInMssSolver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@satSolvers/$(DEPDIR)/BuiltInSatSolver.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@satSolvers/$(DEPDIR)/ExternalMaxSatSolver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@satSolvers/$(DEPDIR)/ExternalMssSolver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@satSolvers/$(DEPDIR)/ExternalSatSolver.Po@am__quote@
 

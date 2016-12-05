@@ -72,15 +72,16 @@ protected:
 
 	virtual void handleForkChild(std::string instanceFile, int pipe[]);
 
-private :
-
-	std::string command;
+	void addBlockingClause();
 
 	std::vector<std::vector<bool> > models;
 
 	void extractModel(char buffer[], FILE *childOutFile);
 
-	void addBlockingClause();
+private :
+
+	std::string command;
+
 };
 
 

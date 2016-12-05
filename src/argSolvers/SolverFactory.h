@@ -8,6 +8,7 @@
 #include <initializer_list>
 
 #include "DefaultStableSemanticsSolver.h"
+#include "DefaultSemistableSemanticsSolver.h"
 #include "DefaultCompleteSemanticsSolver.h"
 #include "DefaultGroundedSemanticsSolver.h"
 #include "DefaultPreferredSemanticsSolver.h"
@@ -15,6 +16,7 @@
 #include "ExternalSatSolver.h"
 #include "BuiltInMssSolver.h"
 #include "ExternalMssSolver.h"
+#include "ExternalMaxSatSolver.h"
 
 
 namespace CoQuiAAS {
@@ -73,6 +75,14 @@ public:
 		return new BuiltInMssSolver();
 	}
 
+	static MaxSatSolver *createMaxSatSolver(std::map<std::string,std::string> *additionalParams) {
+		if(additionalParams->find("-externalMaxSatSolver") != additionalParams->end()) {
+			return new ExternalMaxSatSolver((*additionalParams)["-externalMaxSatSolver"]);
+		}
+		// return new BuiltInMssSolver();
+		throw "No builtin solver yet";
+	}
+
 
 
 	/**
@@ -93,6 +103,8 @@ public:
 			return new DefaultGroundedSemanticsSolver(*createSatSolver(additionalParams), attacks, varMap, task);
 		case SEM_PREFERRED:
 			return new DefaultPreferredSemanticsSolver(*createMssSolver(additionalParams), attacks, varMap, task);
+		case SEM_SEMISTABLE:
+			return new DefaultSemistableSemanticsSolver(*createMaxSatSolver(additionalParams), attacks, varMap, task);
 		default:
 			return NULL;
 		}
