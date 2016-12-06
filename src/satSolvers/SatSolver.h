@@ -26,6 +26,8 @@ public:
 
 	virtual bool addClause(std::vector<int> &clause) = 0;
 
+	virtual int addSelectedClause(std::vector<int> &clause) = 0;
+
 	virtual std::vector<int>& propagatedAtDecisionLvlZero() = 0;
 
 	virtual bool isPropagatedAtDecisionLvlZero(int lit) = 0;

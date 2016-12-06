@@ -121,6 +121,7 @@ void ExternalMssSolver::computeAllMss() {
 
 void ExternalMssSolver::computeAllMss(std::vector<int> &assumps) {
 	unsigned int nbMss = 0;
+	std::vector<int> blockingSelectors;
 	for(;;) {
 		computeMss(assumps);
 		if(this->mss.size() > nbMss) {
@@ -134,12 +135,19 @@ void ExternalMssSolver::computeAllMss(std::vector<int> &assumps) {
 			for(unsigned int i=0; i<opposite.size(); ++i) {
 				if(opposite[i] > 0) blocking.push_back(opposite[i]);
 			}
-			addClause(blocking);
+			int sel = addSelectedClause(blocking);
+			blockingSelectors.push_back(sel);
+			assumps.push_back(sel);
 			++nbMss;
 		} else {
 			break;
 		}
 	}
+	for(int i=0; i<(int) blockingSelectors.size(); ++i) {
+			std::vector<int> cl;
+			cl.push_back(-blockingSelectors[i]);
+			addClause(cl);
+		}
 }
 
 
