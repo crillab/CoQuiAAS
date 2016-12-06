@@ -89,6 +89,11 @@ bool BuiltInMssSolver::addClause(std::vector<int> &clause) {
 }
 
 
+int BuiltInMssSolver::addSelectedClause(std::vector<int> &clause) {
+	return BuiltInSatSolver::addSelectedClause(clause);
+}
+
+
 std::vector<int>& BuiltInMssSolver::propagatedAtDecisionLvlZero() {
 	solver.setSoftInstance(false);
 	return BuiltInSatSolver::propagatedAtDecisionLvlZero();

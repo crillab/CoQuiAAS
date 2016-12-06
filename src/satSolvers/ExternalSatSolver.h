@@ -38,6 +38,8 @@ public:
 
 	virtual bool addClause(std::vector<int> &clause);
 
+	virtual int addSelectedClause(std::vector<int> &clause);
+
 	virtual std::vector<int>& propagatedAtDecisionLvlZero();
 
 	virtual bool isPropagatedAtDecisionLvlZero(int lit);
@@ -72,7 +74,7 @@ protected:
 
 	virtual void handleForkChild(std::string instanceFile, int pipe[]);
 
-	void addBlockingClause();
+	int addBlockingClause();
 
 	std::vector<std::vector<bool> > models;
 

@@ -34,6 +34,8 @@ public:
 
 	virtual bool addClause(std::vector<int> &clause);
 
+	virtual int addSelectedClause(std::vector<int> &clause);
+
 	virtual std::vector<int>& propagatedAtDecisionLvlZero();
 
 	virtual bool isPropagatedAtDecisionLvlZero(int lit);
@@ -68,7 +70,7 @@ protected:
 
 	void extractBuiltInSolverModel();
 
-	bool addBlockingClause();
+	int addBlockingClause();
 };
 
 

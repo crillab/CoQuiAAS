@@ -34,6 +34,15 @@ bool ExternalSatSolver::addClause(std::vector<int> &clause) {
 }
 
 
+int ExternalSatSolver::addSelectedClause(std::vector<int> &clause) {
+	addVariables(1);
+	int selector = this->nVars;
+	clause.push_back(-selector);
+	addClause(clause);
+	return selector;
+}
+
+
 std::vector<int>& ExternalSatSolver::propagatedAtDecisionLvlZero() {
 	std::cerr << "operation unavailable for external solver" << std::endl;
 	exit(1);
@@ -172,25 +181,33 @@ void ExternalSatSolver::computeAllModels() {
 
 void ExternalSatSolver::computeAllModels(std::vector<int> &assumps) {
 	unsigned int nbModels = 0;
+	std::vector<int> blockingSelectors;
 	for(;;) {
 		computeModel(assumps);
 		if(this->models.size() > nbModels) {
-			addBlockingClause();
+			int sel = addBlockingClause();
+			blockingSelectors.push_back(sel);
+			assumps.push_back(sel);
 			++nbModels;
 		} else {
 			break;
 		}
 	}
+	for(int i=0; i<(int) nbModels; ++i) {
+		std::vector<int> cl;
+		cl.push_back(-blockingSelectors[i]);
+		addClause(cl);
+	}
 }
 
 
-void ExternalSatSolver::addBlockingClause() {
+int ExternalSatSolver::addBlockingClause() {
 	std::vector<bool> model = this->models[this->models.size() - 1];
 	std::vector<int> intCl;
 	for(int i=0; i<this->nVars; ++i) {
 		intCl.push_back(model[i] ? -(i+1) : i+1);
 	}
-	addClause(intCl);
+	return addSelectedClause(intCl);
 }
 
 

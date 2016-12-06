@@ -47,6 +47,7 @@ public:
 
 	virtual void addVariables(int nVars);
 	virtual bool addClause(std::vector<int> &clause);
+	virtual int addSelectedClause(std::vector<int> &clause);
 	virtual std::vector<int>& propagatedAtDecisionLvlZero();
 	virtual bool isPropagatedAtDecisionLvlZero(int lit);
 	virtual void computeModel();

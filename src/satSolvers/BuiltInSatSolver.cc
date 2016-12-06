@@ -35,6 +35,15 @@ bool BuiltInSatSolver::addClause(std::vector<int> &clause) {
 }
 
 
+int BuiltInSatSolver::addSelectedClause(std::vector<int> &clause) {
+	addVariables(1);
+	int selector = this->nVars;
+	clause.push_back(-selector);
+	addClause(clause);
+	return selector;
+}
+
+
 std::vector<int>& BuiltInSatSolver::propagatedAtDecisionLvlZero() {
 	solver.useAsCompleteSolver();
 	solver.propagate();
@@ -93,27 +102,35 @@ void BuiltInSatSolver::computeAllModels() {
 
 void BuiltInSatSolver::computeAllModels(vector<int> &assumps) {
 	unsigned int nbModels = 0;
+	std::vector<int> blockingSelectors;
 	this->models.clear();
 	for(;;) {
 		computeModel(assumps);
 		solver.bigRestart();
 		if(this->models.size() > nbModels) {
-			if(!addBlockingClause()) break;
+			int sel = addBlockingClause();
+			blockingSelectors.push_back(sel);
+			assumps.push_back(sel);
 			++nbModels;
 		} else {
 			break;
 		}
 	}
+	for(int i=0; i<(int) nbModels; ++i) {
+		std::vector<int> cl;
+		cl.push_back(-blockingSelectors[i]);
+		addClause(cl);
+	}
 }
 
 
-bool BuiltInSatSolver::addBlockingClause() {
+int BuiltInSatSolver::addBlockingClause() {
 	vector<bool> model = this->models[this->models.size() - 1];
 	vector<int> intCl;
 	for(int i=0; i<this->nVars; ++i) {
 		intCl.push_back(model[i] ? -(i+1) : i+1);
 	}
-	return addClause(intCl);
+	return addSelectedClause(intCl);
 }
 
 

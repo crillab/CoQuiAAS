@@ -170,6 +170,10 @@ bool ExternalMssSolver::addClause(std::vector<int> &clause) {
 	return ExternalSatSolver::addClause(clause);
 }
 
+int ExternalMssSolver::addSelectedClause(std::vector<int> &clause) {
+	return ExternalSatSolver::addSelectedClause(clause);
+}
+
 
 std::vector<int>& ExternalMssSolver::propagatedAtDecisionLvlZero() {
 	return ExternalSatSolver::propagatedAtDecisionLvlZero();

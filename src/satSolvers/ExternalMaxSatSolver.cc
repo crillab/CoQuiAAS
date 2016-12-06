@@ -139,6 +139,10 @@ bool ExternalMaxSatSolver::addClause(std::vector<int> &clause) {
 	return ExternalSatSolver::addClause(clause);
 }
 
+int ExternalMaxSatSolver::addSelectedClause(std::vector<int> &clause) {
+	return ExternalSatSolver::addSelectedClause(clause);
+}
+
 
 std::vector<int>& ExternalMaxSatSolver::propagatedAtDecisionLvlZero() {
 	return ExternalSatSolver::propagatedAtDecisionLvlZero();
