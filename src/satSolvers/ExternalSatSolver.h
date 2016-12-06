@@ -48,6 +48,8 @@ public:
 
 	virtual void computeModel(std::vector<int> &assumps);
 
+	virtual void computeModel(std::vector<int> &assumps, bool clearModelVec);
+
 	virtual void computeAllModels();
 
 	virtual void computeAllModels(std::vector<int> &assumps);

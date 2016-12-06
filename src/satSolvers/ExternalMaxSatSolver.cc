@@ -36,6 +36,12 @@ void ExternalMaxSatSolver::computeMaxSat() {
 
 
 void ExternalMaxSatSolver::computeMaxSat(std::vector<int> &assumps) {
+	computeMaxSat(assumps, true);
+}
+
+
+void ExternalMaxSatSolver::computeMaxSat(std::vector<int> &assumps, bool clearModelVec) {
+	if(clearModelVec) this->models.clear();
 	char *tmpname = strdup("/tmp/tmp_CoQuiASS_ext_XXXXXX");
 	if(-1==mkstemp(tmpname)) {
 		perror("ExternalSatBasedSolver::hasAModel::mkstemp");
@@ -104,8 +110,9 @@ void ExternalMaxSatSolver::computeAllMaxSat() {
 
 
 void ExternalMaxSatSolver::computeAllMaxSat(std::vector<int> &assumps) {
+	this->models.clear();
 	for(;;) {
-		computeMaxSat(assumps);
+		computeMaxSat(assumps, false);
 		if(this->lastObjValue > this->optValue) break;
 		addBlockingClause();
 	}

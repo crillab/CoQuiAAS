@@ -31,6 +31,8 @@ public :
 
 	virtual void computeMaxSat(std::vector<int> &assumps);
 
+	virtual void computeMaxSat(std::vector<int> &assumps, bool clearModelVec);
+
 	virtual void computeAllMaxSat();
 
 	virtual void computeAllMaxSat(std::vector<int> &assumps);

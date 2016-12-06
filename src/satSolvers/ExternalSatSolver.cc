@@ -62,6 +62,12 @@ void ExternalSatSolver::computeModel() {
 
 
 void ExternalSatSolver::computeModel(std::vector<int> &assumps) {
+	computeModel(assumps, true);
+}
+
+
+void ExternalSatSolver::computeModel(std::vector<int> &assumps, bool clearModelVec) {
+	if(clearModelVec) this->models.clear();
 	char *tmpname = strdup("/tmp/tmp_CoQuiASS_ext_XXXXXX");
 	if(-1==mkstemp(tmpname)) {
 		perror("ExternalSatBasedSolver::hasAModel::mkstemp");
@@ -180,10 +186,11 @@ void ExternalSatSolver::computeAllModels() {
 
 
 void ExternalSatSolver::computeAllModels(std::vector<int> &assumps) {
+	this->models.clear();
 	unsigned int nbModels = 0;
 	std::vector<int> blockingSelectors;
 	for(;;) {
-		computeModel(assumps);
+		computeModel(assumps, false);
 		if(this->models.size() > nbModels) {
 			int sel = addBlockingClause();
 			blockingSelectors.push_back(sel);

@@ -72,6 +72,12 @@ void BuiltInSatSolver::computeModel() {
 
 
 void BuiltInSatSolver::computeModel(vector<int> &assumps) {
+	computeModel(assumps, true);
+}
+
+
+void BuiltInSatSolver::computeModel(vector<int> &assumps, bool clearModelVec) {
+	if(clearModelVec) this->models.clear();
 	solver.useAsCompleteSolver();
 	Minisat::vec<Minisat::Lit> minisatAssumps;
 	intClauseToBuiltInClause(assumps, minisatAssumps);
@@ -101,11 +107,12 @@ void BuiltInSatSolver::computeAllModels() {
 
 
 void BuiltInSatSolver::computeAllModels(vector<int> &assumps) {
+	this->models.clear();
 	unsigned int nbModels = 0;
 	std::vector<int> blockingSelectors;
 	this->models.clear();
 	for(;;) {
-		computeModel(assumps);
+		computeModel(assumps, false);
 		solver.bigRestart();
 		if(this->models.size() > nbModels) {
 			int sel = addBlockingClause();

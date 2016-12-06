@@ -32,6 +32,7 @@ void BuiltInMssSolver::computeMss() {
 
 
 void BuiltInMssSolver::computeMss(std::vector<int> &assumps) {
+	this->mss.clear();
 	solver.setSoftInstance(true);
 	solver.bigRestart();
 	solver.optSaveMCS = true;
@@ -49,6 +50,7 @@ void BuiltInMssSolver::computeAllMss() {
 
 
 void BuiltInMssSolver::computeAllMss(std::vector<int> &assumps) {
+	this->mss.clear();
 	solver.setSoftInstance(true);
 	solver.bigRestart();
 	solver.optSaveMCS = true;
