@@ -13,6 +13,7 @@
 #include "DefaultCompleteSemanticsSolver.h"
 #include "DefaultGroundedSemanticsSolver.h"
 #include "DefaultPreferredSemanticsSolver.h"
+#include "DefaultIdealSemanticsSolver.h"
 #include "BuiltInSatSolver.h"
 #include "ExternalSatSolver.h"
 #include "BuiltInMssSolver.h"
@@ -60,6 +61,7 @@ public:
 		if(!str.compare("PR")) return SEM_PREFERRED;
 		if(!str.compare("SST")) return SEM_SEMISTABLE;
 		if(!str.compare("STG")) return SEM_STAGE;
+		if(!str.compare("ID")) return SEM_IDEAL;
 		return SEM_UNDEFINED;
 	}
 
@@ -109,6 +111,8 @@ public:
 			return new DefaultSemistableSemanticsSolver(*createMaxSatSolver(additionalParams), attacks, varMap, task);
 		case SEM_STAGE:
 			return new DefaultStageSemanticsSolver(*createMaxSatSolver(additionalParams), attacks, varMap, task);
+		case SEM_IDEAL:
+			return new DefaultIdealSemanticsSolver(*createMssSolver(additionalParams), attacks, varMap, task);
 		default:
 			return NULL;
 		}

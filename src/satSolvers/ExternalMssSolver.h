@@ -32,6 +32,7 @@ public:
 	virtual void computeMss();
 
 	virtual void computeMss(std::vector<int> &assumps);
+	virtual void computeMss(std::vector<int> &assumps, bool clearMssVec);
 
 	virtual void computeAllMss();
 

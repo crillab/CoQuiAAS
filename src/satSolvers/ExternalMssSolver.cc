@@ -34,6 +34,12 @@ void ExternalMssSolver::computeMss() {
 
 
 void ExternalMssSolver::computeMss(std::vector<int> &assumps) {
+	computeMss(assumps, true);
+}
+
+
+void ExternalMssSolver::computeMss(std::vector<int> &assumps, bool clearMssVec) {
+	if(clearMssVec) this->mss.clear();
 	char *tmpname = strdup("/tmp/tmp_CoQuiASS_ext_XXXXXX");
 	if(-1==mkstemp(tmpname)) {
 		perror("ExternalSatBasedSolver::hasAModel::mkstemp");
@@ -51,8 +57,9 @@ void ExternalMssSolver::computeMss(std::vector<int> &assumps) {
 	while (std::getline(hardCstrsStream, line)) {
 		f << hardCstrWeight << " " << line << std::endl;
 	}
-	for(std::vector<int>::iterator it = assumps.begin(); it != assumps.end(); ++it)
+	for(std::vector<int>::iterator it = assumps.begin(); it != assumps.end(); ++it) {
 		f << hardCstrWeight << " " << *it << " 0" << std::endl;
+	}
 	f.close();
 	launchExternalSolver(std::string(tmpname));
 	unlink(tmpname);
@@ -120,10 +127,11 @@ void ExternalMssSolver::computeAllMss() {
 
 
 void ExternalMssSolver::computeAllMss(std::vector<int> &assumps) {
+	this->mss.clear();
 	unsigned int nbMss = 0;
 	std::vector<int> blockingSelectors;
 	for(;;) {
-		computeMss(assumps);
+		computeMss(assumps, false);
 		if(this->mss.size() > nbMss) {
 			std::vector<int> found = this->mss[this->mss.size()-1];
 			std::vector<int> opposite;
