@@ -1,15 +1,27 @@
 #include "CommandLineHelper.h"
 
 
-#define CLH_MISS_FORMED_MSG "ERR:: WRONG USAGE: CoQuiAAS -p XX-YYY -fo ZZ -f instanceFile [-a variable] [OPTIONS]\n\
+#define CLH_MISS_FORMED_MSG "ERR:: WRONG USAGE\n\
+CoQuiAAS invocation:\n\
+  CoQuiAAS -p XX-YYY -fo ZZ -f instanceFile [-a variable] [OPTIONS]\n\
                        where XX in {SE, EE, DC, DS}\n\
                        where YY in {ST, CO, GR, PR, SST, STG}\n\
                        where ZZ in {apx, cnf, tgf}\n\
                        where \"-a variable\" must be present if XX in {DC, DS}\n\
 \n\
-OPTIONS:\n\
+  OPTIONS:\n\
     -externalSatSolver \"satSolver FILE\"     : launch an external SAT solver using the command \"satSolver FILE\" where FILE is replaced by a DIMACS cnf formatted file ; solver output must be compatible with SAT competitions output ; available for XX-ST and XX-CO problems\n\
-    -externalCoMSSSolver \"coMSSSolver FILE\" : launch an external coMSS solver using the command \"coMssSolver FILE\" where FILE is replaced by a DIMACS wcnf formatted file ; solver output must be compatible with coMSSExtractor output ; available for SE-PR and EE-PR problems\n\
+    -externalCoMssSolver \"coMssSolver FILE\" : launch an external coMss solver using the command \"coMssSolver FILE\" where FILE is replaced by a DIMACS wcnf formatted file ; solver output must be compatible with coMSSExtractor output ; available for SE-PR and EE-PR problems\n\
+    -externalMaxSatSolver \"maxSatSolver FILE\" : launch an external MaxSat solver using the command \"maxSatSolver FILE\" where FILE is replaced by a DIMACS wcnf formatted file ; solver output must be compatible with MaxSat competition ; available for SST and STG problems\n\
+\n\
+show authors and version:\n\
+  CoQuiAAS\n\
+\n\
+show handled input formats:\n\
+  CoQuiAAS --formats\n\
+\n\
+show handled problems:\n\
+  CoQuiAAS --problems\n\
 "
 #ifndef COQUIAAS_VERSION
 #define CLH_CREDITS_MSG "CoQuiAAS\n\
@@ -92,9 +104,9 @@ void CommandLineHelper::parseCommandLine() {
     }
     assertWellFormed(false);
   }
-  assertWellFormed((taskType!=TASK_UNDEFINED) && (semName!=SEM_UNDEFINED) && (instanceFormat!=FORMAT_UNDEFINED) && (!instanceFile.empty()));
-  assertWellFormed((taskType!=TASK_CRED_INF) || (!additionalParams["-a"].empty()));
-  assertWellFormed((taskType!=TASK_SKEP_INF) || (!additionalParams["-a"].empty()));
+  if (!errorOccured) assertWellFormed((taskType!=TASK_UNDEFINED) && (semName!=SEM_UNDEFINED) && (instanceFormat!=FORMAT_UNDEFINED) && (!instanceFile.empty()));
+  if (!errorOccured) assertWellFormed((taskType!=TASK_CRED_INF) || (!additionalParams["-a"].empty()));
+  if (!errorOccured) assertWellFormed((taskType!=TASK_SKEP_INF) || (!additionalParams["-a"].empty()));
 }
 
 SemanticName CommandLineHelper::getSemanticName() {
