@@ -1098,7 +1098,7 @@ public:
     // end of the Coquillas part
     
     void minCoMssIteration();
-    void extractCoMSS();
+    bool extractCoMSS();
     void enumAllCoMssBlocked();
     void enumAllCoMssTree();
     inline void setSoftInstance(bool soft){solvePartialMaxSAT = soft;}

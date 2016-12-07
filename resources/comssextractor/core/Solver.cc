@@ -1021,7 +1021,7 @@ void Solver::garbageCollect()
 /**
    Extract a coMSS of the current formula.
  */
-void Solver::extractCoMSS()
+bool Solver::extractCoMSS()
 {
   vec<Lit> approxCoMss;
 
@@ -1041,14 +1041,14 @@ void Solver::extractCoMSS()
   manageUnitLiterals(approxCoMss); // add the clause associated to the unit literals  
   for(int i = 0 ; i<unitHardPart.size() ; i++) 
     {
-      if(value(unitHardPart[i]) == l_False){printf("s HARD PART UNSATISFIABLE\n"); exit(30);}
+      if(value(unitHardPart[i]) == l_False){printf("s HARD PART UNSATISFIABLE\n"); return false;}
       if(value(unitHardPart[i]) == l_Undef) uncheckedEnqueue(unitHardPart[i]);
     }
   
   bool res = solve();
   bigRestart();
 
-  if(!res && solvePartialMaxSAT){printf("s HARD PART UNSATISFIABLE\n"); exit(30);}
+  if(!res && solvePartialMaxSAT){printf("s HARD PART UNSATISFIABLE\n"); return false;}
   for(int i = 0 ; i<approxCoMss.size() && res ; i++) res = model[var(approxCoMss[i])] != l_False;  
   if(res && !solvePartialMaxSAT){printSolution(true);}
   if(res) for(int i = 0 ; i<model.size() ; i++) polarity[i] = (model[i] != l_True); 
@@ -1076,6 +1076,7 @@ void Solver::extractCoMSS()
 
   if (verbosity > 0) printSolution(false);
   if (optSaveMCS) saveOneMCSOnTheTrail();
+  return true;
 }// extractCoMSS
 
 
