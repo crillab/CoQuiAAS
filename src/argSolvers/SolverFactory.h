@@ -76,7 +76,9 @@ public:
 		if(additionalParams->find("-externalCoMssSolver") != additionalParams->end()) {
 			return new ExternalMssSolver((*additionalParams)["-externalCoMssSolver"]);
 		}
-		return new BuiltInMssSolver();
+		std::cerr << "ERROR:: no builtin MaxSAT solver" << std::endl;
+		std::exit(1);
+		// return new BuiltInMssSolver();
 	}
 
 	static MaxSatSolver *createMaxSatSolver(std::map<std::string,std::string> *additionalParams) {
@@ -84,7 +86,7 @@ public:
 			return new ExternalMaxSatSolver((*additionalParams)["-externalMaxSatSolver"]);
 		}
 		std::cerr << "ERROR:: no builtin MaxSAT solver" << std::endl;
-			std::exit(1);
+		std::exit(1);
 	}
 
 
