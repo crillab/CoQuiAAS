@@ -80,6 +80,8 @@ protected:
 
 	std::vector<std::vector<bool> > models;
 
+	std::vector<int> blockingSelectors;
+
 	void extractModel(char buffer[], FILE *childOutFile);
 
 	void clearModels();

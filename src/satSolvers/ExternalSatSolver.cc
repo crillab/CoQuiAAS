@@ -57,6 +57,7 @@ bool ExternalSatSolver::isPropagatedAtDecisionLvlZero(int lit) {
 
 void ExternalSatSolver::clearModels() {
 	this->models.clear();
+	this->blockingSelectors.clear();
 }
 
 
@@ -197,20 +198,14 @@ void ExternalSatSolver::computeAllModels() {
 
 void ExternalSatSolver::computeAllModels(std::vector<int> &assumps) {
 	this->models.clear();
-	unsigned int nbModels = 0;
-	std::vector<int> blockingSelectors;
 	for(;;) {
-		computeModel(assumps, false);
-		if(this->models.size() > nbModels) {
-			int sel = addBlockingClause();
-			blockingSelectors.push_back(sel);
-			assumps.push_back(sel);
-			++nbModels;
-		} else {
-			break;
-		}
+		bool modelFound = computeModel(assumps, false);
+		if(!modelFound) break;
+		int sel = addBlockingClause();
+		blockingSelectors.push_back(sel);
+		assumps.push_back(sel);
 	}
-	for(int i=0; i<(int) nbModels; ++i) {
+	for(int i=0; i<(int) this->models.size(); ++i) {
 		std::vector<int> cl;
 		cl.push_back(-blockingSelectors[i]);
 		addClause(cl);

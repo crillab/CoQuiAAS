@@ -113,11 +113,16 @@ void ExternalMaxSatSolver::computeAllMaxSat() {
 
 
 void ExternalMaxSatSolver::computeAllMaxSat(std::vector<int> &assumps) {
-	this->models.clear();
 	for(;;) {
 		computeMaxSat(assumps, false);
 		if(this->lastObjValue > this->optValue) break;
-		addBlockingClause();
+		int sel = addBlockingClause();
+		blockingSelectors.push_back(sel);
+	}
+	for(int i=0; i<(int) blockingSelectors.size(); ++i) {
+		std::vector<int> cl;
+		cl.push_back(-blockingSelectors[i]);
+		addClause(cl);
 	}
 }
 

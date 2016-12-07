@@ -29,6 +29,7 @@ void ExternalMssSolver::addSoftClause(std::vector<int> &clause) {
 
 void ExternalMssSolver::clearMss() {
 	this->mss.clear();
+	this->blockingSelectors.clear();
 }
 
 
@@ -136,7 +137,6 @@ void ExternalMssSolver::computeAllMss() {
 
 void ExternalMssSolver::computeAllMss(std::vector<int> &assumps) {
 	clearMss();
-	std::vector<int> blockingSelectors;
 	for(;;) {
 		if(!computeMss(assumps, false)) break;
 		std::vector<int> found = this->mss[this->mss.size()-1];
