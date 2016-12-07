@@ -76,7 +76,7 @@ public:
 		if(additionalParams->find("-externalCoMssSolver") != additionalParams->end()) {
 			return new ExternalMssSolver((*additionalParams)["-externalCoMssSolver"]);
 		}
-		std::cerr << "ERROR:: no builtin MaxSAT solver" << std::endl;
+		std::cerr << "ERROR:: no builtin coMSS solver" << std::endl;
 		std::exit(1);
 		// return new BuiltInMssSolver();
 	}
