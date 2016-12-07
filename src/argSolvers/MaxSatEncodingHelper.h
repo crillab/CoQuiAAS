@@ -24,7 +24,9 @@ public:
 
 	MaxSatEncodingHelper(MaxSatSolver &solver, Attacks& attacks, VarMap& varMap);
 
-	int setMaxRangeNeeded(int disjVarsStartId);
+	void setMaxRangeNeeded(int disjVarsStartId);
+
+	void setMaxExtensionNeeded(int disjVarsStartId);
 
 	virtual ~MaxSatEncodingHelper();
 

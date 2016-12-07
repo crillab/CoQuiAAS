@@ -38,6 +38,8 @@ public:
 private:
 
 	MaxSatSolver &solver;
+
+	std::vector<std::vector<bool> > computeAllMaxInclExtensions();
 };
 
 
