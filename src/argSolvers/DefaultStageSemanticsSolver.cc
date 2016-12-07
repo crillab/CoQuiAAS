@@ -36,12 +36,8 @@ void DefaultStageSemanticsSolver::computeOneExtension() {
 
 
 void DefaultStageSemanticsSolver::computeAllExtensions() {
-	solver.computeAllMaxSat();
-	if(!solver.hasAModel()) {
-		this->answer = "[]";
-	}
+	std::vector<std::vector<bool> > allMs = computeAllMaxInclExtensions();
 	this->answer = "[";
-	std::vector<std::vector<bool> > allMs = solver.getAllMaxSat();
 	int nMs = (signed) allMs.size();
 	for(int i=0; i<nMs-1; ++i) {
 		this->answer = this->answer + modelToString(allMs[i]) + ",";
@@ -51,30 +47,57 @@ void DefaultStageSemanticsSolver::computeAllExtensions() {
 }
 
 
-void DefaultStageSemanticsSolver::isCredulouslyAccepted() {
+std::vector<std::vector<bool> > DefaultStageSemanticsSolver::computeAllMaxInclExtensions() {
+	std::vector<std::vector<bool> > maxExts;
 	std::vector<int> assumps;
-	assumps.push_back(varMap.getVar(this->acceptanceQueryArgument));
-	solver.computeModel(assumps);
-	int optWith = solver.getOptValue();
-	assumps.pop_back();
-	assumps.push_back(-varMap.getVar(this->acceptanceQueryArgument));
-	solver.computeModel(assumps);
-	int optWithout = solver.getOptValue();
-	this->answer = optWith == optWithout ? "YES" : "NO";
+	std::vector<int> selectors;
+	for(;;) {
+		solver.computeMaxSat(assumps);
+		if(!solver.hasAModel()) break;
+		std::vector<bool> maxExt = solver.getMaxSat();
+		maxExts.push_back(maxExt);
+		std::vector<int> blockingCl;
+		for(int i=0; i<(int) maxExt.size(); ++i) {
+			if(!maxExt[i]) {
+				blockingCl.push_back(i+1);
+			}
+		}
+		int selector = solver.addSelectedClause(blockingCl);
+		assumps.push_back(selector);
+		selectors.push_back(selector);
+	}
+	for(int i=0; i<(int) selectors.size(); ++i) {
+		std::vector<int> cl;
+		cl.push_back(-selectors[i]);
+		solver.addClause(cl);
+	}
+	return maxExts;
+}
+
+
+void DefaultStageSemanticsSolver::isCredulouslyAccepted() {
+	std::vector<std::vector<bool> > allMs = computeAllMaxInclExtensions();
+	int arg = varMap.getVar(this->acceptanceQueryArgument);
+	for(unsigned int i=0; i<allMs.size(); ++i) {
+		if(allMs[i][arg-1]) {
+			this->answer = "YES";
+			return;
+		}
+	}
+	this->answer = "NO";
 }
 
 
 void DefaultStageSemanticsSolver::isSkepticallyAccepted() {
-	solver.computeAllMaxSat();
-		std::vector<std::vector<bool> > allMs = solver.getAllMaxSat();
-		int arg = varMap.getVar(this->acceptanceQueryArgument);
-		for(unsigned int i=0; i<allMs.size(); ++i) {
-			if(!allMs[i][arg-1]) {
-				this->answer = "NO";
-				return;
-			}
+	std::vector<std::vector<bool> > allMs = computeAllMaxInclExtensions();
+	int arg = varMap.getVar(this->acceptanceQueryArgument);
+	for(unsigned int i=0; i<allMs.size(); ++i) {
+		if(!allMs[i][arg-1]) {
+			this->answer = "NO";
+			return;
 		}
-		this->answer = "YES";
+	}
+	this->answer = "YES";
 }
 
 
