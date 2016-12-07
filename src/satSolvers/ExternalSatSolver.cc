@@ -55,19 +55,24 @@ bool ExternalSatSolver::isPropagatedAtDecisionLvlZero(int lit) {
 }
 
 
-void ExternalSatSolver::computeModel() {
+void ExternalSatSolver::clearModels() {
+	this->models.clear();
+}
+
+
+bool ExternalSatSolver::computeModel() {
 	std::vector<int> assumps;
-	computeModel(assumps);
+	return computeModel(assumps);
 }
 
 
-void ExternalSatSolver::computeModel(std::vector<int> &assumps) {
-	computeModel(assumps, true);
+bool ExternalSatSolver::computeModel(std::vector<int> &assumps) {
+	return computeModel(assumps, true);
 }
 
 
-void ExternalSatSolver::computeModel(std::vector<int> &assumps, bool clearModelVec) {
-	if(clearModelVec) this->models.clear();
+bool ExternalSatSolver::computeModel(std::vector<int> &assumps, bool clearModelVec) {
+	if(clearModelVec) clearModels();
 	char *tmpname = strdup("/tmp/tmp_CoQuiASS_ext_XXXXXX");
 	if(-1==mkstemp(tmpname)) {
 		perror("ExternalSatBasedSolver::hasAModel::mkstemp");
@@ -79,9 +84,10 @@ void ExternalSatSolver::computeModel(std::vector<int> &assumps, bool clearModelV
 	for(std::vector<int>::iterator it = assumps.begin(); it != assumps.end(); ++it)
 		f << *it << " 0" << std::endl;
 	f.close();
-	launchExternalSolver(std::string(tmpname));
+	int modelFound = launchExternalSolver(std::string(tmpname));
 	unlink(tmpname);
 	free(tmpname);
+	return modelFound;
 }
 
 
@@ -92,35 +98,39 @@ static char *convertToCString(const std::string & s) {
 }
 
 
-void ExternalSatSolver::launchExternalSolver(std::string instanceFile) {
+bool ExternalSatSolver::launchExternalSolver(std::string instanceFile) {
 	pid_t pid;
 	int pfds[2];
 
 	if(-1 == pipe(pfds)) {perror("CoQuiAAS");exit(1);}
 	if(-1 == (pid = fork())) {perror("CoQuiAAS");exit(1);}
 	if(pid > 0) {
-		handleForkAncestor(pfds);
+		return handleForkAncestor(pfds);
 	} else {
 		handleForkChild(instanceFile, pfds);
+		return true; // will never be returned since exec() is called in fork child
 	}
 }
 
 
-void ExternalSatSolver::handleForkAncestor(int pfds[]) {
+bool ExternalSatSolver::handleForkAncestor(int pfds[]) {
+	int modelFound = false;
 	wait(NULL);
 	close(pfds[1]);
 	FILE *childOutFile = fdopen(pfds[0],"r");
 	char buffer[EXTERNAL_SAT_BUFFER_SIZE];
 	while(fgets(buffer, EXTERNAL_SAT_BUFFER_SIZE, childOutFile)) {
 		if(!strncmp(buffer, "s UNSATISFIABLE", 15)) {
-			return;
+			break;
 		}
 		if(!strncmp(buffer, "v ", 2)) {
 			extractModel(buffer, childOutFile);
+			modelFound = true;
 		}
 	}
 	fclose(childOutFile);
 	close(pfds[0]);
+	return modelFound;
 }
 
 
@@ -224,7 +234,7 @@ bool ExternalSatSolver::hasAModel() {
 
 
 std::vector<bool>& ExternalSatSolver::getModel() {
-	return this->models[0];
+	return this->models[this->models.size()-1];
 }
 
 

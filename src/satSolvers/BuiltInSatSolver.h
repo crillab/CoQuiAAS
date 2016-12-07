@@ -40,12 +40,16 @@ public:
 
 	virtual bool isPropagatedAtDecisionLvlZero(int lit);
 
-	virtual void computeModel();
+	virtual bool computeModel();
 
-	virtual void computeModel(std::vector<int> &assumps);
+	virtual bool computeModel(std::vector<int> &assumps);
 
-	virtual void computeModel(std::vector<int> &assumps, bool clearModelVec);
+	virtual bool computeModel(std::vector<int> &assumps, bool clearModelVec);
+/*
+	virtual bool computeAnotherModel();
 
+	virtual bool computeAnotherModel(std::vector<int> &assumps);
+*/
 	virtual void computeAllModels();
 
 	virtual void computeAllModels(std::vector<int> &assumps);
@@ -68,11 +72,15 @@ protected:
 
 	std::vector<std::vector<bool> > models;
 
+	std::vector<int> blockingSelectors;
+
 	std::vector<int> propagated;
 
 	void extractBuiltInSolverModel();
 
 	int addBlockingClause();
+
+	void clearModels();
 };
 
 

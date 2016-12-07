@@ -27,19 +27,24 @@ void ExternalMssSolver::addSoftClause(std::vector<int> &clause) {
 }
 
 
-void ExternalMssSolver::computeMss() {
+void ExternalMssSolver::clearMss() {
+	this->mss.clear();
+}
+
+
+bool ExternalMssSolver::computeMss() {
 	std::vector<int> assumps;
-	computeMss(assumps);
+	return computeMss(assumps);
 }
 
 
-void ExternalMssSolver::computeMss(std::vector<int> &assumps) {
-	computeMss(assumps, true);
+bool ExternalMssSolver::computeMss(std::vector<int> &assumps) {
+	return computeMss(assumps, true);
 }
 
 
-void ExternalMssSolver::computeMss(std::vector<int> &assumps, bool clearMssVec) {
-	if(clearMssVec) this->mss.clear();
+bool ExternalMssSolver::computeMss(std::vector<int> &assumps, bool clearMssVec) {
+	if(clearMssVec) clearMss();
 	char *tmpname = strdup("/tmp/tmp_CoQuiASS_ext_XXXXXX");
 	if(-1==mkstemp(tmpname)) {
 		perror("ExternalSatBasedSolver::hasAModel::mkstemp");
@@ -61,16 +66,17 @@ void ExternalMssSolver::computeMss(std::vector<int> &assumps, bool clearMssVec) 
 		f << hardCstrWeight << " " << *it << " 0" << std::endl;
 	}
 	f.close();
-	launchExternalSolver(std::string(tmpname));
+	int result = launchExternalSolver(std::string(tmpname));
 	unlink(tmpname);
 	free(tmpname);
+	return result;
 }
 
 
-void ExternalMssSolver::handleForkAncestor(int pipe[]) {
+bool ExternalMssSolver::handleForkAncestor(int pipe[]) {
+	int mssFound = false;
 	if(computingModel) {
-		ExternalSatSolver::handleForkAncestor(pipe);
-		return;
+		return ExternalSatSolver::handleForkAncestor(pipe);
 	}
 	wait(NULL);
 	close(pipe[1]);
@@ -78,14 +84,16 @@ void ExternalMssSolver::handleForkAncestor(int pipe[]) {
 	char buffer[EXTERNAL_SAT_BUFFER_SIZE];
 	while(fgets(buffer, EXTERNAL_SAT_BUFFER_SIZE, childOutFile)) {
 		if(!strncmp(buffer, "s HARD PART UNSATISFIABLE", 25)) {
-			return;
+			break;
 		}
 		if(!strncmp(buffer, "v ", 2)) {
 			extractMss(buffer, childOutFile);
+			mssFound = true;
 		}
 	}
 	fclose(childOutFile);
 	close(pipe[0]);
+	return mssFound;
 }
 
 
@@ -127,35 +135,29 @@ void ExternalMssSolver::computeAllMss() {
 
 
 void ExternalMssSolver::computeAllMss(std::vector<int> &assumps) {
-	this->mss.clear();
-	unsigned int nbMss = 0;
+	clearMss();
 	std::vector<int> blockingSelectors;
 	for(;;) {
-		computeMss(assumps, false);
-		if(this->mss.size() > nbMss) {
-			std::vector<int> found = this->mss[this->mss.size()-1];
-			std::vector<int> opposite;
-			for(int i=1; i<=nSoftCstrs; ++i) opposite.push_back(i);
-			for(unsigned int i=0; i<found.size(); ++i) {
-				opposite[found[i]-1] = -1;
-			}
-			std::vector<int> blocking;
-			for(unsigned int i=0; i<opposite.size(); ++i) {
-				if(opposite[i] > 0) blocking.push_back(opposite[i]);
-			}
-			int sel = addSelectedClause(blocking);
-			blockingSelectors.push_back(sel);
-			assumps.push_back(sel);
-			++nbMss;
-		} else {
-			break;
+		if(!computeMss(assumps, false)) break;
+		std::vector<int> found = this->mss[this->mss.size()-1];
+		std::vector<int> opposite;
+		for(int i=1; i<=nSoftCstrs; ++i) opposite.push_back(i);
+		for(unsigned int i=0; i<found.size(); ++i) {
+			opposite[found[i]-1] = -1;
 		}
+		std::vector<int> blocking;
+		for(unsigned int i=0; i<opposite.size(); ++i) {
+			if(opposite[i] > 0) blocking.push_back(opposite[i]);
+		}
+		int sel = addSelectedClause(blocking);
+		blockingSelectors.push_back(sel);
+		assumps.push_back(sel);
 	}
 	for(int i=0; i<(int) blockingSelectors.size(); ++i) {
-			std::vector<int> cl;
-			cl.push_back(-blockingSelectors[i]);
-			addClause(cl);
-		}
+		std::vector<int> cl;
+		cl.push_back(-blockingSelectors[i]);
+		addClause(cl);
+	}
 }
 
 
@@ -165,7 +167,7 @@ bool ExternalMssSolver::hasAMss() {
 
 
 std::vector<int>& ExternalMssSolver::getMss() {
-	return this->mss[0];
+	return this->mss[this->mss.size()-1];
 }
 
 
@@ -201,17 +203,19 @@ bool ExternalMssSolver::isPropagatedAtDecisionLvlZero(int lit) {
 }
 
 
-void ExternalMssSolver::computeModel() {
+bool ExternalMssSolver::computeModel() {
 	this->computingModel = true;
-	ExternalSatSolver::computeModel();
+	bool result = ExternalSatSolver::computeModel();
 	this->computingModel = false;
+	return result;
 }
 
 
-void ExternalMssSolver::computeModel(std::vector<int> &assumps) {
+bool ExternalMssSolver::computeModel(std::vector<int> &assumps) {
 	this->computingModel = true;
-	ExternalSatSolver::computeModel(assumps);
+	bool result = ExternalSatSolver::computeModel(assumps);
 	this->computingModel = false;
+	return result;
 }
 
 

@@ -20,9 +20,9 @@ public:
 
 	virtual void addSoftClause(std::vector<int> &clause) = 0;
 
-	virtual void computeMaxSat() = 0;
+	virtual bool computeMaxSat() = 0;
 
-	virtual void computeMaxSat(std::vector<int> &assumps) = 0;
+	virtual bool computeMaxSat(std::vector<int> &assumps) = 0;
 
 	virtual void computeAllMaxSat() = 0;
 

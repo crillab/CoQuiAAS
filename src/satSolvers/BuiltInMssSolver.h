@@ -24,9 +24,9 @@ public:
 
 	virtual void addSoftClause(std::vector<int> &clause);
 
-	virtual void computeMss();
+	virtual bool computeMss();
 
-	virtual void computeMss(std::vector<int> &assumps);
+	virtual bool computeMss(std::vector<int> &assumps);
 
 	virtual void computeAllMss();
 
@@ -45,8 +45,8 @@ public:
 	virtual int addSelectedClause(std::vector<int> &clause);
 	virtual std::vector<int>& propagatedAtDecisionLvlZero();
 	virtual bool isPropagatedAtDecisionLvlZero(int lit);
-	virtual void computeModel();
-	virtual void computeModel(std::vector<int> &assumps);
+	virtual bool computeModel();
+	virtual bool computeModel(std::vector<int> &assumps);
 	virtual void computeAllModels();
 	virtual void computeAllModels(std::vector<int> &assumps);
 	virtual bool hasAModel();
@@ -56,6 +56,8 @@ public:
 private:
 
 	std::vector<std::vector<int> > mss;
+
+	void clearMss();
 
 	int nSoftCstrs;
 };

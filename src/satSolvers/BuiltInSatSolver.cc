@@ -65,29 +65,37 @@ bool BuiltInSatSolver::isPropagatedAtDecisionLvlZero(int lit) {
 }
 
 
-void BuiltInSatSolver::computeModel() {
+void BuiltInSatSolver::clearModels() {
+	this->models.clear();
+	this->blockingSelectors.clear();
+}
+
+
+bool BuiltInSatSolver::computeModel() {
 	std::vector<int> assumps;
-	computeModel(assumps);
+	return computeModel(assumps);
 }
 
 
-void BuiltInSatSolver::computeModel(vector<int> &assumps) {
-	computeModel(assumps, true);
+bool BuiltInSatSolver::computeModel(vector<int> &assumps) {
+	return computeModel(assumps, true);
 }
 
 
-void BuiltInSatSolver::computeModel(vector<int> &assumps, bool clearModelVec) {
-	if(clearModelVec) this->models.clear();
+bool BuiltInSatSolver::computeModel(vector<int> &assumps, bool clearModelVec) {
+	if(clearModelVec) clearModels();
 	solver.useAsCompleteSolver();
 	Minisat::vec<Minisat::Lit> minisatAssumps;
 	intClauseToBuiltInClause(assumps, minisatAssumps);
 	Minisat::lbool ret = solver.solveLimited(minisatAssumps);
 	if(ret == MINISAT_LBOOL_TRUE) {
 		extractBuiltInSolverModel();
+		return true;
 	} else if (ret == MINISAT_LBOOL_UNDEF) {
 		std::cerr << "ERR:: Minisat returned LBOOL_UNDEF" << std::endl;
 		exit(127);
 	}
+	return false;
 }
 
 
@@ -107,23 +115,16 @@ void BuiltInSatSolver::computeAllModels() {
 
 
 void BuiltInSatSolver::computeAllModels(vector<int> &assumps) {
-	this->models.clear();
-	unsigned int nbModels = 0;
-	std::vector<int> blockingSelectors;
-	this->models.clear();
+	clearModels();
 	for(;;) {
-		computeModel(assumps, false);
+		bool newModel = computeModel(assumps, false);
 		solver.bigRestart();
-		if(this->models.size() > nbModels) {
-			int sel = addBlockingClause();
-			blockingSelectors.push_back(sel);
-			assumps.push_back(sel);
-			++nbModels;
-		} else {
-			break;
-		}
+		if(!newModel) break;
+		int sel = addBlockingClause();
+		blockingSelectors.push_back(sel);
+		assumps.push_back(sel);
 	}
-	for(int i=0; i<(int) nbModels; ++i) {
+	for(int i=0; i<(int) this->models.size(); ++i) {
 		std::vector<int> cl;
 		cl.push_back(-blockingSelectors[i]);
 		addClause(cl);
@@ -147,7 +148,7 @@ bool BuiltInSatSolver::hasAModel() {
 
 
 std::vector<bool>& BuiltInSatSolver::getModel() {
-	return this->models[0];
+	return this->models[this->models.size()-1];
 }
 
 

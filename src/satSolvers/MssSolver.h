@@ -20,9 +20,9 @@ public:
 
 	virtual void addSoftClause(std::vector<int> &clause) = 0;
 
-	virtual void computeMss() = 0;
+	virtual bool computeMss() = 0;
 
-	virtual void computeMss(std::vector<int> &assumps) = 0;
+	virtual bool computeMss(std::vector<int> &assumps) = 0;
 
 	virtual void computeAllMss() = 0;
 

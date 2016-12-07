@@ -29,18 +29,18 @@ void ExternalMaxSatSolver::addSoftClause(std::vector<int> &clause) {
 }
 
 
-void ExternalMaxSatSolver::computeMaxSat() {
+bool ExternalMaxSatSolver::computeMaxSat() {
 	std::vector<int> assumps;
-	computeMaxSat(assumps);
+	return computeMaxSat(assumps);
 }
 
 
-void ExternalMaxSatSolver::computeMaxSat(std::vector<int> &assumps) {
-	computeMaxSat(assumps, true);
+bool ExternalMaxSatSolver::computeMaxSat(std::vector<int> &assumps) {
+	return computeMaxSat(assumps, true);
 }
 
 
-void ExternalMaxSatSolver::computeMaxSat(std::vector<int> &assumps, bool clearModelVec) {
+bool ExternalMaxSatSolver::computeMaxSat(std::vector<int> &assumps, bool clearModelVec) {
 	if(clearModelVec) this->models.clear();
 	char *tmpname = strdup("/tmp/tmp_CoQuiASS_ext_XXXXXX");
 	if(-1==mkstemp(tmpname)) {
@@ -62,16 +62,17 @@ void ExternalMaxSatSolver::computeMaxSat(std::vector<int> &assumps, bool clearMo
 	for(std::vector<int>::iterator it = assumps.begin(); it != assumps.end(); ++it)
 		f << hardCstrWeight << " " << *it << " 0" << std::endl;
 	f.close();
-	launchExternalSolver(std::string(tmpname));
+	int result = launchExternalSolver(std::string(tmpname));
 	unlink(tmpname);
 	free(tmpname);
+	return result;
 }
 
 
-void ExternalMaxSatSolver::handleForkAncestor(int pipe[]) {
+bool ExternalMaxSatSolver::handleForkAncestor(int pipe[]) {
+	bool msFound = false;
 	if(computingModel) {
-		ExternalSatSolver::handleForkAncestor(pipe);
-		return;
+		return ExternalSatSolver::handleForkAncestor(pipe);
 	}
 	wait(NULL);
 	close(pipe[1]);
@@ -88,13 +89,15 @@ void ExternalMaxSatSolver::handleForkAncestor(int pipe[]) {
 		}
 		if(!strncmp(buffer, "v ", 2)) {
 			if(this->optValue == -1) this->optValue = this->lastObjValue;
-			if(this->lastObjValue > this->optValue) return;
+			if(this->lastObjValue > this->optValue) break;
 			extractMaxSat(buffer, childOutFile);
+			msFound = true;
 			break;
 		}
 	}
 	fclose(childOutFile);
 	close(pipe[0]);
+	return msFound;
 }
 
 
@@ -120,7 +123,7 @@ void ExternalMaxSatSolver::computeAllMaxSat(std::vector<int> &assumps) {
 
 
 std::vector<bool>& ExternalMaxSatSolver::getMaxSat() {
-	return this->models[0];
+	return this->models[this->models.size()-1];
 }
 
 
@@ -161,17 +164,19 @@ bool ExternalMaxSatSolver::isPropagatedAtDecisionLvlZero(int lit) {
 }
 
 
-void ExternalMaxSatSolver::computeModel() {
+bool ExternalMaxSatSolver::computeModel() {
 	this->computingModel = true;
-	ExternalSatSolver::computeModel();
+	bool result = ExternalSatSolver::computeModel();
 	this->computingModel = false;
+	return result;
 }
 
 
-void ExternalMaxSatSolver::computeModel(std::vector<int> &assumps) {
+bool ExternalMaxSatSolver::computeModel(std::vector<int> &assumps) {
 	this->computingModel = true;
-	ExternalSatSolver::computeModel(assumps);
+	bool result = ExternalSatSolver::computeModel(assumps);
 	this->computingModel = false;
+	return result;
 }
 
 

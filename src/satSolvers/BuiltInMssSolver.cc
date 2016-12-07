@@ -25,21 +25,28 @@ void BuiltInMssSolver::addSoftClause(std::vector<int> &clause) {
 }
 
 
-void BuiltInMssSolver::computeMss() {
-	std::vector<int> assumps;
-	computeMss(assumps);
+void BuiltInMssSolver::clearMss() {
+	this->mss.clear();
 }
 
 
-void BuiltInMssSolver::computeMss(std::vector<int> &assumps) {
-	this->mss.clear();
+bool BuiltInMssSolver::computeMss() {
+	std::vector<int> assumps;
+	return computeMss(assumps);
+}
+
+
+bool BuiltInMssSolver::computeMss(std::vector<int> &assumps) {
+	clearMss();
 	solver.setSoftInstance(true);
 	solver.bigRestart();
 	solver.optSaveMCS = true;
 	solver.verbosity = 0;
-	solver.extractCoMSS();
+	bool foundOne = solver.extractCoMSS();
+	if(!foundOne) return false;
 	vector<int> mss = extractMssFromCoMss(solver.computedMCS[0], this->nSoftCstrs);
 	this->mss.push_back(mss);
+	return true;
 }
 
 
@@ -50,7 +57,7 @@ void BuiltInMssSolver::computeAllMss() {
 
 
 void BuiltInMssSolver::computeAllMss(std::vector<int> &assumps) {
-	this->mss.clear();
+	clearMss();
 	solver.setSoftInstance(true);
 	solver.bigRestart();
 	solver.optSaveMCS = true;
@@ -70,7 +77,7 @@ bool BuiltInMssSolver::hasAMss() {
 
 
 std::vector<int>& BuiltInMssSolver::getMss() {
-	return this->mss[0];
+	return this->mss[this->mss.size()-1];
 }
 
 
@@ -108,19 +115,19 @@ bool BuiltInMssSolver::isPropagatedAtDecisionLvlZero(int lit) {
 }
 
 
-void BuiltInMssSolver::computeModel() {
+bool BuiltInMssSolver::computeModel() {
 	solver.bigRestart();
 	solver.setSoftInstance(false);
 	solver.useAsCompleteSolver();
-	BuiltInSatSolver::computeModel();
+	return BuiltInSatSolver::computeModel();
 }
 
 
-void BuiltInMssSolver::computeModel(std::vector<int> &assumps) {
+bool BuiltInMssSolver::computeModel(std::vector<int> &assumps) {
 	solver.bigRestart();
 	solver.setSoftInstance(false);
 	solver.useAsCompleteSolver();
-	BuiltInSatSolver::computeModel(assumps);
+	return BuiltInSatSolver::computeModel(assumps);
 }
 
 

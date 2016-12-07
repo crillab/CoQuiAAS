@@ -44,11 +44,11 @@ public:
 
 	virtual bool isPropagatedAtDecisionLvlZero(int lit);
 
-	virtual void computeModel();
+	virtual bool computeModel();
 
-	virtual void computeModel(std::vector<int> &assumps);
+	virtual bool computeModel(std::vector<int> &assumps);
 
-	virtual void computeModel(std::vector<int> &assumps, bool clearModelVec);
+	virtual bool computeModel(std::vector<int> &assumps, bool clearModelVec);
 
 	virtual void computeAllModels();
 
@@ -70,9 +70,9 @@ protected:
 
 	std::stringstream dimacsCstrs;
 
-	virtual void launchExternalSolver(std::string instanceFile);
+	virtual bool launchExternalSolver(std::string instanceFile);
 
-	virtual void handleForkAncestor(int pipe[]);
+	virtual bool handleForkAncestor(int pipe[]);
 
 	virtual void handleForkChild(std::string instanceFile, int pipe[]);
 
@@ -81,6 +81,8 @@ protected:
 	std::vector<std::vector<bool> > models;
 
 	void extractModel(char buffer[], FILE *childOutFile);
+
+	void clearModels();
 
 private :
 
