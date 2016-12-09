@@ -24,7 +24,7 @@ namespace Minisat {
 #define SAT 1
 #define UNS 2
 #define OUT 3
-#define BIG 1<<29
+#define BIG (1<<29)
 
 #define WASS_TRUE(l,ass) (((sign(l)) & 1) ^ (ass))
 #define WASS_FALSE(l,ass) (!(((sign(l)) & 1) ^ (ass)))

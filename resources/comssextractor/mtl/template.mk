@@ -24,7 +24,7 @@ LFLAGS    ?= -Wall
 
 COPTIMIZE ?= -O3
 
-CFLAGS    += -I$(MROOT) -D __STDC_LIMIT_MACROS -D __STDC_FORMAT_MACROS -Wno-unknown-warning-option -Wno-literal-suffix
+CFLAGS    += -I$(MROOT) -D __STDC_LIMIT_MACROS -D __STDC_FORMAT_MACROS -Wno-unknown-warning-option -Wno-literal-suffix -Wno-unused-private-field
 LFLAGS    += -lz
 
 .PHONY : s p d r rs clean 
