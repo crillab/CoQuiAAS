@@ -71,8 +71,6 @@ private:
 
 	bool handleForkAncestor(int pipe[]);
 
-	void extractMss(char buffer[], FILE *childOutFile);
-
 	void clearMss();
 
 	bool computingModel;

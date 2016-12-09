@@ -33,7 +33,6 @@ public:
 	virtual std::vector<int> getModel(char *line);
 
 	~CoMssExtractorOutputInspector();
-
 };
 
 }

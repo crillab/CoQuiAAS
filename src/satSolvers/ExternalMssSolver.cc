@@ -84,48 +84,17 @@ bool ExternalMssSolver::handleForkAncestor(int pipe[]) {
 	FILE *childOutFile = fdopen(pipe[0],"r");
 	char buffer[EXTERNAL_SAT_BUFFER_SIZE];
 	while(fgets(buffer, EXTERNAL_SAT_BUFFER_SIZE, childOutFile)) {
-		if(!strncmp(buffer, "s HARD PART UNSATISFIABLE", 25)) {
-			break;
+		if(this->outInspector.isHardPartStatusLine(buffer)) {
+			if(!this->outInspector.getHardPartStatus(buffer)) break;
 		}
-		if(!strncmp(buffer, "v ", 2)) {
-			extractMss(buffer, childOutFile);
+		if(this->outInspector.isCoMssLine(buffer)) {
+			this->mss.push_back(this->outInspector.getCoMss(buffer, nSoftCstrs, childOutFile));
 			mssFound = true;
 		}
 	}
 	fclose(childOutFile);
 	close(pipe[0]);
 	return mssFound;
-}
-
-
-void ExternalMssSolver::extractMss(char buffer[], FILE *childOutFile) {
-	char *pc = buffer+2;
-	int nb = 0;
-	bool readingNb = false;
-	std::vector<int> tmpMss;
-	for(int i=1; i<=nSoftCstrs; ++i) tmpMss.push_back(i);
-	for(; *pc != '\n'; ++pc) {
-		if(!*pc) {
-			fgets(buffer, EXTERNAL_COMSS_BUFFER_SIZE, childOutFile);
-			pc = buffer;
-		}
-		if((*pc == ' ' || *pc == '\t') && readingNb) {
-			if(!nb) break;
-			tmpMss[nb-1] = -1;
-			nb = 0;
-			readingNb = false;
-		} else if(*pc >= '0' && *pc <= '9') {
-			nb = 10*nb + (*pc - '0');
-			readingNb = true;
-		}
-	}
-	std::vector<int> newMss;
-	for(unsigned int i=0; i<tmpMss.size(); ++i) {
-		if(tmpMss[i] > 0) {
-			newMss.push_back(tmpMss[i]);
-		}
-	}
-	this->mss.push_back(newMss);
 }
 
 

@@ -76,8 +76,8 @@ public:
 
 	static MssSolver *createMssSolver(std::map<std::string,std::string> *additionalParams) {
 		if(additionalParams->find("-externalCoMssSolver") != additionalParams->end()) {
-			CoMssExtractorOutputInspector inspector;
-			return new ExternalMssSolver((*additionalParams)["-externalCoMssSolver"], inspector);
+			CoMssExtractorOutputInspector* inspector = new CoMssExtractorOutputInspector;
+			return new ExternalMssSolver((*additionalParams)["-externalCoMssSolver"], *inspector);
 		}
 		std::cerr << "ERROR:: no builtin coMSS solver" << std::endl;
 		std::exit(1);

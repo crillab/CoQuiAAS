@@ -18,6 +18,8 @@ namespace CoQuiAAS {
 
 class CoMssSolverOutputInspector {
 
+public:
+
 	virtual bool isHardPartStatusLine(char *line) = 0;
 
 	virtual bool getHardPartStatus(char *line) = 0;
