@@ -12,7 +12,7 @@
 using namespace CoQuiAAS;
 
 
-ExternalMssSolver::ExternalMssSolver(std::string command) : ExternalSatSolver(command) {
+ExternalMssSolver::ExternalMssSolver(std::string command, CoMssSolverOutputInspector &outInspector) : ExternalSatSolver(command), outInspector(outInspector) {
 	this->nSoftCstrs = 0;
 	this->computingModel = false;
 }

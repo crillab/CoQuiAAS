@@ -16,6 +16,7 @@
 
 #include "MssSolver.h"
 #include "ExternalSatSolver.h"
+#include "CoMssSolverOutputInspector.h"
 
 
 namespace CoQuiAAS {
@@ -25,7 +26,7 @@ class ExternalMssSolver: public MssSolver, public ExternalSatSolver {
 
 public:
 
-	ExternalMssSolver(std::string command);
+	ExternalMssSolver(std::string command, CoMssSolverOutputInspector &outInspector);
 
 	virtual void addSoftClause(std::vector<int> &clause);
 
@@ -75,6 +76,8 @@ private:
 	void clearMss();
 
 	bool computingModel;
+
+	CoMssSolverOutputInspector& outInspector;
 };
 
 
