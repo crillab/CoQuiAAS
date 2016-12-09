@@ -26,14 +26,14 @@ show handled problems:\n\
 #ifndef COQUIAAS_VERSION
 #define CLH_CREDITS_MSG "CoQuiAAS\n\
 Compiled " __DATE__ " " __TIME__ "\n\
-Jean-Marie Lagniez, Emmanuel Lonca, Jean-Guy Mailly {lagniez,lonca,mailly}@cril.fr"
+Jean-Marie Lagniez, Emmanuel Lonca, Jean-Guy Mailly {lagniez,lonca}@cril.fr, jean-guy.mailly@parisdescartes.fr"
 #else
 #define str(s) #s
 #define xstr(s) str(s)
 #define COQUIAAS_VERSION_STR xstr(COQUIAAS_VERSION)
 #define CLH_CREDITS_MSG "CoQuiAAS v" COQUIAAS_VERSION_STR " \n\
 Compiled " __DATE__ " " __TIME__ "\n\
-Jean-Marie Lagniez, Emmanuel Lonca, Jean-Guy Mailly -- {lagniez,lonca}@cril.fr, jmailly@dbai.tuwien.ac.at"
+Jean-Marie Lagniez, Emmanuel Lonca, Jean-Guy Mailly -- {lagniez,lonca}@cril.fr, jean-guy.mailly@parisdescartes.fr"
 #endif
 
 #define CLH_SUPPORTED_FORMATS_MSG "[apx,cnf,tgf]"
