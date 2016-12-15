@@ -26,6 +26,8 @@ public:
 
 	void setMaxExtensionNeeded();
 
+	void setMaxRangeNeeded(int disjVarsStartId);
+
 	virtual ~MssEncodingHelper();
 
 private:

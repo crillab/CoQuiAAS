@@ -110,7 +110,7 @@ public:
 		case SEM_PREFERRED:
 			return new DefaultPreferredSemanticsSolver(*createMssSolver(additionalParams), attacks, varMap, task);
 		case SEM_SEMISTABLE:
-			return new DefaultSemistableSemanticsSolver(*createMaxSatSolver(additionalParams), attacks, varMap, task);
+			return new DefaultSemistableSemanticsSolver(*createMssSolver(additionalParams), attacks, varMap, task);
 		case SEM_STAGE:
 			return new DefaultStageSemanticsSolver(*createMaxSatSolver(additionalParams), attacks, varMap, task);
 		case SEM_IDEAL:
