@@ -35,11 +35,7 @@ public:
 	virtual bool computeModel() = 0;
 
 	virtual bool computeModel(std::vector<int> &assumps) = 0;
-/*
-	virtual bool computeAnotherModel() = 0;
 
-	virtual bool computeAnotherModel(std::vector<int> &assumps) = 0;
-*/
 	virtual void computeAllModels() = 0;
 
 	virtual void computeAllModels(std::vector<int> &assumps) = 0;

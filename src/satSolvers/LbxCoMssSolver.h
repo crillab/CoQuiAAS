@@ -8,6 +8,14 @@
 #ifndef SRC_SATSOLVERS_LBXCOMSSSOLVER_H_
 #define SRC_SATSOLVERS_LBXCOMSSSOLVER_H_
 
+#include <fstream>
+#include <sstream>
+#include <cstring>
+
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
 #include "MssSolver.h"
 
 namespace CoQuiAAS {
@@ -38,7 +46,33 @@ public:
 
 	virtual std::vector<std::vector<int> >& getAllMss();
 
+	virtual void addVariables(int nVars);
+
+	virtual bool addClause(std::vector<int> &clause);
+
+	virtual int addSelectedClause(std::vector<int> &clause);
+
+	virtual std::vector<int>& propagatedAtDecisionLvlZero();
+
+	virtual bool isPropagatedAtDecisionLvlZero(int lit);
+
+	virtual bool computeModel();
+
+	virtual bool computeModel(std::vector<int> &assumps);
+
+	virtual void computeAllModels();
+
+	virtual void computeAllModels(std::vector<int> &assumps);
+
+	virtual bool hasAModel();
+
+	virtual std::vector<bool>& getModel();
+
+	virtual std::vector<std::vector<bool> >& getModels();
+
 private:
+
+	static const int BUF_READ_SIZE = (1<<10);
 
 	std::string lbxPath;
 
@@ -48,14 +82,29 @@ private:
 
 	std::vector<std::vector<int> > mss;
 
+	std::vector<std::vector<bool> >models;
+
 	int nSoftCstrs;
 
-	std::string writeInstance(std::vector<int> assumps);
+	std::string writeInstance(std::vector<int> assumps, bool onlyHardClauses);
 
 	bool launchExternalSolver(std::string instanceFile, bool allModels);
 
-	void handleForkChild(std::string instanceFile, bool allModels, int pfds[])
+	bool handleForkAncestor(int pipe[]);
 
+	void handleForkChild(std::string instanceFile, bool allModels, int pfds[]);
+
+	std::vector<int> extractCoMss(char *line);
+
+	std::vector<bool> extractModel(char *line);
+
+	std::vector<int> readIntVector(char *line);
+
+	int nVars;
+
+	int nCstrs;
+
+	std::stringstream dimacsCstrs;
 };
 
 }

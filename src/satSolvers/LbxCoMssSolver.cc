@@ -13,6 +13,9 @@ using namespace CoQuiAAS;
 
 LbxCoMssSolver::LbxCoMssSolver(std::string lbxPath) {
 	this->lbxPath = lbxPath;
+	this->nSoftCstrs = 0;
+	this->nVars = 0;
+	this->nCstrs = 0;
 }
 
 
@@ -30,17 +33,22 @@ void LbxCoMssSolver::addSoftClause(std::vector<int> &clause) {
 
 void LbxCoMssSolver::clearMss() {
 	this->mss.clear();
-	this->blockingSelectors.clear();
+	this->models.clear();
 }
 
 
 bool LbxCoMssSolver::computeMss() {
 	std::vector<int> assumps;
-	computeMss(assumps);
+	return computeMss(assumps);
 }
 
 
-bool LbxCoMssSolver::computeMss(std::vector<int> &assumps);
+bool LbxCoMssSolver::computeMss(std::vector<int> &assumps) {
+	std::string instance = writeInstance(assumps, false);
+	int ret = launchExternalSolver(instance, false);
+	unlink(instance.c_str());
+	return ret;
+}
 
 
 void LbxCoMssSolver::computeAllMss() {
@@ -49,7 +57,11 @@ void LbxCoMssSolver::computeAllMss() {
 }
 
 
-void LbxCoMssSolver::computeAllMss(std::vector<int> &assumps);
+void LbxCoMssSolver::computeAllMss(std::vector<int> &assumps) {
+	std::string instance = writeInstance(assumps, false);
+	launchExternalSolver(instance, true);
+	unlink(instance.c_str());
+}
 
 
 bool LbxCoMssSolver::hasAMss() {
@@ -66,19 +78,22 @@ std::vector<std::vector<int> >& LbxCoMssSolver::getAllMss() {
 	return this->mss;
 }
 
-std::string LbxCoMssSolver::writeInstance(std::vector<int> assumps) {
+std::string LbxCoMssSolver::writeInstance(std::vector<int> assumps, bool onlyHardClauses) {
 	std::string tmpname("/tmp/tmp_CoQuiASS_ext_XXXXXX");
-	if(-1==mkstemp(tmpname.c_str())) {
+	if(-1==mkstemp((char *) tmpname.c_str())) {
 		perror("ExternalSatBasedSolver::hasAModel::mkstemp");
 		exit(2);
 	}
 	std::ofstream f(tmpname.c_str());
 	int hardCstrWeight = (this->nSoftCstrs+1);
-	f << "p wcnf " << this->nVars << " " << (unsigned int)(this->nSoftCstrs+this->nCstrs+assumps.size()) << " " << hardCstrWeight <<std::endl;
+	unsigned int nClauses = onlyHardClauses ? this->nCstrs+assumps.size() : this->nSoftCstrs+this->nCstrs+assumps.size();
+	f << "p wcnf " << this->nVars << " " << nClauses << " " << hardCstrWeight <<std::endl;
 	std::string line;
-	std::istringstream softCstrsStream(this->dimacsSoftCstrs.str());
-	while (std::getline(softCstrsStream, line)) {
-		f << "1 " << line << std::endl;
+	if(!onlyHardClauses) {
+		std::istringstream softCstrsStream(this->dimacsSoftCstrs.str());
+		while (std::getline(softCstrsStream, line)) {
+			f << "1 " << line << std::endl;
+		}
 	}
 	std::istringstream hardCstrsStream(this->dimacsCstrs.str());
 	while (std::getline(hardCstrsStream, line)) {
@@ -101,58 +116,173 @@ bool LbxCoMssSolver::launchExternalSolver(std::string instanceFile, bool allMode
 	if(pid > 0) {
 		return handleForkAncestor(pfds);
 	} else {
-		handleForkChild(instanceFile, pfds);
+		handleForkChild(instanceFile, allModels, pfds);
 		return true; // will never be returned since exec() is called in fork child
 	}
 }
 
 
-void ExternalSatSolver::handleForkChild(std::string instanceFile, bool allModels, int pfds[]) {
-	std::vector<std::string> tokens;
-	std::istringstream iss(this->command);
-	std::copy(std::istream_iterator<std::string>(iss), std::istream_iterator<std::string>(), back_inserter(tokens));
-	std::vector<char*> ctokens;
-	std::transform(tokens.begin(), tokens.end(), std::back_inserter(ctokens), convertToCString);
-	char **args = new char*[allModels ? 4 : 6];
-	args[0] = this->lbxPath;
-	args[1] = "-wm";
-	if(!allModels) {
-		args[2] = "-n";
-		args[3] = "1";
-	}
-	args[allModels ? 2 : 4] = instanceFile;
-	args[allModels ? 3 : 5] = NULL;
+void LbxCoMssSolver::handleForkChild(std::string instanceFile, bool allModels, int pfds[]) {
 	close(1);
 	if(-1==dup(pfds[1])) {
 		perror("launchExternalSolver::dup");
 		exit(2);
 	}
 	close(pfds[0]);
-	execvp(args[0], args);
+	if(allModels) {
+		execl(this->lbxPath.c_str(), this->lbxPath.c_str(), "-wm", instanceFile.c_str(), NULL);
+	} else {
+		execl(this->lbxPath.c_str(), this->lbxPath.c_str(), "-wm", "-num", "1", instanceFile.c_str(), NULL);
+	}
 	perror("CoQuiAAS");
 	exit(1);
 }
 
 
-bool ExternalMssSolver::handleForkAncestor(int pipe[]) {
-	int mssFound = false;
-	if(computingModel) {
-		return ExternalSatSolver::handleForkAncestor(pipe);
-	}
+bool LbxCoMssSolver::handleForkAncestor(int pipe[]) {
 	wait(NULL);
 	close(pipe[1]);
+	bool ret = false;
 	FILE *childOutFile = fdopen(pipe[0], "r");
-	char buffer[EXTERNAL_SAT_BUFFER_SIZE];
-	while(fgets(buffer, EXTERNAL_SAT_BUFFER_SIZE, childOutFile)) {
-		if(this->outInspector.isHardPartStatusLine(buffer)) {
-			if(!this->outInspector.getHardPartStatus(buffer)) break;
+	char buffer[BUF_READ_SIZE];
+	while(fgets(buffer, BUF_READ_SIZE, childOutFile)) {
+		if(!strncmp(buffer, "c MCS: ", 7)) {
+			this->mss.push_back(extractCoMss(buffer+7));
+			ret = true;
+			continue;
 		}
-		if(this->outInspector.isCoMssLine(buffer)) {
-			this->mss.push_back(this->outInspector.getCoMss(buffer, nSoftCstrs, childOutFile));
-			mssFound = true;
+		if(!strncmp(buffer, "c model: ", 9)) {
+			this->models.push_back(extractModel(buffer+9));
+			continue;
 		}
 	}
 	fclose(childOutFile);
 	close(pipe[0]);
-	return mssFound;
+	return ret;
 }
+
+
+std::vector<int> LbxCoMssSolver::extractCoMss(char *line) {
+	std::vector<int> tmpMss;
+	for(int i=1; i<=nSoftCstrs; ++i) tmpMss.push_back(i);
+	std::vector<int> mcs = readIntVector(line);
+	for(unsigned int i=0; i<mcs.size(); ++i) tmpMss[mcs[i]-1] = -1;
+	std::vector<int> newMss;
+	for(unsigned int i=0; i<tmpMss.size(); ++i) {
+		if(tmpMss[i] > 0) {
+			newMss.push_back(tmpMss[i]);
+		}
+	}
+	return newMss;
+}
+
+
+std::vector<int> LbxCoMssSolver::readIntVector(char *line) {
+	std::vector<int> vec;
+	char *pc = line;
+	bool readingNb = false;
+	int nb = 0;
+	for(; *pc && (*pc != '\n'); ++pc) {
+		if((*pc == ' ' || *pc == '\t') && readingNb) {
+			if(!nb) break;
+			vec.push_back(nb);
+			nb = 0;
+			readingNb = false;
+		} else if(*pc >= '0' && *pc <= '9') {
+			nb = 10*nb + (*pc - '0');
+			readingNb = true;
+		}
+	}
+	return vec;
+}
+
+
+std::vector<bool> LbxCoMssSolver::extractModel(char *line) {
+	std::vector<int> intModel = readIntVector(line);
+	std::vector<bool> boolModel;
+	for(unsigned int i=0; i<intModel.size(); ++i) {
+		int val = intModel[i];
+		if(!val) break;
+		boolModel.push_back(val > 0);
+	}
+	return boolModel;
+}
+
+
+void LbxCoMssSolver::addVariables(int nVars) {
+	this->nVars += nVars;
+}
+
+
+bool LbxCoMssSolver::addClause(std::vector<int> &clause) {
+	for(std::vector<int>::iterator itCl = clause.begin(); itCl != clause.end(); ++itCl) {
+		dimacsCstrs << *itCl << " ";
+	}
+	dimacsCstrs << "0\n";
+	++nCstrs;
+	return true;
+}
+
+
+int LbxCoMssSolver::addSelectedClause(std::vector<int> &clause) {
+	addVariables(1);
+	int selector = this->nVars;
+	clause.push_back(-selector);
+	addClause(clause);
+	return selector;
+}
+
+
+std::vector<int>& LbxCoMssSolver::propagatedAtDecisionLvlZero() {
+	std::cerr << "operation unavailable for external solver" << std::endl;
+	exit(1);
+}
+
+
+bool LbxCoMssSolver::isPropagatedAtDecisionLvlZero(int lit) {
+	std::cerr << "operation unavailable for external solver" << std::endl;
+	exit(1);
+}
+
+
+bool LbxCoMssSolver::computeModel() {
+	std::vector<int> assumps;
+	return computeModel(assumps);
+}
+
+
+bool LbxCoMssSolver::computeModel(std::vector<int> &assumps) {
+	std::string instance = writeInstance(assumps, true);
+	int ret = launchExternalSolver(instance, false);
+	unlink(instance.c_str());
+	return ret;
+}
+
+
+void LbxCoMssSolver::computeAllModels() {
+	std::vector<int> assumps;
+	return computeAllModels(assumps);
+}
+
+
+void LbxCoMssSolver::computeAllModels(std::vector<int> &assumps) {
+	std::string instance = writeInstance(assumps, true);
+	launchExternalSolver(instance, false);
+	unlink(instance.c_str());
+}
+
+
+bool LbxCoMssSolver::hasAModel() {
+	return this->models.size() > 0;
+}
+
+
+std::vector<bool>& LbxCoMssSolver::getModel() {
+	return this->models[this->models.size()-1];
+}
+
+
+std::vector<std::vector<bool> >& LbxCoMssSolver::getModels() {
+	return this->models;
+}
+

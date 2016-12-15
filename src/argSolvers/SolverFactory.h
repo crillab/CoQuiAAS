@@ -18,8 +18,7 @@
 #include "ExternalSatSolver.h"
 #include "BuiltInMssSolver.h"
 #include "ExternalMssSolver.h"
-#include "CoMssSolverOutputInspector.h"
-#include "CoMssExtractorOutputInspector.h"
+#include "LbxCoMssSolver.h"
 #include "ExternalMaxSatSolver.h"
 
 
@@ -75,13 +74,11 @@ public:
 	}
 
 	static MssSolver *createMssSolver(std::map<std::string,std::string> *additionalParams) {
-		if(additionalParams->find("-externalCoMssSolver") != additionalParams->end()) {
-			CoMssExtractorOutputInspector* inspector = new CoMssExtractorOutputInspector;
-			return new ExternalMssSolver((*additionalParams)["-externalCoMssSolver"], *inspector);
+		if(additionalParams->find("-lbx") != additionalParams->end()) {
+			return new LbxCoMssSolver((*additionalParams)["-lbx"]);
 		}
 		std::cerr << "ERROR:: no builtin coMSS solver" << std::endl;
 		std::exit(1);
-		// return new BuiltInMssSolver();
 	}
 
 	static MaxSatSolver *createMaxSatSolver(std::map<std::string,std::string> *additionalParams) {
