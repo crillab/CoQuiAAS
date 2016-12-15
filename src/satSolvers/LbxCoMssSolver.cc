@@ -182,12 +182,16 @@ std::vector<int> LbxCoMssSolver::readIntVector(char *line) {
 	char *pc = line;
 	bool readingNb = false;
 	int nb = 0;
+	bool minus = false;
 	for(; *pc && (*pc != '\n'); ++pc) {
 		if((*pc == ' ' || *pc == '\t') && readingNb) {
 			if(!nb) break;
-			vec.push_back(nb);
+			vec.push_back(minus ? -nb : nb);
 			nb = 0;
+			minus = false;
 			readingNb = false;
+		} else if (*pc == '-' && !readingNb) {
+			minus = true;
 		} else if(*pc >= '0' && *pc <= '9') {
 			nb = 10*nb + (*pc - '0');
 			readingNb = true;
