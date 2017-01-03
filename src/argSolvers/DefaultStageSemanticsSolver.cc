@@ -13,11 +13,11 @@
 using namespace CoQuiAAS;
 
 
-DefaultStageSemanticsSolver::DefaultStageSemanticsSolver(MaxSatSolver &solver, Attacks &attacks, VarMap &varMap, TaskType taskType)  : SemanticsProblemSolver(attacks, varMap, taskType), solver(solver) {}
+DefaultStageSemanticsSolver::DefaultStageSemanticsSolver(MssSolver &solver, Attacks &attacks, VarMap &varMap, TaskType taskType)  : SemanticsProblemSolver(attacks, varMap, taskType), solver(solver) {}
 
 
 void DefaultStageSemanticsSolver::init() {
-	MaxSatEncodingHelper helper(solver, attacks, varMap);
+	MssEncodingHelper helper(solver, attacks, varMap);
 	int disjId = helper.reserveDisjunctionVars();
 	helper.setMaxRangeNeeded(disjId);
 	helper.createAttackersDisjunctionVars(disjId);
@@ -26,62 +26,54 @@ void DefaultStageSemanticsSolver::init() {
 
 
 void DefaultStageSemanticsSolver::computeOneExtension() {
-	solver.computeMaxSat();
-	if(!solver.hasAModel()) {
+	solver.computeMss();
+	if(!solver.hasAMss()) {
 		this->answer = "NO";
 	}
-	std::vector<bool> ms = solver.getMaxSat();
-	this->answer = modelToString(ms);
+	this->answer = modelToString(solver.getModel());
 }
 
 
 void DefaultStageSemanticsSolver::computeAllExtensions() {
-	std::vector<std::vector<bool> > allMs = computeAllMaxInclExtensions();
-	this->answer = "[";
-	int nMs = (signed) allMs.size();
-	for(int i=0; i<nMs-1; ++i) {
-		this->answer = this->answer + modelToString(allMs[i]) + ",";
+	computeAllStgExtensions();
+	std::vector<std::vector<bool> > models = solver.getModels();
+	this->answer = "[" + modelToString(models[0]);
+	for(unsigned int i=1; i<models.size(); ++i) {
+		this->answer = this->answer + "," + modelToString(models[i]);
 	}
-	if(nMs) this->answer = this->answer + modelToString(allMs[allMs.size()-1]);
 	this->answer = this->answer + "]";
 }
 
 
-std::vector<std::vector<bool> > DefaultStageSemanticsSolver::computeAllMaxInclExtensions() {
-	std::vector<std::vector<bool> > maxExts;
-	std::vector<int> assumps;
+void DefaultStageSemanticsSolver::computeAllStgExtensions() {
 	std::vector<int> selectors;
-	for(;;) {
-		solver.computeMaxSat(assumps);
-		if(!solver.hasAModel()) break;
-		std::vector<bool> maxExt = solver.getMaxSat();
-		maxExts.push_back(maxExt);
-		std::vector<int> blockingCl;
-		for(int i=0; i<(int) maxExt.size(); ++i) {
-			if(!maxExt[i]) {
-				blockingCl.push_back(i+1);
-			}
-		}
-		int selector = solver.addSelectedClause(blockingCl);
-		assumps.push_back(selector);
-		selectors.push_back(selector);
-	}
-	for(int i=0; i<(int) selectors.size(); ++i) {
+	while(solver.computeMss(selectors)) {
+		std::vector<bool> model = solver.getModel();
 		std::vector<int> cl;
-		cl.push_back(-selectors[i]);
+		for(unsigned int i=0; i< (unsigned int)varMap.nVars(); ++i) {
+			if(!model[i]) cl.push_back(i+1);
+		}
+		selectors.push_back(solver.addSelectedClause(cl));
+	}
+	for(unsigned int i=0; i<selectors.size(); ++i) {
+		std::vector<int> cl;
+		cl.push_back(selectors[i]);
 		solver.addClause(cl);
 	}
-	return maxExts;
 }
 
 
 void DefaultStageSemanticsSolver::isCredulouslyAccepted() {
-	std::vector<std::vector<bool> > allMs = computeAllMaxInclExtensions();
+	computeAllStgExtensions();
+	std::vector<std::vector<int> > allMss = solver.getAllMss();
 	int arg = varMap.getVar(this->acceptanceQueryArgument);
-	for(unsigned int i=0; i<allMs.size(); ++i) {
-		if(allMs[i][arg-1]) {
-			this->answer = "YES";
-			return;
+	for(unsigned int i=0; i<allMss.size(); ++i) {
+		std::vector<int> mss = allMss[i];
+		for(unsigned int j=0; i<mss.size(); ++j) {
+			if(mss[j] == arg) {
+				this->answer = "YES";
+				return;
+			}
 		}
 	}
 	this->answer = "NO";
@@ -89,10 +81,19 @@ void DefaultStageSemanticsSolver::isCredulouslyAccepted() {
 
 
 void DefaultStageSemanticsSolver::isSkepticallyAccepted() {
-	std::vector<std::vector<bool> > allMs = computeAllMaxInclExtensions();
+	computeAllStgExtensions();
+	std::vector<std::vector<int> > allMss = solver.getAllMss();
 	int arg = varMap.getVar(this->acceptanceQueryArgument);
-	for(unsigned int i=0; i<allMs.size(); ++i) {
-		if(!allMs[i][arg-1]) {
+	for(unsigned int i=0; i<allMss.size(); ++i) {
+		std::vector<int> mss = allMss[i];
+		bool found = false;
+		for(unsigned int j=0; i<mss.size(); ++j) {
+			if(mss[j] == arg) {
+				found = true;
+				break;
+			}
+		}
+		if(!found) {
 			this->answer = "NO";
 			return;
 		}

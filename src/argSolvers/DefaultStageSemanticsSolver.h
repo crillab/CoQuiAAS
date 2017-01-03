@@ -11,8 +11,8 @@
 
 #include "SemanticsProblemSolver.h"
 #include "core/Solver.h"
-#include "MaxSatEncodingHelper.h"
-#include "MaxSatSolver.h"
+#include "MssEncodingHelper.h"
+#include "MssSolver.h"
 
 
 namespace CoQuiAAS {
@@ -21,7 +21,7 @@ namespace CoQuiAAS {
 class DefaultStageSemanticsSolver : public SemanticsProblemSolver {
 
 public:
-	DefaultStageSemanticsSolver(MaxSatSolver &solver, Attacks &attacks, VarMap &varMap, TaskType taskType);
+	DefaultStageSemanticsSolver(MssSolver &solver, Attacks &attacks, VarMap &varMap, TaskType taskType);
 
 	void init();
 
@@ -37,9 +37,9 @@ public:
 
 private:
 
-	MaxSatSolver &solver;
+	MssSolver &solver;
 
-	std::vector<std::vector<bool> > computeAllMaxInclExtensions();
+	void computeAllStgExtensions();
 };
 
 
