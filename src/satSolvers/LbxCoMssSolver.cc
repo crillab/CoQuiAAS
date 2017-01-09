@@ -135,6 +135,7 @@ void LbxCoMssSolver::handleForkChild(std::string instanceFile, bool allModels, i
 		execl(this->lbxPath.c_str(), this->lbxPath.c_str(), "-wm", "-num", "1", instanceFile.c_str(), NULL);
 	}
 	perror("CoQuiAAS");
+	std::cerr << "this error may occur in case lbx has not been found; check its path is \"" << this->lbxPath << "\"" << std::endl;
 	exit(1);
 }
 
