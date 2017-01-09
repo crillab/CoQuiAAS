@@ -5,14 +5,13 @@
 CoQuiAAS invocation:\n\
   CoQuiAAS -p XX-YYY -fo ZZ -f instanceFile [-a variable] [OPTIONS]\n\
                        where XX in {SE, EE, DC, DS}\n\
-                       where YY in {ST, CO, GR, PR, SST, STG}\n\
+                       where YY in {ST, CO, GR, PR, SST, STG, ID}\n\
                        where ZZ in {apx, cnf, tgf}\n\
                        where \"-a variable\" must be present if XX in {DC, DS}\n\
 \n\
   OPTIONS:\n\
     -externalSatSolver \"satSolver FILE\"     : launch an external SAT solver using the command \"satSolver FILE\" where FILE is replaced by a DIMACS cnf formatted file ; solver output must be compatible with SAT competitions output ; available for XX-ST and XX-CO problems\n\
-    -externalCoMssSolver \"coMssSolver FILE\" : launch an external coMss solver using the command \"coMssSolver FILE\" where FILE is replaced by a DIMACS wcnf formatted file ; solver output must be compatible with coMSSExtractor output ; available for SE-PR and EE-PR problems\n\
-    -externalMaxSatSolver \"maxSatSolver FILE\" : launch an external MaxSat solver using the command \"maxSatSolver FILE\" where FILE is replaced by a DIMACS wcnf formatted file ; solver output must be compatible with MaxSat competition ; available for SST and STG problems\n\
+    -lbx \"path\" : launch an external lbx-like coMss solver located at \"path\" ; solver must handle \"-wm\" and \"-num n\" lbx options, and respect its input/output format ; mandatory for problems in the second level of the polynomial hierarchy\n\
 \n\
 show authors and version:\n\
   CoQuiAAS\n\
@@ -38,10 +37,10 @@ Jean-Marie Lagniez, Emmanuel Lonca, Jean-Guy Mailly -- {lagniez,lonca}@cril.fr, 
 
 #define CLH_SUPPORTED_FORMATS_MSG "[apx,cnf,tgf]"
 
-#define CLH_SUPPORTED_PROBLEMS_MSG "[SE-ST,SE-CO,SE-GR,SE-PR,SE-SST,SE-STG,"\
-									"EE-ST,EE-CO,EE-GR,EE-PR,EE-SST,EE-STG,"\
-									"DC-ST,DC-CO,DC-GR,DC-PR,DC-SST,DC-STG,"\
-									"DS-ST,DS-CO,DS-GR,DS-PR,DS-SST,DS-STG]"
+#define CLH_SUPPORTED_PROBLEMS_MSG "[SE-ST,SE-CO,SE-GR,SE-PR,SE-SST,SE-STG,SE-ID"\
+									"EE-ST,EE-CO,EE-GR,EE-PR,EE-SST,EE-STG,EE-ID"\
+									"DC-ST,DC-CO,DC-GR,DC-PR,DC-SST,DC-STG,DC-ID"\
+									"DS-ST,DS-CO,DS-GR,DS-PR,DS-SST,DS-STG,DS-ID]"
 
 #define FLAG_SET "FLAG_SET"
 

@@ -17,7 +17,6 @@
 #include "BuiltInSatSolver.h"
 #include "ExternalSatSolver.h"
 #include "BuiltInMssSolver.h"
-#include "ExternalMssSolver.h"
 #include "LbxCoMssSolver.h"
 #include "ExternalMaxSatSolver.h"
 
