@@ -64,6 +64,8 @@ class Attacks {
    */
   unsigned int maxAttacks();
 
+  VarMap &getVarMap();
+
  protected :
   /** The variables on which is built the attack relation */
   VarMap& varMap;

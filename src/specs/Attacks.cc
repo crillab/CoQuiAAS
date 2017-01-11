@@ -40,3 +40,7 @@ unsigned int Attacks::nAttacks() {
 unsigned int Attacks::maxAttacks() {
   return nMaxAttacks;
 }
+
+VarMap &Attacks::getVarMap() {
+	return varMap;
+}
