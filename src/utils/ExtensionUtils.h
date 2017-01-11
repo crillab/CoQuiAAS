@@ -17,6 +17,8 @@ public:
 
 	std::vector<int> groundedExtension();
 
+	bool isMaxRange(std::vector<int>& extension);
+
 	virtual ~ExtensionUtils();
 
 private:

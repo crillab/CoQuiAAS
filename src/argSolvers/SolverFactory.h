@@ -15,6 +15,7 @@
 #include "GraphBasedGroundedSemanticsSolver.h"
 #include "DefaultPreferredSemanticsSolver.h"
 #include "DefaultIdealSemanticsSolver.h"
+#include "DefaultDungTriathlonSolver.h"
 #include "BuiltInSatSolver.h"
 #include "ExternalSatSolver.h"
 #include "BuiltInMssSolver.h"
@@ -41,6 +42,7 @@ public:
 	static TaskType getTaskType(std::string str) {
 		str = str.substr(0,2);
 		std::transform(str.begin(), str.end(), str.begin(), ::toupper);
+		if(!str.compare("DT")) return TASK_TRIATHLON;
 		if(!str.compare("SE")) return TASK_ONE_EXT;
 		if(!str.compare("EE")) return TASK_ALL_EXTS;
 		if(!str.compare("DC")) return TASK_CRED_INF;
@@ -54,8 +56,9 @@ public:
 	 * \param str : the string to parse
 	 */
 	static SemanticName getSemanticName(std::string str) {
-		str = str.substr(3);
 		std::transform(str.begin(), str.end(), str.begin(), ::toupper);
+		if(!str.compare("DT")) return SEM_TRIATHLON;
+		str = str.substr(3);
 		if(!str.compare("ST")) return SEM_STABLE;
 		if(!str.compare("CO")) return SEM_COMPLETE;
 		if(!str.compare("GR")) return SEM_GROUNDED;
@@ -120,6 +123,8 @@ public:
 			return new DefaultStageSemanticsSolver(*createMssSolver(additionalParams), attacks, varMap, task);
 		case SEM_IDEAL:
 			return new DefaultIdealSemanticsSolver(*createMssSolver(additionalParams), attacks, varMap, task);
+		case SEM_TRIATHLON:
+			return new DefaultDungTriathlonSolver(*createMssSolver(additionalParams), attacks, varMap);
 		default:
 			return NULL;
 		}

@@ -128,7 +128,8 @@ am__objects_3 = argSolvers/SatEncodingHelper.$(OBJEXT) \
 	argSolvers/DefaultStableSemanticsSolver.$(OBJEXT) \
 	argSolvers/DefaultSemistableSemanticsSolver.$(OBJEXT) \
 	argSolvers/DefaultStageSemanticsSolver.$(OBJEXT) \
-	argSolvers/DefaultIdealSemanticsSolver.$(OBJEXT)
+	argSolvers/DefaultIdealSemanticsSolver.$(OBJEXT) \
+	argSolvers/DefaultDungTriathlonSolver.$(OBJEXT)
 am__objects_4 = satSolvers/ExternalSatSolver.$(OBJEXT) \
 	satSolvers/BuiltInMssSolver.$(OBJEXT) \
 	satSolvers/BuiltInSatSolver.$(OBJEXT) \
@@ -395,7 +396,9 @@ argSolversDirSources = argSolvers/SolverFactory.h \
 	argSolvers/DefaultStageSemanticsSolver.cc \
 	argSolvers/DefaultStageSemanticsSolver.h \
 	argSolvers/DefaultIdealSemanticsSolver.cc \
-	argSolvers/DefaultIdealSemanticsSolver.h
+	argSolvers/DefaultIdealSemanticsSolver.h \
+	argSolvers/DefaultDungTriathlonSolver.cc \
+	argSolvers/DefaultDungTriathlonSolver.h
 specsDirSources = ./specs/VarMap.cc ./specs/VarMap.h ./specs/Attacks.cc ./specs/Attacks.h ./specs/Types.h
 parserDirSources = ./parser/AspartixFormatParser.cc ./parser/AspartixFormatParser.h ./parser/CNFFormatParser.cc ./parser/CNFFormatParser.h ./parser/TrivialGraphFormatParser.cc ./parser/TrivialGraphFormatParser.h ./parser/IParser.h ./parser/ParserFactory.h
 utilsDirSources = ./utils/DefaultStatMap.cc ./utils/DefaultStatMap.h ./utils/FakeStatMap.cc ./utils/FakeStatMap.h ./utils/CommandLineHelper.cc ./utils/CommandLineHelper.h ./utils/LogStatMap.cc ./utils/LogStatMap.h ./utils/StatMap.h ./utils/StatMapFactory.h ./utils/ExtensionUtils.cc ./utils/ExtensionUtils.h
@@ -518,6 +521,9 @@ argSolvers/DefaultStageSemanticsSolver.$(OBJEXT):  \
 	argSolvers/$(am__dirstamp) \
 	argSolvers/$(DEPDIR)/$(am__dirstamp)
 argSolvers/DefaultIdealSemanticsSolver.$(OBJEXT):  \
+	argSolvers/$(am__dirstamp) \
+	argSolvers/$(DEPDIR)/$(am__dirstamp)
+argSolvers/DefaultDungTriathlonSolver.$(OBJEXT):  \
 	argSolvers/$(am__dirstamp) \
 	argSolvers/$(DEPDIR)/$(am__dirstamp)
 satSolvers/$(am__dirstamp):
@@ -648,6 +654,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./utils/$(DEPDIR)/FakeStatMap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./utils/$(DEPDIR)/LogStatMap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@argSolvers/$(DEPDIR)/DefaultCompleteSemanticsSolver.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@argSolvers/$(DEPDIR)/DefaultDungTriathlonSolver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@argSolvers/$(DEPDIR)/DefaultGroundedSemanticsSolver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@argSolvers/$(DEPDIR)/DefaultIdealSemanticsSolver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@argSolvers/$(DEPDIR)/DefaultPreferredSemanticsSolver.Po@am__quote@

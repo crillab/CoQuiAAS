@@ -69,5 +69,30 @@ std::vector<int> ExtensionUtils::groundedExtension() {
 }
 
 
+bool ExtensionUtils::isMaxRange(std::vector<int>& extension) {
+	std::vector<int> allVars = *attacks.getVarMap().intVars();
+	std::vector<bool> inExt;
+	for(unsigned int i=0; i<allVars.size(); ++i) {
+		inExt.push_back(false);
+	}
+	for(unsigned int i=0; i<extension.size(); ++i) {
+		inExt[extension[i]-1] = true;
+	}
+	for(unsigned int i=0; i<inExt.size(); ++i) {
+		if(inExt[i]) continue;
+		std::vector<int> attackers = *attacks.getAttacksTo(i+1);
+		bool attacked = false;
+		for(unsigned int j=0; j<attackers.size(); ++j) {
+			if(inExt[attackers[j]-1]) {
+				attacked = true;
+				break;
+			}
+		}
+		if(!attacked) return false;
+	}
+	return true;
+}
+
+
 ExtensionUtils::~ExtensionUtils() {}
 
