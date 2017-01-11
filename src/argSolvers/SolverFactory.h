@@ -12,6 +12,7 @@
 #include "DefaultSemistableSemanticsSolver.h"
 #include "DefaultCompleteSemanticsSolver.h"
 #include "DefaultGroundedSemanticsSolver.h"
+#include "GraphBasedGroundedSemanticsSolver.h"
 #include "DefaultPreferredSemanticsSolver.h"
 #include "DefaultIdealSemanticsSolver.h"
 #include "BuiltInSatSolver.h"
@@ -88,7 +89,12 @@ public:
 		std::exit(1);
 	}
 
-
+	static SemanticsProblemSolver *groundedSolver(TaskType task, std::map<std::string,std::string> *additionalParams, Attacks &attacks, VarMap &varMap) {
+		if(additionalParams->find("--graphBased") != additionalParams->end()) {
+			return new GraphBasedGroundedSemanticsSolver(attacks, varMap, task);
+		}
+		return new DefaultGroundedSemanticsSolver(*createSatSolver(additionalParams), attacks, varMap, task);
+	}
 
 	/**
 	 * \fn getProblemInstance(SemanticName,TaskType,std::string)
@@ -105,7 +111,7 @@ public:
 		case SEM_COMPLETE:
 			return new DefaultCompleteSemanticsSolver(*createSatSolver(additionalParams), attacks, varMap, task);
 		case SEM_GROUNDED:
-			return new DefaultGroundedSemanticsSolver(*createSatSolver(additionalParams), attacks, varMap, task);
+			return groundedSolver(task, additionalParams, attacks, varMap);
 		case SEM_PREFERRED:
 			return new DefaultPreferredSemanticsSolver(*createMssSolver(additionalParams), attacks, varMap, task);
 		case SEM_SEMISTABLE:

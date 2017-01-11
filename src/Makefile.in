@@ -123,6 +123,7 @@ am__objects_3 = argSolvers/SatEncodingHelper.$(OBJEXT) \
 	argSolvers/DefaultCompleteSemanticsSolver.$(OBJEXT) \
 	argSolvers/SemanticsProblemSolver.$(OBJEXT) \
 	argSolvers/DefaultGroundedSemanticsSolver.$(OBJEXT) \
+	argSolvers/GraphBasedGroundedSemanticsSolver.$(OBJEXT) \
 	argSolvers/DefaultPreferredSemanticsSolver.$(OBJEXT) \
 	argSolvers/DefaultStableSemanticsSolver.$(OBJEXT) \
 	argSolvers/DefaultSemistableSemanticsSolver.$(OBJEXT) \
@@ -136,7 +137,7 @@ am__objects_4 = satSolvers/ExternalSatSolver.$(OBJEXT) \
 am__objects_5 = ./utils/DefaultStatMap.$(OBJEXT) \
 	./utils/FakeStatMap.$(OBJEXT) \
 	./utils/CommandLineHelper.$(OBJEXT) \
-	./utils/LogStatMap.$(OBJEXT)
+	./utils/LogStatMap.$(OBJEXT) ./utils/ExtensionUtils.$(OBJEXT)
 am___top_builddir__lib_libcoquiaas_a_OBJECTS = $(am__objects_1) \
 	$(am__objects_2) $(am__objects_3) $(am__objects_4) \
 	$(am__objects_5)
@@ -372,10 +373,32 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CPPFLAGS = -g -Wall -Wno-unknown-warning-option -Wno-parentheses -D __STDC_LIMIT_MACROS -D __STDC_FORMAT_MACROS -I$(srcdir)/specs -I$(srcdir)/utils -I$(srcdir)/parser -I$(srcdir)/satSolvers -I$(srcdir)/argSolvers -I$(top_srcdir)/resources/comssextractor/
 satSolversDirSources = satSolvers/SatSolver.h satSolvers/MssSolver.h satSolvers/ExternalSatSolver.cc satSolvers/ExternalSatSolver.h satSolvers/BuiltInMssSolver.cc satSolvers/BuiltInMssSolver.h satSolvers/BuiltInSatSolver.cc satSolvers/BuiltInSatSolver.h satSolvers/MaxSatSolver.h satSolvers/ExternalMaxSatSolver.h satSolvers/ExternalMaxSatSolver.cc satSolvers/LbxCoMssSolver.h satSolvers/LbxCoMssSolver.cc
-argSolversDirSources = argSolvers/SolverFactory.h argSolvers/SatEncodingHelper.cc argSolvers/SatEncodingHelper.h argSolvers/MssEncodingHelper.cc argSolvers/MssEncodingHelper.h argSolvers/MaxSatEncodingHelper.cc argSolvers/MaxSatEncodingHelper.h argSolvers/DefaultCompleteSemanticsSolver.cc argSolvers/DefaultCompleteSemanticsSolver.h argSolvers/SemanticsProblemSolver.cc argSolvers/SemanticsProblemSolver.h argSolvers/DefaultGroundedSemanticsSolver.cc argSolvers/DefaultGroundedSemanticsSolver.h argSolvers/DefaultPreferredSemanticsSolver.cc argSolvers/DefaultPreferredSemanticsSolver.h argSolvers/DefaultStableSemanticsSolver.cc argSolvers/DefaultStableSemanticsSolver.h argSolvers/DefaultSemistableSemanticsSolver.cc argSolvers/DefaultSemistableSemanticsSolver.h argSolvers/DefaultStageSemanticsSolver.cc argSolvers/DefaultStageSemanticsSolver.h argSolvers/DefaultIdealSemanticsSolver.cc argSolvers/DefaultIdealSemanticsSolver.h
+argSolversDirSources = argSolvers/SolverFactory.h \
+	argSolvers/SatEncodingHelper.cc argSolvers/SatEncodingHelper.h \
+	argSolvers/MssEncodingHelper.cc argSolvers/MssEncodingHelper.h \
+	argSolvers/MaxSatEncodingHelper.cc \
+	argSolvers/MaxSatEncodingHelper.h \
+	argSolvers/DefaultCompleteSemanticsSolver.cc \
+	argSolvers/DefaultCompleteSemanticsSolver.h \
+	argSolvers/SemanticsProblemSolver.cc \
+	argSolvers/SemanticsProblemSolver.h \
+	argSolvers/DefaultGroundedSemanticsSolver.cc \
+	argSolvers/DefaultGroundedSemanticsSolver.h \
+	argSolvers/GraphBasedGroundedSemanticsSolver.cc \
+	argSolvers/GraphBasedGroundedSemanticsSolver.h \
+	argSolvers/DefaultPreferredSemanticsSolver.cc \
+	argSolvers/DefaultPreferredSemanticsSolver.h \
+	argSolvers/DefaultStableSemanticsSolver.cc \
+	argSolvers/DefaultStableSemanticsSolver.h \
+	argSolvers/DefaultSemistableSemanticsSolver.cc \
+	argSolvers/DefaultSemistableSemanticsSolver.h \
+	argSolvers/DefaultStageSemanticsSolver.cc \
+	argSolvers/DefaultStageSemanticsSolver.h \
+	argSolvers/DefaultIdealSemanticsSolver.cc \
+	argSolvers/DefaultIdealSemanticsSolver.h
 specsDirSources = ./specs/VarMap.cc ./specs/VarMap.h ./specs/Attacks.cc ./specs/Attacks.h ./specs/Types.h
 parserDirSources = ./parser/AspartixFormatParser.cc ./parser/AspartixFormatParser.h ./parser/CNFFormatParser.cc ./parser/CNFFormatParser.h ./parser/TrivialGraphFormatParser.cc ./parser/TrivialGraphFormatParser.h ./parser/IParser.h ./parser/ParserFactory.h
-utilsDirSources = ./utils/DefaultStatMap.cc ./utils/DefaultStatMap.h ./utils/FakeStatMap.cc ./utils/FakeStatMap.h ./utils/CommandLineHelper.cc ./utils/CommandLineHelper.h ./utils/LogStatMap.cc ./utils/LogStatMap.h ./utils/StatMap.h ./utils/StatMapFactory.h
+utilsDirSources = ./utils/DefaultStatMap.cc ./utils/DefaultStatMap.h ./utils/FakeStatMap.cc ./utils/FakeStatMap.h ./utils/CommandLineHelper.cc ./utils/CommandLineHelper.h ./utils/LogStatMap.cc ./utils/LogStatMap.h ./utils/StatMap.h ./utils/StatMapFactory.h ./utils/ExtensionUtils.cc ./utils/ExtensionUtils.h
 srcDirSources = ./Main.cc
 comssextractorObjs = $(top_builddir)/resources/comssextractor/utils/Options.o $(top_builddir)/resources/comssextractor/utils/System.o $(top_builddir)/resources/comssextractor/core/SolverRL.o $(top_builddir)/resources/comssextractor/core/Solver.o $(top_builddir)/resources/comssextractor/core/Main.o
 noinst_LIBRARIES = $(top_builddir)/lib/libcoquiaas.a
@@ -479,6 +502,9 @@ argSolvers/SemanticsProblemSolver.$(OBJEXT):  \
 argSolvers/DefaultGroundedSemanticsSolver.$(OBJEXT):  \
 	argSolvers/$(am__dirstamp) \
 	argSolvers/$(DEPDIR)/$(am__dirstamp)
+argSolvers/GraphBasedGroundedSemanticsSolver.$(OBJEXT):  \
+	argSolvers/$(am__dirstamp) \
+	argSolvers/$(DEPDIR)/$(am__dirstamp)
 argSolvers/DefaultPreferredSemanticsSolver.$(OBJEXT):  \
 	argSolvers/$(am__dirstamp) \
 	argSolvers/$(DEPDIR)/$(am__dirstamp)
@@ -523,6 +549,8 @@ utils/$(DEPDIR)/$(am__dirstamp):
 ./utils/CommandLineHelper.$(OBJEXT): utils/$(am__dirstamp) \
 	utils/$(DEPDIR)/$(am__dirstamp)
 ./utils/LogStatMap.$(OBJEXT): utils/$(am__dirstamp) \
+	utils/$(DEPDIR)/$(am__dirstamp)
+./utils/ExtensionUtils.$(OBJEXT): utils/$(am__dirstamp) \
 	utils/$(DEPDIR)/$(am__dirstamp)
 $(top_builddir)/lib/$(am__dirstamp):
 	@$(MKDIR_P) $(top_builddir)/lib
@@ -616,6 +644,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./specs/$(DEPDIR)/VarMap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./utils/$(DEPDIR)/CommandLineHelper.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./utils/$(DEPDIR)/DefaultStatMap.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./utils/$(DEPDIR)/ExtensionUtils.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./utils/$(DEPDIR)/FakeStatMap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./utils/$(DEPDIR)/LogStatMap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@argSolvers/$(DEPDIR)/DefaultCompleteSemanticsSolver.Po@am__quote@
@@ -625,6 +654,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@argSolvers/$(DEPDIR)/DefaultSemistableSemanticsSolver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@argSolvers/$(DEPDIR)/DefaultStableSemanticsSolver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@argSolvers/$(DEPDIR)/DefaultStageSemanticsSolver.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@argSolvers/$(DEPDIR)/GraphBasedGroundedSemanticsSolver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@argSolvers/$(DEPDIR)/MaxSatEncodingHelper.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@argSolvers/$(DEPDIR)/MssEncodingHelper.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@argSolvers/$(DEPDIR)/SatEncodingHelper.Po@am__quote@
