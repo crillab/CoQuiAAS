@@ -12,7 +12,7 @@
 using namespace CoQuiAAS;
 
 
-DefaultPreferredSemanticsSolver::DefaultPreferredSemanticsSolver(MssSolver &solver, Attacks &attacks, VarMap &varMap, TaskType taskType)  : SemanticsProblemSolver(attacks, varMap, taskType), solver(solver) {}
+DefaultPreferredSemanticsSolver::DefaultPreferredSemanticsSolver(std::shared_ptr<MssSolver> solver, Attacks &attacks, VarMap &varMap, TaskType taskType)  : SemanticsProblemSolver(attacks, varMap, taskType), solver(solver) {}
 
 
 void DefaultPreferredSemanticsSolver::init() {
@@ -30,22 +30,22 @@ void DefaultPreferredSemanticsSolver::init() {
 
 
 void DefaultPreferredSemanticsSolver::computeOneExtension() {
-	solver.computeMss();
-	if(!solver.hasAMss()) {
+	solver->computeMss();
+	if(!solver->hasAMss()) {
 		this->answer = "NO";
 	}
-	std::vector<int> mss = solver.getMss();
+	std::vector<int> mss = solver->getMss();
 	this->answer = modelToString(mss);
 }
 
 
 void DefaultPreferredSemanticsSolver::computeAllExtensions() {
-	solver.computeAllMss();
-	if(!solver.hasAMss()) {
+	solver->computeAllMss();
+	if(!solver->hasAMss()) {
 		this->answer = "[]";
 	}
 	this->answer = "[";
-	std::vector<std::vector<int> > allMss = solver.getAllMss();
+	std::vector<std::vector<int> > allMss = solver->getAllMss();
 	int nMss = (signed) allMss.size();
 	for(int i=0; i<nMss-1; ++i) {
 		this->answer = this->answer + modelToString(allMss[i]) + ",";
@@ -58,14 +58,14 @@ void DefaultPreferredSemanticsSolver::computeAllExtensions() {
 void DefaultPreferredSemanticsSolver::isCredulouslyAccepted() {
 	std::vector<int> assumps;
 	assumps.push_back(varMap.getVar(this->acceptanceQueryArgument));
-	solver.computeModel(assumps);
-	this->answer = solver.hasAModel() ? "YES" : "NO";
+	solver->computeModel(assumps);
+	this->answer = solver->hasAModel() ? "YES" : "NO";
 }
 
 
 void DefaultPreferredSemanticsSolver::isSkepticallyAccepted() {
-	solver.computeAllMss();
-	std::vector<std::vector<int> > allMss = solver.getAllMss();
+	solver->computeAllMss();
+	std::vector<std::vector<int> > allMss = solver->getAllMss();
 	int arg = varMap.getVar(this->acceptanceQueryArgument);
 	for(unsigned int i=0; i<allMss.size(); ++i) {
 		std::vector<int> mss = allMss[i];

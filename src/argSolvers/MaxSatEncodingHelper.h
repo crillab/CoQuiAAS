@@ -9,6 +9,8 @@
 #define SRC_ARGSOLVERS_MAXSATENCODINGHELPER_H_
 
 
+#include <memory>
+
 #include "SatEncodingHelper.h"
 #include "MaxSatSolver.h"
 #include "Attacks.h"
@@ -22,7 +24,7 @@ class MaxSatEncodingHelper : public SatEncodingHelper {
 
 public:
 
-	MaxSatEncodingHelper(MaxSatSolver &solver, Attacks& attacks, VarMap& varMap);
+	MaxSatEncodingHelper(std::shared_ptr<MaxSatSolver> solver, Attacks& attacks, VarMap& varMap);
 
 	void setMaxRangeNeeded(int disjVarsStartId);
 
@@ -32,7 +34,7 @@ public:
 
 private:
 
-	MaxSatSolver &solver;
+	std::shared_ptr<MaxSatSolver> solver;
 };
 
 

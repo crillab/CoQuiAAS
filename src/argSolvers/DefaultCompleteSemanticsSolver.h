@@ -21,7 +21,7 @@ class DefaultCompleteSemanticsSolver : public SemanticsProblemSolver {
 
 public:
 
-	DefaultCompleteSemanticsSolver(SatSolver &solver, Attacks &attacks, VarMap &varMap, TaskType taskType);
+	DefaultCompleteSemanticsSolver(std::shared_ptr<SatSolver> solver, Attacks &attacks, VarMap &varMap, TaskType taskType);
 
 	void init();
 
@@ -37,7 +37,7 @@ public:
 
 private:
 
-	SatSolver &solver;
+	std::shared_ptr<SatSolver> solver;
 };
 
 

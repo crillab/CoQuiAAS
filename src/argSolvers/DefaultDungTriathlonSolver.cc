@@ -12,7 +12,7 @@
 using namespace CoQuiAAS;
 
 
-DefaultDungTriathlonSolver::DefaultDungTriathlonSolver(MssSolver &solver, Attacks &attacks, VarMap &varMap)  : SemanticsProblemSolver(attacks, varMap, TASK_ALL_EXTS), solver(solver) {}
+DefaultDungTriathlonSolver::DefaultDungTriathlonSolver(std::shared_ptr<MssSolver> solver, Attacks &attacks, VarMap &varMap)  : SemanticsProblemSolver(attacks, varMap, TASK_ALL_EXTS), solver(solver) {}
 
 
 void DefaultDungTriathlonSolver::init() {
@@ -38,7 +38,7 @@ void DefaultDungTriathlonSolver::computeAllExtensions() {
 	this->answer = "";
 	addGroundedExtensions();
 	this->answer += "\n";
-	solver.computeAllMss();
+	solver->computeAllMss();
 	addStableExtensions();
 	this->answer += "\n";
 	addPreferredExtensions();
@@ -46,12 +46,12 @@ void DefaultDungTriathlonSolver::computeAllExtensions() {
 
 
 void DefaultDungTriathlonSolver::addPreferredExtensions() {
-	if(!solver.hasAMss()) {
+	if(!solver->hasAMss()) {
 		this->answer += "[]";
 		return;
 	}
 	this->answer += "[";
-	std::vector<std::vector<int> > allMss = solver.getAllMss();
+	std::vector<std::vector<int> > allMss = solver->getAllMss();
 	int nMss = (signed) allMss.size();
 	for(int i=0; i<nMss-1; ++i) {
 		this->answer = this->answer + modelToString(allMss[i]) + ",";
@@ -79,12 +79,12 @@ void DefaultDungTriathlonSolver::addGroundedExtensions() {
 
 
 void DefaultDungTriathlonSolver::addStableExtensions() {
-	if(!solver.hasAMss()) {
+	if(!solver->hasAMss()) {
 		this->answer += "[]";
 		return;
 	}
 	this->answer += "[";
-	std::vector<std::vector<int> > allMss = solver.getAllMss();
+	std::vector<std::vector<int> > allMss = solver->getAllMss();
 	int nMss = (signed) allMss.size();
 	ExtensionUtils extUtils(attacks);
 	bool first = true;

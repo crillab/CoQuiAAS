@@ -9,6 +9,8 @@
 #define SRC_SOLVERS_SATENCODINGHELPER_H_
 
 
+#include <memory>
+
 #include "SatSolver.h"
 #include "Attacks.h"
 #include "VarMap.h"
@@ -21,7 +23,7 @@ class SatEncodingHelper {
 
 public:
 
-	SatEncodingHelper(SatSolver &solver, Attacks& attacks, VarMap& varMap);
+	SatEncodingHelper(std::shared_ptr<SatSolver> solver, Attacks& attacks, VarMap& varMap);
 
 	int reserveVars(int n);
 
@@ -41,7 +43,7 @@ public:
 
 private:
 
-	SatSolver &solver;
+	std::shared_ptr<SatSolver> solver;
 
 protected:
 

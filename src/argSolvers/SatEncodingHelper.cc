@@ -11,15 +11,15 @@
 using namespace CoQuiAAS;
 
 
-SatEncodingHelper::SatEncodingHelper(SatSolver &solver, Attacks &attacks, VarMap &varMap) : solver(solver), attacks(attacks), varMap(varMap) {
+SatEncodingHelper::SatEncodingHelper(std::shared_ptr<SatSolver> solver, Attacks &attacks, VarMap &varMap) : solver(solver), attacks(attacks), varMap(varMap) {
 	this->nbVars = varMap.nVars();
-	solver.addVariables(this->nbVars);
+	solver->addVariables(this->nbVars);
 }
 
 
 int SatEncodingHelper::reserveVars(int n) {
 	int ret = this->nbVars + 1;
-	solver.addVariables(n);
+	solver->addVariables(n);
 	this->nbVars += n;
 	return ret;
 }
@@ -39,18 +39,18 @@ void SatEncodingHelper::createAttackersDisjunctionVars(int startId) {
 		std::vector<int, std::allocator<int> >* attacksToCurrentVar = this->attacks.getAttacksTo(var);
 		binaryCl.push_back(-var);
 		binaryCl.push_back(-(var+startId-1));
-		solver.addClause(binaryCl); // (-a \lor -Pa)
+		solver->addClause(binaryCl); // (-a \lor -Pa)
 		binaryCl.clear();
 		completeCl.push_back(-(var+startId-1));
 		for(std::vector<int>::iterator itAttackers = attacksToCurrentVar->begin(); itAttackers != attacksToCurrentVar->end(); ++itAttackers) {
 			int attacker = *itAttackers;
 			binaryCl.push_back(var+startId-1);
 			binaryCl.push_back(-attacker);
-			solver.addClause(binaryCl); // Pa \lor -b
+			solver->addClause(binaryCl); // Pa \lor -b
 			binaryCl.clear();
 			completeCl.push_back(attacker);
 		}
-		solver.addClause(completeCl); // -Pa \lor b1 \lor ... \lor bp
+		solver->addClause(completeCl); // -Pa \lor b1 \lor ... \lor bp
 		completeCl.clear();
 	}
 }
@@ -67,11 +67,11 @@ void SatEncodingHelper::createCompleteEncodingConstraints(int startId) {
 			int attacker = *itAttackers;
 			binaryCl.push_back(-var);
 			binaryCl.push_back(attacker+startId-1); // -a \lor Pb
-			solver.addClause(binaryCl);
+			solver->addClause(binaryCl);
 			binaryCl.clear();
 			completeCl.push_back(-(attacker+startId-1));
 		}
-		solver.addClause(completeCl);
+		solver->addClause(completeCl);
 		completeCl.clear();
 	}
 }
@@ -87,7 +87,7 @@ void SatEncodingHelper::createConflictFreenessEncodingConstraints(int startId) {
 			int attacker = *itAttackers;
 			binaryCl.push_back(-var);
 			binaryCl.push_back(-attacker); // -a \lor -b
-			solver.addClause(binaryCl);
+			solver->addClause(binaryCl);
 			binaryCl.clear();
 		}
 	}
@@ -106,11 +106,11 @@ void SatEncodingHelper::createStableEncodingConstraints() {
 			if(var == attacker) continue;
 			binaryCl.push_back(-(var));
 			binaryCl.push_back(-(attacker));
-			solver.addClause(binaryCl); // -a \lor -b
+			solver->addClause(binaryCl); // -a \lor -b
 			binaryCl.clear();
 			completeCl.push_back(attacker);
 		}
-		solver.addClause(completeCl); // a \lor b1 \lor ... \lor bp
+		solver->addClause(completeCl); // a \lor b1 \lor ... \lor bp
 		completeCl.clear();
 	}
 }
@@ -124,20 +124,20 @@ void SatEncodingHelper::createStableEncodingConstraints(int startId) {
 		std::vector<int, std::allocator<int> >* attacksToCurrentVar = attacks.getAttacksTo(var);
 		if(attacksToCurrentVar->size() == 0) {
 			cl.push_back(var);
-			solver.addClause(cl); // a
+			solver->addClause(cl); // a
 			cl.clear();
 			cl.push_back(-(var+startId-1));
-			solver.addClause(cl); // -Pa
+			solver->addClause(cl); // -Pa
 			cl.clear();
 			continue;
 		}
 		cl.push_back(var);
 		cl.push_back(var+startId-1);
-		solver.addClause(cl); // a \lor Pa
+		solver->addClause(cl); // a \lor Pa
 		cl.clear();
 		cl.push_back(-var);
 		cl.push_back(var+startId-1);
-		solver.addClause(cl); // -a \lor -Pa
+		solver->addClause(cl); // -a \lor -Pa
 		cl.clear();
 	}
 }

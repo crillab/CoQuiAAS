@@ -12,7 +12,7 @@
 using namespace CoQuiAAS;
 
 
-DefaultStableSemanticsSolver::DefaultStableSemanticsSolver(SatSolver &solver, Attacks &attacks, VarMap &varMap, TaskType taskType)  : SemanticsProblemSolver(attacks, varMap, taskType), solver(solver) {}
+DefaultStableSemanticsSolver::DefaultStableSemanticsSolver(std::shared_ptr<SatSolver> solver, Attacks &attacks, VarMap &varMap, TaskType taskType)  : SemanticsProblemSolver(attacks, varMap, taskType), solver(solver) {}
 
 
 void DefaultStableSemanticsSolver::init() {
@@ -22,24 +22,24 @@ void DefaultStableSemanticsSolver::init() {
 
 
 void DefaultStableSemanticsSolver::computeOneExtension() {
-	solver.computeModel();
-	if(!solver.hasAModel()) {
+	solver->computeModel();
+	if(!solver->hasAModel()) {
 		this->answer = "NO";
 		return;
 	}
-	std::vector<bool> model = solver.getModel();
+	std::vector<bool> model = solver->getModel();
 	this->answer = modelToString(model);
 }
 
 
 void DefaultStableSemanticsSolver::computeAllExtensions() {
-	solver.computeAllModels();
-	if(!solver.hasAModel()) {
+	solver->computeAllModels();
+	if(!solver->hasAModel()) {
 		this->answer = "[]";
 		return;
 	}
 	this->answer = "[";
-	std::vector<vector<bool> > models = solver.getModels();
+	std::vector<vector<bool> > models = solver->getModels();
 	int nModels = (signed) models.size();
 	for(int i=0; i<nModels-1; ++i) {
 		this->answer = this->answer + modelToString(models[i]) + ",";
@@ -51,16 +51,16 @@ void DefaultStableSemanticsSolver::computeAllExtensions() {
 void DefaultStableSemanticsSolver::isCredulouslyAccepted() {
 	std::vector<int> assumps;
 	assumps.push_back(varMap.getVar(this->acceptanceQueryArgument));
-	solver.computeModel();
-	this->answer = solver.hasAModel() ? "YES" : "NO";
+	solver->computeModel();
+	this->answer = solver->hasAModel() ? "YES" : "NO";
 }
 
 
 void DefaultStableSemanticsSolver::isSkepticallyAccepted() {
 	std::vector<int> assumps;
 	assumps.push_back(-varMap.getVar(this->acceptanceQueryArgument));
-	solver.computeModel();
-	this->answer = solver.hasAModel() ? "NO" : "YES";
+	solver->computeModel();
+	this->answer = solver->hasAModel() ? "NO" : "YES";
 }
 
 

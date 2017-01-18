@@ -21,7 +21,7 @@ class DefaultDungTriathlonSolver : public SemanticsProblemSolver {
 
 public:
 
-	DefaultDungTriathlonSolver(MssSolver &solver, Attacks &attacks, VarMap &varMap);
+	DefaultDungTriathlonSolver(std::shared_ptr<MssSolver> solver, Attacks &attacks, VarMap &varMap);
 
 	void init();
 
@@ -43,7 +43,7 @@ private:
 
 	void addStableExtensions();
 
-	MssSolver &solver;
+	std::shared_ptr<MssSolver> solver;
 };
 
 

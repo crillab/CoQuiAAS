@@ -12,7 +12,7 @@
 using namespace CoQuiAAS;
 
 
-DefaultIdealSemanticsSolver::DefaultIdealSemanticsSolver(MssSolver &solver, Attacks &attacks, VarMap &varMap, TaskType taskType)  : SemanticsProblemSolver(attacks, varMap, taskType), solver(solver) {}
+DefaultIdealSemanticsSolver::DefaultIdealSemanticsSolver(std::shared_ptr<MssSolver> solver, Attacks &attacks, VarMap &varMap, TaskType taskType)  : SemanticsProblemSolver(attacks, varMap, taskType), solver(solver) {}
 
 
 void DefaultIdealSemanticsSolver::init() {
@@ -30,8 +30,8 @@ void DefaultIdealSemanticsSolver::init() {
 
 
 void DefaultIdealSemanticsSolver::computeOneExtension() {
-	solver.computeAllMss();
-	std::vector<std::vector<int> > allMss = solver.getAllMss();
+	solver->computeAllMss();
+	std::vector<std::vector<int> > allMss = solver->getAllMss();
 	std::vector<bool> argAllowed(varMap.nVars(), true);
 	int nMss = (signed) allMss.size();
 	for(int i=0; i<nMss; ++i) {
@@ -51,8 +51,8 @@ void DefaultIdealSemanticsSolver::computeOneExtension() {
 			assumps.push_back(-i-1);
 		}
 	}
-	solver.computeMss(assumps);
-	std::vector<int> mss = solver.getMss();
+	solver->computeMss(assumps);
+	std::vector<int> mss = solver->getMss();
 	this->answer = modelToString(mss);
 }
 
@@ -64,9 +64,9 @@ void DefaultIdealSemanticsSolver::computeAllExtensions() {
 
 
 void DefaultIdealSemanticsSolver::isCredulouslyAccepted() {
-	solver.computeMss();
+	solver->computeMss();
 	int arg = varMap.getVar(this->acceptanceQueryArgument);
-	std::vector<int> mss = solver.getMss();
+	std::vector<int> mss = solver->getMss();
 	for(unsigned int j=0; j<mss.size(); ++j) {
 		if(mss[j] == arg) {
 			this->answer = "YES";

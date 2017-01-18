@@ -11,7 +11,7 @@
 using namespace CoQuiAAS;
 
 
-DefaultGroundedSemanticsSolver::DefaultGroundedSemanticsSolver(SatSolver &satSolver, Attacks &attacks, VarMap &varMap, TaskType taskType) : SemanticsProblemSolver(attacks, varMap, taskType), solver(satSolver) {}
+DefaultGroundedSemanticsSolver::DefaultGroundedSemanticsSolver(std::shared_ptr<SatSolver> solver, Attacks &attacks, VarMap &varMap, TaskType taskType) : SemanticsProblemSolver(attacks, varMap, taskType), solver(solver) {}
 
 
 void DefaultGroundedSemanticsSolver::init() {
@@ -23,7 +23,7 @@ void DefaultGroundedSemanticsSolver::init() {
 
 
 void DefaultGroundedSemanticsSolver::computeOneExtension() {
-	std::vector<int>& propagated = solver.propagatedAtDecisionLvlZero();
+	std::vector<int>& propagated = solver->propagatedAtDecisionLvlZero();
 	this->answer = "[";
 	int nPropagated = (signed) propagated.size();
 	int nArgs = varMap.nVars();
@@ -46,7 +46,7 @@ void DefaultGroundedSemanticsSolver::computeAllExtensions() {
 
 
 void DefaultGroundedSemanticsSolver::isCredulouslyAccepted() {
-	bool isPropagated = solver.isPropagatedAtDecisionLvlZero(varMap.getVar(this->acceptanceQueryArgument));
+	bool isPropagated = solver->isPropagatedAtDecisionLvlZero(varMap.getVar(this->acceptanceQueryArgument));
 	this->answer = isPropagated ? "YES" : "NO";
 }
 

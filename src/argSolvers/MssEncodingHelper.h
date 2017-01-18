@@ -22,7 +22,7 @@ class MssEncodingHelper : public SatEncodingHelper {
 
 public:
 
-	MssEncodingHelper(MssSolver &solver, Attacks& attacks, VarMap& varMap);
+	MssEncodingHelper(std::shared_ptr<MssSolver> solver, Attacks& attacks, VarMap& varMap);
 
 	void setMaxExtensionNeeded();
 
@@ -32,7 +32,7 @@ public:
 
 private:
 
-	MssSolver &solver;
+	std::shared_ptr<MssSolver> solver;
 };
 
 

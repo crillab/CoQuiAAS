@@ -9,6 +9,8 @@
 #define SRC_SOLVERS_STABLESEMANTICSSOLVER_H_
 
 
+#include <memory>
+
 #include "SemanticsProblemSolver.h"
 #include "core/Solver.h"
 #include "SatEncodingHelper.h"
@@ -21,7 +23,7 @@ class DefaultStableSemanticsSolver : public SemanticsProblemSolver {
 
 public:
 
-	DefaultStableSemanticsSolver(SatSolver &solver, Attacks &attacks, VarMap &varMap, TaskType taskType);
+	DefaultStableSemanticsSolver(std::shared_ptr<SatSolver> solver, Attacks &attacks, VarMap &varMap, TaskType taskType);
 
 	void init();
 
@@ -37,7 +39,7 @@ public:
 
 private:
 
-	SatSolver &solver;
+	std::shared_ptr<SatSolver> solver;
 };
 
 

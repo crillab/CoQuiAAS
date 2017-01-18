@@ -11,7 +11,7 @@
 using namespace CoQuiAAS;
 
 
-MaxSatEncodingHelper::MaxSatEncodingHelper(MaxSatSolver &solver, Attacks& attacks, VarMap& varMap) : SatEncodingHelper(solver, attacks, varMap), solver(solver) {}
+MaxSatEncodingHelper::MaxSatEncodingHelper(std::shared_ptr<MaxSatSolver> solver, Attacks& attacks, VarMap& varMap) : SatEncodingHelper(std::static_pointer_cast<SatSolver>(solver), attacks, varMap), solver(solver) {}
 
 
 void MaxSatEncodingHelper::setMaxExtensionNeeded(int disjVarsStartId) {
@@ -19,7 +19,7 @@ void MaxSatEncodingHelper::setMaxExtensionNeeded(int disjVarsStartId) {
 	for(std::vector<int>::iterator itVars = vars.begin() ; itVars != vars.end(); ++itVars) { // iterate over vars representing arguments
 		std::vector<int> softClause;
 		softClause.push_back(*itVars);
-		solver.addSoftClause(softClause);
+		solver->addSoftClause(softClause);
 	}
 }
 
@@ -30,7 +30,7 @@ void MaxSatEncodingHelper::setMaxRangeNeeded(int disjVarsStartId) {
 	for(std::vector<int>::iterator itVars = vars.begin() ; itVars != vars.end(); ++itVars) { // iterate over vars representing arguments
 		std::vector<int> softClause;
 		softClause.push_back(*itVars+(disjVarsStartId-1));
-		solver.addSoftClause(softClause);
+		solver->addSoftClause(softClause);
 	}
 }
 

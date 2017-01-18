@@ -21,7 +21,7 @@ namespace CoQuiAAS {
 class DefaultIdealSemanticsSolver : public SemanticsProblemSolver {
 
 public:
-	DefaultIdealSemanticsSolver(MssSolver &solver, Attacks &attacks, VarMap &varMap, TaskType taskType);
+	DefaultIdealSemanticsSolver(std::shared_ptr<MssSolver> solver, Attacks &attacks, VarMap &varMap, TaskType taskType);
 
 	void init();
 
@@ -37,7 +37,7 @@ public:
 
 private:
 
-	MssSolver &solver;
+	std::shared_ptr<MssSolver> solver;
 };
 
 
