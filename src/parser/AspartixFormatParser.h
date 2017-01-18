@@ -43,8 +43,8 @@ class AspartixFormatParser : public IParser {
    */
   virtual ~AspartixFormatParser(){}
   void parseInstance();
-  Attacks *getAttacks();
-  VarMap *getVarMap();
+  Attacks& getAttacks();
+  VarMap& getVarMap();
 
  private:
   Attacks attacks;  /*!< The attack relation corresponding to the parsed file  */

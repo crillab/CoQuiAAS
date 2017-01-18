@@ -13,7 +13,7 @@
 using namespace CoQuiAAS;
 
 
-Attacks::Attacks(VarMap *vm) : varMap(*vm) {
+Attacks::Attacks(VarMap& vm) : varMap(vm) {
   nbAttacks = 0;
   nMaxAttacks = 0;
 }

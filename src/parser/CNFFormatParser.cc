@@ -13,7 +13,7 @@
 using namespace CoQuiAAS;
 
 
-CNFFormatParser::CNFFormatParser(std::istream *input) : attacks(&varMap) {
+CNFFormatParser::CNFFormatParser(std::istream *input) : attacks(varMap) {
   is = input;
 }
 
@@ -40,11 +40,11 @@ void CNFFormatParser::parseInstance() {
 }
 
 
-inline Attacks *CNFFormatParser::getAttacks() {
-  return &attacks;
+inline Attacks& CNFFormatParser::getAttacks() {
+  return attacks;
 }
 
 
-VarMap *CNFFormatParser::getVarMap() {
-  return &varMap;
+inline VarMap& CNFFormatParser::getVarMap() {
+  return varMap;
 }

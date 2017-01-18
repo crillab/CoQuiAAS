@@ -40,14 +40,14 @@ class IParser {
    * \brief Returns the attack relation corresponding to the input file
    * \return the attack relation corresponding to the input file
    */
-  virtual Attacks *getAttacks() = 0;
+  virtual Attacks& getAttacks() = 0;
 
   /**
    * \fn getVarMap()
    * \brief Returns the mapping between the arguments and the literals
    * \return the mapping between the arguments and the literals
    */
-  virtual VarMap *getVarMap() = 0;
+  virtual VarMap& getVarMap() = 0;
 
   virtual ~IParser(){}
 

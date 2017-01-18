@@ -14,7 +14,7 @@
 using namespace CoQuiAAS;
 
 
-TrivialGraphFormatParser::TrivialGraphFormatParser(std::istream *input) : attacks(&varMap) {
+TrivialGraphFormatParser::TrivialGraphFormatParser(std::istream *input) : attacks(varMap) {
   is = input;
 }
 
@@ -33,11 +33,11 @@ void TrivialGraphFormatParser::parseInstance() {
 }
 
 
-inline Attacks *TrivialGraphFormatParser::getAttacks() {
-  return &attacks;
+inline Attacks& TrivialGraphFormatParser::getAttacks() {
+  return attacks;
 }
 
 
-VarMap *TrivialGraphFormatParser::getVarMap() {
-  return &varMap;
+inline VarMap& TrivialGraphFormatParser::getVarMap() {
+  return varMap;
 }

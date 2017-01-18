@@ -2,6 +2,8 @@
 #define __PARSER_FACTORY_H__
 
 
+#include <memory>
+
 #include "IParser.h"
 #include "AspartixFormatParser.h"
 #include "CNFFormatParser.h"
@@ -39,16 +41,16 @@ class ParserFactory {
    * \param file : a stream opened with read rights where pointer is at the beginning of the instance file
    * \return an InstanceFormat object corresponding to the string passed in parameter ; FORMAT_UNDEFINED is returned in case the string is not recognized
    */
-  static IParser *getParserInstance(InstanceFormat format, istream *file) {
+  static std::unique_ptr<IParser> getParserInstance(InstanceFormat format, istream *file) {
     switch(format) {
     case FORMAT_ASPARTIX:
-      return new AspartixFormatParser(file);
+      return std::unique_ptr<IParser>(new AspartixFormatParser(file));
     case FORMAT_CNF:
-      return new CNFFormatParser(file);
+      return std::unique_ptr<IParser>(new CNFFormatParser(file));
     case FORMAT_TRIVIAL_GRAPH:
-      return new TrivialGraphFormatParser(file);
+      return std::unique_ptr<IParser>(new TrivialGraphFormatParser(file));
     default: 
-      return NULL;
+      return nullptr;
     }
   }
   

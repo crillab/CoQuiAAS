@@ -17,6 +17,7 @@
  */
 
 
+#include <memory>
 #include <iostream>
 #include <fstream>
 #include <ctime>
@@ -41,13 +42,13 @@ pthread_t timeoutTh;
 clock_t clk;
 
 
-inline bool undefinedArgument(string arg, VarMap* map){
-	return !map->contains(arg);
+inline bool undefinedArgument(string arg, VarMap& map){
+	return !map.contains(arg);
 }
 
 
-void setInitStats(CommandLineHelper *clh, IParser *p);
-void setFinalStats(CommandLineHelper *clh, IParser *p);
+void setInitStats(CommandLineHelper&clh, std::unique_ptr<IParser> const &p);
+void setFinalStats(CommandLineHelper& clh, std::unique_ptr<IParser> const &p);
 void *handleTimeout(void *strSeconds);
 
 
@@ -69,7 +70,7 @@ int main(int argc, char** argv){
 
 	// parse instance depending on the format and the file
 	ifstream file(clh.getInstanceFile().c_str(),ios::in);
-	IParser *parser = ParserFactory::getParserInstance(clh.getInstanceFormat(), &file);
+	std::unique_ptr<IParser> parser = ParserFactory::getParserInstance(clh.getInstanceFormat(), &file);
 	if(!parser) {
 		cerr << MAIN_UNSUPPORTED_FILE_FORMAT_MSG << endl;
 		return 2;
@@ -78,9 +79,9 @@ int main(int argc, char** argv){
 	file.close();
 
 	// initialize the StatMap
-	setInitStats(&clh, parser);
+	setInitStats(clh, parser);
 	// request a semantic instance depending on the problem to compute
-	SemanticsProblemSolver *problem = SolverFactory::getProblemInstance(clh.getSemanticName(), clh.getTaskType(), clh.getAdditionalParams(), *(parser->getAttacks()), *(parser->getVarMap()));
+	SemanticsProblemSolver *problem = SolverFactory::getProblemInstance(clh.getSemanticName(), clh.getTaskType(), clh.getAdditionalParams(), parser->getAttacks(), parser->getVarMap());
 	if(!clh.getAdditionalParameter("-a").empty()){
 		if(undefinedArgument(clh.getAdditionalParameter("-a"),parser->getVarMap())){
 			cout << "UNDEFINED" << endl ;
@@ -99,27 +100,26 @@ int main(int argc, char** argv){
 	//pthread_cancel(timeoutTh);
 	StatMapFactory::deleteInstance();
 	delete problem;
-	delete parser;
 
 	return 0;
 }
 
 
-void setInitStats(CommandLineHelper *clh, IParser *parser) {
+void setInitStats(CommandLineHelper& clh, std::unique_ptr<IParser> const &parser) {
 	StatMapFactory::getInstance()->setStat("solver", "CoQuiAAS v1.0");
-	StatMapFactory::getInstance()->setStat("instance", clh->getInstanceFile());
+	StatMapFactory::getInstance()->setStat("instance", clh.getInstanceFile());
 	StatMapFactory::getInstance()->setStat("","");
-	StatMapFactory::getInstance()->setStat("nArgs", (int)parser->getVarMap()->nVars());
-	StatMapFactory::getInstance()->setStat("nSelfAttacking", (int)parser->getVarMap()->nSelfAttacking());
-	StatMapFactory::getInstance()->setStat("nAttacks", (int)parser->getAttacks()->nAttacks());
-	StatMapFactory::getInstance()->setStat("maxAttacks", (int)parser->getAttacks()->maxAttacks());
+	StatMapFactory::getInstance()->setStat("nArgs", (int)parser->getVarMap().nVars());
+	StatMapFactory::getInstance()->setStat("nSelfAttacking", (int)parser->getVarMap().nSelfAttacking());
+	StatMapFactory::getInstance()->setStat("nAttacks", (int)parser->getAttacks().nAttacks());
+	StatMapFactory::getInstance()->setStat("maxAttacks", (int)parser->getAttacks().maxAttacks());
 	StatMapFactory::getInstance()->setStat("","");
-	StatMapFactory::getInstance()->setStat("graph density", (double)(parser->getAttacks()->nAttacks())/(parser->getVarMap()->nVars()*parser->getVarMap()->nVars()));
+	StatMapFactory::getInstance()->setStat("graph density", (double)(parser->getAttacks().nAttacks())/(parser->getVarMap().nVars()*parser->getVarMap().nVars()));
 	StatMapFactory::getInstance()->setStat("","");
 }
 
 
-void setFinalStats(CommandLineHelper *clh, IParser *parser) {
+void setFinalStats(CommandLineHelper& clh, std::unique_ptr<IParser> const &parser) {
 	StatMapFactory::getInstance()->setStat("computation time (s)",(double)(clock()-clk)/CLOCKS_PER_SEC);
 	StatMapFactory::getInstance()->printStats(stdout);
 	fflush(stdout);

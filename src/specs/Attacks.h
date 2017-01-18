@@ -32,7 +32,7 @@ class Attacks {
    * \brief Constructor
    * \param vm : the variables concerned by the attack relation
    */
-  Attacks(VarMap *vm);
+  Attacks(VarMap& vm);
 
   /**
    * \fn addAttack

@@ -44,8 +44,8 @@ class CNFFormatParser : public IParser {
   virtual ~CNFFormatParser(){}
 
   void parseInstance();
-  Attacks *getAttacks();
-  VarMap *getVarMap();
+  Attacks& getAttacks();
+  VarMap& getVarMap();
 
  private:
   Attacks attacks; /*!< The attack relation corresponding to the parsed file  */

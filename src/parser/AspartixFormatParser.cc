@@ -18,7 +18,7 @@
 using namespace CoQuiAAS;
 
 
-AspartixFormatParser::AspartixFormatParser(std::istream *input) : attacks(&varMap) {
+AspartixFormatParser::AspartixFormatParser(std::istream *input) : attacks(varMap) {
   is = input;
 }
 
@@ -65,11 +65,11 @@ void AspartixFormatParser::parseInstance() {
     
 
 
-inline Attacks *AspartixFormatParser::getAttacks() {
-  return &attacks;
+inline Attacks& AspartixFormatParser::getAttacks() {
+  return attacks;
 }
 
 
-VarMap *AspartixFormatParser::getVarMap() {
-  return &varMap;
+inline VarMap& AspartixFormatParser::getVarMap() {
+  return varMap;
 }
