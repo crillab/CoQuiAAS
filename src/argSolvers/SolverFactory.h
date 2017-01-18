@@ -71,14 +71,14 @@ public:
 
 	static std::shared_ptr<SatSolver> createSatSolver(std::map<std::string,std::string>& additionalParams) {
 		if(additionalParams.find("-externalSatSolver") != additionalParams.end()) {
-			return std::shared_ptr<SatSolver>(new ExternalSatSolver(additionalParams["-externalSatSolver"]));
+			return std::shared_ptr<SatSolver>(std::make_shared<ExternalSatSolver>(additionalParams["-externalSatSolver"]));
 		}
-		return std::shared_ptr<SatSolver>(new BuiltInSatSolver());
+		return std::shared_ptr<SatSolver>(std::make_shared<BuiltInSatSolver>());
 	}
 
 	static std::shared_ptr<MssSolver> createMssSolver(std::map<std::string,std::string>& additionalParams) {
 		if(additionalParams.find("-lbx") != additionalParams.end()) {
-			return std::shared_ptr<MssSolver>(new LbxCoMssSolver(additionalParams["-lbx"]));
+			return std::shared_ptr<MssSolver>(std::make_shared<LbxCoMssSolver>(additionalParams["-lbx"]));
 		}
 		std::cerr << "ERROR:: no builtin coMSS solver" << std::endl;
 		std::exit(1);
@@ -86,7 +86,7 @@ public:
 
 	static std::shared_ptr<MaxSatSolver> createMaxSatSolver(std::map<std::string,std::string>& additionalParams) {
 		if(additionalParams.find("-externalMaxSatSolver") != additionalParams.end()) {
-			return std::shared_ptr<MaxSatSolver>(new ExternalMaxSatSolver(additionalParams["-externalMaxSatSolver"]));
+			return std::shared_ptr<MaxSatSolver>(std::make_shared<ExternalMaxSatSolver>(additionalParams["-externalMaxSatSolver"]));
 		}
 		std::cerr << "ERROR:: no builtin MaxSAT solver" << std::endl;
 		std::exit(1);
@@ -94,7 +94,7 @@ public:
 
 	static std::unique_ptr<SemanticsProblemSolver> groundedSolver(TaskType task, std::map<std::string,std::string>& additionalParams, Attacks &attacks, VarMap &varMap) {
 		if(additionalParams.find("--graphBased") != additionalParams.end()) {
-			return std::unique_ptr<SemanticsProblemSolver>(new GraphBasedGroundedSemanticsSolver(attacks, varMap, task));
+			return std::unique_ptr<SemanticsProblemSolver>(std::make_unique<GraphBasedGroundedSemanticsSolver>(attacks, varMap, task));
 		}
 		return std::unique_ptr<SemanticsProblemSolver>(new DefaultGroundedSemanticsSolver(createSatSolver(additionalParams), attacks, varMap, task));
 	}
