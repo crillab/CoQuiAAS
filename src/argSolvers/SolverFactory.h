@@ -1,7 +1,7 @@
 #ifndef __SOLVER_FACTORY_H__
 #define __SOLVER_FACTORY_H__
 
-
+#include <memory>
 #include <algorithm>
 #include <string>
 #include <map>
@@ -69,31 +69,31 @@ public:
 		return SEM_UNDEFINED;
 	}
 
-	static SatSolver *createSatSolver(std::map<std::string,std::string> *additionalParams) {
-		if(additionalParams->find("-externalSatSolver") != additionalParams->end()) {
-			return new ExternalSatSolver((*additionalParams)["-externalSatSolver"]);
+	static SatSolver *createSatSolver(std::map<std::string,std::string>& additionalParams) {
+		if(additionalParams.find("-externalSatSolver") != additionalParams.end()) {
+			return new ExternalSatSolver(additionalParams["-externalSatSolver"]);
 		}
 		return new BuiltInSatSolver();
 	}
 
-	static MssSolver *createMssSolver(std::map<std::string,std::string> *additionalParams) {
-		if(additionalParams->find("-lbx") != additionalParams->end()) {
-			return new LbxCoMssSolver((*additionalParams)["-lbx"]);
+	static MssSolver *createMssSolver(std::map<std::string,std::string>& additionalParams) {
+		if(additionalParams.find("-lbx") != additionalParams.end()) {
+			return new LbxCoMssSolver(additionalParams["-lbx"]);
 		}
 		std::cerr << "ERROR:: no builtin coMSS solver" << std::endl;
 		std::exit(1);
 	}
 
-	static MaxSatSolver *createMaxSatSolver(std::map<std::string,std::string> *additionalParams) {
-		if(additionalParams->find("-externalMaxSatSolver") != additionalParams->end()) {
-			return new ExternalMaxSatSolver((*additionalParams)["-externalMaxSatSolver"]);
+	static MaxSatSolver *createMaxSatSolver(std::map<std::string,std::string>& additionalParams) {
+		if(additionalParams.find("-externalMaxSatSolver") != additionalParams.end()) {
+			return new ExternalMaxSatSolver(additionalParams["-externalMaxSatSolver"]);
 		}
 		std::cerr << "ERROR:: no builtin MaxSAT solver" << std::endl;
 		std::exit(1);
 	}
 
-	static SemanticsProblemSolver *groundedSolver(TaskType task, std::map<std::string,std::string> *additionalParams, Attacks &attacks, VarMap &varMap) {
-		if(additionalParams->find("--graphBased") != additionalParams->end()) {
+	static SemanticsProblemSolver *groundedSolver(TaskType task, std::map<std::string,std::string>& additionalParams, Attacks &attacks, VarMap &varMap) {
+		if(additionalParams.find("--graphBased") != additionalParams.end()) {
 			return new GraphBasedGroundedSemanticsSolver(attacks, varMap, task);
 		}
 		return new DefaultGroundedSemanticsSolver(*createSatSolver(additionalParams), attacks, varMap, task);
@@ -106,27 +106,27 @@ public:
 	 * \param task : the task that is required
 	 * \param additionalParams the additional parameters from the command line
 	 */
-	static SemanticsProblemSolver *getProblemInstance(SemanticName semantic, TaskType task, std::map<std::string,std::string> *additionalParams, Attacks &attacks, VarMap &varMap) {
+	static std::unique_ptr<SemanticsProblemSolver> getProblemInstance(SemanticName semantic, TaskType task, std::map<std::string,std::string>& additionalParams, Attacks &attacks, VarMap &varMap) {
 		if(task == TASK_UNDEFINED) return NULL;
 		switch(semantic) {
 		case SEM_STABLE:
-			return new DefaultStableSemanticsSolver(*createSatSolver(additionalParams), attacks, varMap, task);
+			return std::unique_ptr<SemanticsProblemSolver>(new DefaultStableSemanticsSolver(*createSatSolver(additionalParams), attacks, varMap, task));
 		case SEM_COMPLETE:
-			return new DefaultCompleteSemanticsSolver(*createSatSolver(additionalParams), attacks, varMap, task);
+			return std::unique_ptr<SemanticsProblemSolver>(new DefaultCompleteSemanticsSolver(*createSatSolver(additionalParams), attacks, varMap, task));
 		case SEM_GROUNDED:
-			return groundedSolver(task, additionalParams, attacks, varMap);
+			return std::unique_ptr<SemanticsProblemSolver>(groundedSolver(task, additionalParams, attacks, varMap));
 		case SEM_PREFERRED:
-			return new DefaultPreferredSemanticsSolver(*createMssSolver(additionalParams), attacks, varMap, task);
+			return std::unique_ptr<SemanticsProblemSolver>(new DefaultPreferredSemanticsSolver(*createMssSolver(additionalParams), attacks, varMap, task));
 		case SEM_SEMISTABLE:
-			return new DefaultSemistableSemanticsSolver(*createMssSolver(additionalParams), attacks, varMap, task);
+			return std::unique_ptr<SemanticsProblemSolver>(new DefaultSemistableSemanticsSolver(*createMssSolver(additionalParams), attacks, varMap, task));
 		case SEM_STAGE:
-			return new DefaultStageSemanticsSolver(*createMssSolver(additionalParams), attacks, varMap, task);
+			return std::unique_ptr<SemanticsProblemSolver>(new DefaultStageSemanticsSolver(*createMssSolver(additionalParams), attacks, varMap, task));
 		case SEM_IDEAL:
-			return new DefaultIdealSemanticsSolver(*createMssSolver(additionalParams), attacks, varMap, task);
+			return std::unique_ptr<SemanticsProblemSolver>(new DefaultIdealSemanticsSolver(*createMssSolver(additionalParams), attacks, varMap, task));
 		case SEM_TRIATHLON:
-			return new DefaultDungTriathlonSolver(*createMssSolver(additionalParams), attacks, varMap);
+			return std::unique_ptr<SemanticsProblemSolver>(new DefaultDungTriathlonSolver(*createMssSolver(additionalParams), attacks, varMap));
 		default:
-			return NULL;
+			return nullptr;
 		}
 	}
 

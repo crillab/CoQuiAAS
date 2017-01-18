@@ -128,8 +128,8 @@ string CommandLineHelper::getAdditionalParameter(string param) {
   return additionalParams[param];
 }
 
-map<string,string> *CommandLineHelper::getAdditionalParams() {
-  return &additionalParams;
+map<string,string>& CommandLineHelper::getAdditionalParams() {
+  return additionalParams;
 }
 
 bool CommandLineHelper::assertWellFormed(bool test) {

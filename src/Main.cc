@@ -47,7 +47,7 @@ inline bool undefinedArgument(string arg, VarMap& map){
 }
 
 
-void setInitStats(CommandLineHelper&clh, std::unique_ptr<IParser> const &p);
+void setInitStats(CommandLineHelper& clh, std::unique_ptr<IParser> const &p);
 void setFinalStats(CommandLineHelper& clh, std::unique_ptr<IParser> const &p);
 void *handleTimeout(void *strSeconds);
 
@@ -59,10 +59,10 @@ int main(int argc, char** argv){
 	CommandLineHelper clh = CommandLineHelper(argc, argv);
 	clh.parseCommandLine();
 	if(clh.mustExitNow()) return clh.errorInCommandLine() ? 1 : 0;
-	StatMapFactory::createInstance(clh.getAdditionalParams()->find("--printStats") == clh.getAdditionalParams()->end());
+	StatMapFactory::createInstance(clh.getAdditionalParams().find("--printStats") == clh.getAdditionalParams().end());
 
 	// handle timeout (if any)
-	if(clh.getAdditionalParams()->find("-timeout") != clh.getAdditionalParams()->end()) {
+	if(clh.getAdditionalParams().find("-timeout") != clh.getAdditionalParams().end()) {
 		string strTimeout = clh.getAdditionalParameter("-timeout");
 		pthread_create(&timeoutTh, NULL, handleTimeout, &strTimeout);
 		pthread_detach(timeoutTh);
@@ -81,7 +81,7 @@ int main(int argc, char** argv){
 	// initialize the StatMap
 	setInitStats(clh, parser);
 	// request a semantic instance depending on the problem to compute
-	SemanticsProblemSolver *problem = SolverFactory::getProblemInstance(clh.getSemanticName(), clh.getTaskType(), clh.getAdditionalParams(), parser->getAttacks(), parser->getVarMap());
+	std::unique_ptr<SemanticsProblemSolver> problem = SolverFactory::getProblemInstance(clh.getSemanticName(), clh.getTaskType(), clh.getAdditionalParams(), parser->getAttacks(), parser->getVarMap());
 	if(!clh.getAdditionalParameter("-a").empty()){
 		if(undefinedArgument(clh.getAdditionalParameter("-a"),parser->getVarMap())){
 			cout << "UNDEFINED" << endl ;
@@ -99,7 +99,6 @@ int main(int argc, char** argv){
 
 	//pthread_cancel(timeoutTh);
 	StatMapFactory::deleteInstance();
-	delete problem;
 
 	return 0;
 }

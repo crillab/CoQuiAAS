@@ -73,7 +73,7 @@ class CommandLineHelper {
    * \brief allows to know the whole set of additional parameters defined by the command line
    * \return the parameters' map
    */
-  map<string,string> *getAdditionalParams();
+  map<string,string>& getAdditionalParams();
 
   /**
    * \fn mustExitNow
