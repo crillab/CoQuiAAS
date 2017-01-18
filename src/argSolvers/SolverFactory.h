@@ -94,7 +94,7 @@ public:
 
 	static std::unique_ptr<SemanticsProblemSolver> groundedSolver(TaskType task, std::map<std::string,std::string>& additionalParams, Attacks &attacks, VarMap &varMap) {
 		if(additionalParams.find("--graphBased") != additionalParams.end()) {
-			return std::unique_ptr<SemanticsProblemSolver>(std::make_unique<GraphBasedGroundedSemanticsSolver>(attacks, varMap, task));
+			return std::unique_ptr<SemanticsProblemSolver>(new GraphBasedGroundedSemanticsSolver(attacks, varMap, task));
 		}
 		return std::unique_ptr<SemanticsProblemSolver>(new DefaultGroundedSemanticsSolver(createSatSolver(additionalParams), attacks, varMap, task));
 	}

@@ -97,30 +97,29 @@ int main(int argc, char** argv){
 	// display solution depending of the problem pointed at init time
 	std::cout << problem->answerToString() << std::endl;
 
-	//pthread_cancel(timeoutTh);
-	StatMapFactory::deleteInstance();
-
 	return 0;
 }
 
 
 void setInitStats(CommandLineHelper& clh, std::unique_ptr<IParser> const &parser) {
-	StatMapFactory::getInstance()->setStat("solver", "CoQuiAAS v1.0");
-	StatMapFactory::getInstance()->setStat("instance", clh.getInstanceFile());
-	StatMapFactory::getInstance()->setStat("","");
-	StatMapFactory::getInstance()->setStat("nArgs", (int)parser->getVarMap().nVars());
-	StatMapFactory::getInstance()->setStat("nSelfAttacking", (int)parser->getVarMap().nSelfAttacking());
-	StatMapFactory::getInstance()->setStat("nAttacks", (int)parser->getAttacks().nAttacks());
-	StatMapFactory::getInstance()->setStat("maxAttacks", (int)parser->getAttacks().maxAttacks());
-	StatMapFactory::getInstance()->setStat("","");
-	StatMapFactory::getInstance()->setStat("graph density", (double)(parser->getAttacks().nAttacks())/(parser->getVarMap().nVars()*parser->getVarMap().nVars()));
-	StatMapFactory::getInstance()->setStat("","");
+	std::shared_ptr<StatMap> statMap = statMap;
+	statMap->setStat("solver", "CoQuiAAS v1.0");
+	statMap->setStat("instance", clh.getInstanceFile());
+	statMap->setStat("","");
+	statMap->setStat("nArgs", (int)parser->getVarMap().nVars());
+	statMap->setStat("nSelfAttacking", (int)parser->getVarMap().nSelfAttacking());
+	statMap->setStat("nAttacks", (int)parser->getAttacks().nAttacks());
+	statMap->setStat("maxAttacks", (int)parser->getAttacks().maxAttacks());
+	statMap->setStat("","");
+	statMap->setStat("graph density", (double)(parser->getAttacks().nAttacks())/(parser->getVarMap().nVars()*parser->getVarMap().nVars()));
+	statMap->setStat("","");
 }
 
 
 void setFinalStats(CommandLineHelper& clh, std::unique_ptr<IParser> const &parser) {
-	StatMapFactory::getInstance()->setStat("computation time (s)",(double)(clock()-clk)/CLOCKS_PER_SEC);
-	StatMapFactory::getInstance()->printStats(stdout);
+	std::shared_ptr<StatMap> statMap = statMap;
+	statMap->setStat("computation time (s)",(double)(clock()-clk)/CLOCKS_PER_SEC);
+	statMap->printStats(stdout);
 	fflush(stdout);
 }
 
@@ -130,16 +129,16 @@ void *handleTimeout(void *strSeconds) {
 	int nSec;
 	struct sigaction sigact;
 	int retVal = 0;
-
+	std::shared_ptr<StatMap> statMap = statMap;
 
 	sscanf(((string*)strSeconds)->c_str(), "%d", &nSec);
 	if(nSec <= 0) {
-		StatMapFactory::getInstance()->setStat("timeout (s)", "INVALID_VAL");
+		statMap->setStat("timeout (s)", "INVALID_VAL");
 		retVal = 1;
 		pthread_exit(&retVal);
 		return NULL;
 	}
-	StatMapFactory::getInstance()->setStat("timeout (s)", nSec);
+	statMap->setStat("timeout (s)", nSec);
 	memset(&sigact, 0, sizeof(struct sigaction));
 	sigact.sa_handler = sigIntHandler;
 	sigemptyset(&sigact.sa_mask);
@@ -158,9 +157,10 @@ void *handleTimeout(void *strSeconds) {
 
 
 void sigIntHandler(int sig) {
-	StatMapFactory::getInstance()->setStat("timeout", "TRUE");
-	StatMapFactory::getInstance()->setStat("computation time (s)",(double)(clock()-clk)/CLOCKS_PER_SEC);
-	StatMapFactory::getInstance()->printStats(stdout);
+	std::shared_ptr<StatMap> statMap = statMap;
+	statMap->setStat("timeout", "TRUE");
+	statMap->setStat("computation time (s)",(double)(clock()-clk)/CLOCKS_PER_SEC);
+	statMap->printStats(stdout);
 	fflush(stdout);
 	exit(10);
 }

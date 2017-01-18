@@ -2,6 +2,8 @@
 #define __STAT_MAP_FACTORY_H__
 
 
+#include <memory>
+
 #include "DefaultStatMap.h"
 #include "FakeStatMap.h"
 #include "LogStatMap.h"
@@ -12,29 +14,25 @@ namespace CoQuiAAS {
 
 class StatMapFactory {
 
- public:
+public:
 
-  static void createInstance(bool isFake) {
+	static void createInstance(bool isFake) {
+		if(isFake)
+			StatMapFactory::instance = std::shared_ptr<StatMap>(std::make_shared<FakeStatMap>());
+		else
+			StatMapFactory::instance = std::shared_ptr<StatMap>(std::make_shared<LogStatMap>(stdout));
+	}
 
-    // StatMapFactory::instance = (isFake) ? (StatMap*)(new FakeStatMap()) : (StatMap*)(new DefaultStatMap());
-    StatMapFactory::instance = (isFake) ? (StatMap*)(new FakeStatMap()) : (StatMap*)(new LogStatMap(stdout));
-  }
+	static std::shared_ptr<StatMap> getInstance() {
 
-  static StatMap *getInstance() {
+		return StatMapFactory::instance;
+	}
 
-    return StatMapFactory::instance;
-  }
-
-  static void deleteInstance() {
-
-    delete StatMapFactory::instance;
-  }
-
- public:
-  static StatMap *instance;
+public:
+	static std::shared_ptr<StatMap> instance;
 };
 
-StatMap *StatMapFactory::instance = NULL;
+std::shared_ptr<StatMap> StatMapFactory::instance = nullptr;
 
 
 }
