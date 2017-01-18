@@ -16,7 +16,7 @@ ExtensionUtils::ExtensionUtils(Attacks &attacks) : attacks(attacks) {}
 std::vector<int> ExtensionUtils::groundedExtension() {
 	VarMap& vm = attacks.getVarMap();
 	std::vector<int> grExt;
-	std::vector<int> allVars = *attacks.getVarMap().intVars();
+	std::vector<int>& allVars = attacks.getVarMap().intVars();
 	std::vector<bool> inExt;
 	for(unsigned int i=0; i<allVars.size(); ++i) inExt.push_back(false);
 	std::vector<bool> defeated;
@@ -70,7 +70,7 @@ std::vector<int> ExtensionUtils::groundedExtension() {
 
 
 bool ExtensionUtils::isMaxRange(std::vector<int>& extension) {
-	std::vector<int> allVars = *attacks.getVarMap().intVars();
+	std::vector<int>& allVars = attacks.getVarMap().intVars();
 	std::vector<bool> inExt;
 	for(unsigned int i=0; i<allVars.size(); ++i) {
 		inExt.push_back(false);

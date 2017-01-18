@@ -70,7 +70,7 @@ class VarMap {
    * \brief To iterate over the integer variables corresponding to the string variables
    * \return a vector containing the integer variables
    */
-  std::vector<int>* intVars();
+  std::vector<int>& intVars();
 
   /**
    * \fn nVars
@@ -122,6 +122,7 @@ class VarMap {
   
  private:
   std::map<int, std::string> varToName; /**< Mapping from Boolean variables to their names */
+  std::vector<int> intVariables;
   std::map<std::string, int> nameToVar; /**< Mapping from the names to the Boolean variables */
   int nvars; /**< The number of variables */
   std::map<int, bool> selfAttacking; /**< Allows to know if an argument is self-attacking */

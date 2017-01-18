@@ -21,7 +21,8 @@ VarMap::VarMap() {
 
 void VarMap::addEntry(std::string name) {
   if(!contains(name)){
-    varToName[++nvars] = name;
+	intVariables.push_back(++nvars);
+    varToName[nvars] = name;
     selfAttacking[nvars] = false ;
     nameToVar[name] = nvars;
   }
@@ -45,11 +46,8 @@ bool VarMap::contains(std::string name){
   return (bool)nameToVar[name];
 }
 
-std::vector<int>* VarMap::intVars() {
-  std::vector<int> *res = new std::vector<int>;
-  for(std::map<int, std::string>::iterator it = varToName.begin(); it != varToName.end(); ++it)
-    res->push_back(it->first);
-  return res;
+std::vector<int>& VarMap::intVars() {
+  return intVariables;
 }
 
 long VarMap::nVars() {

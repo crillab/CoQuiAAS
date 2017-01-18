@@ -26,15 +26,15 @@ int SatEncodingHelper::reserveVars(int n) {
 
 
 int SatEncodingHelper::reserveDisjunctionVars() {
-	return reserveVars(varMap.intVars()->size());
+	return reserveVars(varMap.intVars().size());
 }
 
 
 void SatEncodingHelper::createAttackersDisjunctionVars(int startId) {
-	std::vector<int, std::allocator<int> >* vars = varMap.intVars();
+	std::vector<int, std::allocator<int> >& vars = varMap.intVars();
 	Minisat::vec<Minisat::Lit> binaryClause, naryClause;
 	std::vector<int> binaryCl, completeCl;
-	for(std::vector<int>::iterator itVars = vars->begin() ; itVars != vars->end(); ++itVars) {
+	for(std::vector<int>::iterator itVars = vars.begin() ; itVars != vars.end(); ++itVars) {
 		int var = *itVars;
 		std::vector<int, std::allocator<int> >* attacksToCurrentVar = this->attacks.getAttacksTo(var);
 		binaryCl.push_back(-var);
@@ -58,8 +58,8 @@ void SatEncodingHelper::createAttackersDisjunctionVars(int startId) {
 
 void SatEncodingHelper::createCompleteEncodingConstraints(int startId) {
 	std::vector<int> binaryCl, completeCl;
-	std::vector<int, std::allocator<int> >* vars = varMap.intVars();
-	for(std::vector<int>::iterator itVars = vars->begin() ; itVars != vars->end(); ++itVars) {
+	std::vector<int, std::allocator<int> >& vars = varMap.intVars();
+	for(std::vector<int>::iterator itVars = vars.begin() ; itVars != vars.end(); ++itVars) {
 		int var = *itVars;
 		std::vector<int, std::allocator<int> >* attacksToCurrentVar = attacks.getAttacksTo(var);
 		completeCl.push_back(var);
@@ -79,8 +79,8 @@ void SatEncodingHelper::createCompleteEncodingConstraints(int startId) {
 
 void SatEncodingHelper::createConflictFreenessEncodingConstraints(int startId) {
 	std::vector<int> binaryCl;
-	std::vector<int, std::allocator<int> >* vars = varMap.intVars();
-	for(std::vector<int>::iterator itVars = vars->begin() ; itVars != vars->end(); ++itVars) {
+	std::vector<int, std::allocator<int> >& vars = varMap.intVars();
+	for(std::vector<int>::iterator itVars = vars.begin() ; itVars != vars.end(); ++itVars) {
 		int var = *itVars;
 		std::vector<int, std::allocator<int> >* attacksToCurrentVar = attacks.getAttacksTo(var);
 		for(std::vector<int>::iterator itAttackers = attacksToCurrentVar->begin(); itAttackers != attacksToCurrentVar->end(); ++itAttackers) {
@@ -96,8 +96,8 @@ void SatEncodingHelper::createConflictFreenessEncodingConstraints(int startId) {
 
 void SatEncodingHelper::createStableEncodingConstraints() {
 	std::vector<int> binaryCl, completeCl;
-	std::vector<int, std::allocator<int> >* vars = varMap.intVars();
-	for(std::vector<int>::iterator itVars = vars->begin() ; itVars != vars->end(); ++itVars) {
+	std::vector<int, std::allocator<int> >& vars = varMap.intVars();
+	for(std::vector<int>::iterator itVars = vars.begin() ; itVars != vars.end(); ++itVars) {
 		int var = *itVars;
 		completeCl.push_back(var);
 		std::vector<int, std::allocator<int> >* attacksToCurrentVar = attacks.getAttacksTo(var);
@@ -118,8 +118,8 @@ void SatEncodingHelper::createStableEncodingConstraints() {
 
 void SatEncodingHelper::createStableEncodingConstraints(int startId) {
 	std::vector<int> cl;
-	std::vector<int, std::allocator<int> >* vars = varMap.intVars();
-	for(std::vector<int>::iterator itVars = vars->begin() ; itVars != vars->end(); ++itVars) {
+	std::vector<int, std::allocator<int> >& vars = varMap.intVars();
+	for(std::vector<int>::iterator itVars = vars.begin() ; itVars != vars.end(); ++itVars) {
 		int var = *itVars;
 		std::vector<int, std::allocator<int> >* attacksToCurrentVar = attacks.getAttacksTo(var);
 		if(attacksToCurrentVar->size() == 0) {

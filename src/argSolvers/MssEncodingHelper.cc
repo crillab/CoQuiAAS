@@ -15,8 +15,8 @@ MssEncodingHelper::MssEncodingHelper(MssSolver &solver, Attacks& attacks, VarMap
 
 
 void MssEncodingHelper::setMaxExtensionNeeded() {
-	std::vector<int, std::allocator<int> >* vars = varMap.intVars();
-	for(std::vector<int>::iterator itVars = vars->begin() ; itVars != vars->end(); ++itVars) { // iterate over vars representing arguments
+	std::vector<int, std::allocator<int> >& vars = varMap.intVars();
+	for(std::vector<int>::iterator itVars = vars.begin() ; itVars != vars.end(); ++itVars) { // iterate over vars representing arguments
 		std::vector<int> softClause;
 		softClause.push_back(*itVars);
 		solver.addSoftClause(softClause);
@@ -25,8 +25,8 @@ void MssEncodingHelper::setMaxExtensionNeeded() {
 
 
 void MssEncodingHelper::setMaxRangeNeeded(int disjVarsStartId) {
-	std::vector<int, std::allocator<int> >* vars = varMap.intVars();
-	for(std::vector<int>::iterator itVars = vars->begin() ; itVars != vars->end(); ++itVars) { // iterate over vars representing arguments
+	std::vector<int, std::allocator<int> >& vars = varMap.intVars();
+	for(std::vector<int>::iterator itVars = vars.begin() ; itVars != vars.end(); ++itVars) { // iterate over vars representing arguments
 		std::vector<int> softClause;
 		softClause.push_back(*itVars);
 		softClause.push_back(*itVars+(disjVarsStartId-1));
