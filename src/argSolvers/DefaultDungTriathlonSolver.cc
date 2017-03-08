@@ -63,7 +63,7 @@ void DefaultDungTriathlonSolver::addPreferredExtensions() {
 void DefaultDungTriathlonSolver::addGroundedExtensions() {
 	ExtensionUtils extUtils(attacks);
 	std::vector<int> propagated = extUtils.groundedExtension();
-	this->answer += "[";
+	this->answer += "[[";
 	int nPropagated = (signed) propagated.size();
 	int nArgs = varMap.nVars();
 	int nPropagatedArgs = 0;
@@ -74,7 +74,7 @@ void DefaultDungTriathlonSolver::addGroundedExtensions() {
 			this->answer = this->answer+varMap.getName(propagated[i]);
 		}
 	}
-	this->answer = this->answer + "]";
+	this->answer = this->answer + "]]";
 }
 
 
