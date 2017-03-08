@@ -40,7 +40,7 @@ Jean-Marie Lagniez, Emmanuel Lonca, Jean-Guy Mailly -- {lagniez,lonca}@cril.fr, 
 #define CLH_SUPPORTED_PROBLEMS_MSG "[SE-ST,SE-CO,SE-GR,SE-PR,SE-SST,SE-STG,SE-ID,"\
 									"EE-ST,EE-CO,EE-GR,EE-PR,EE-SST,EE-STG,EE-ID,"\
 									"DC-ST,DC-CO,DC-GR,DC-PR,DC-SST,DC-STG,DC-ID,"\
-									"DS-ST,DS-CO,DS-GR,DS-PR,DS-SST,DS-STG,DS-ID]"
+									"DS-ST,DS-CO,DS-GR,DS-PR,DS-SST,DS-STG,DS-ID,D3]"
 
 #define FLAG_SET "FLAG_SET"
 
