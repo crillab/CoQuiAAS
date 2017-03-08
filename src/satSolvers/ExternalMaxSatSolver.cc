@@ -212,3 +212,7 @@ std::vector<bool>& ExternalMaxSatSolver::getModel() {
 std::vector<std::vector<bool> >& ExternalMaxSatSolver::getModels() {
 	return ExternalSatSolver::getModels();
 }
+
+void ExternalMaxSatSolver::resetModels() {
+	this->models.clear();
+}

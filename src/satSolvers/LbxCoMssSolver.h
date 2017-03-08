@@ -46,6 +46,8 @@ public:
 
 	virtual std::vector<std::vector<int> >& getAllMss();
 
+	virtual void resetAllMss();
+
 	virtual void addVariables(int nVars);
 
 	virtual bool addClause(std::vector<int> &clause);
@@ -69,6 +71,8 @@ public:
 	virtual std::vector<bool>& getModel();
 
 	virtual std::vector<std::vector<bool> >& getModels();
+
+	virtual void resetModels();
 
 private:
 

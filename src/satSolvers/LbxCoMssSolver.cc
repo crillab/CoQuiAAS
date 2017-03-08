@@ -78,6 +78,10 @@ std::vector<std::vector<int> >& LbxCoMssSolver::getAllMss() {
 	return this->mss;
 }
 
+void LbxCoMssSolver::resetAllMss() {
+	this->mss.clear();
+}
+
 std::string LbxCoMssSolver::writeInstance(std::vector<int> assumps, bool onlyHardClauses) {
 	std::string tmpname("/tmp/tmp_CoQuiASS_ext_XXXXXX");
 	if(-1==mkstemp((char *) tmpname.c_str())) {
@@ -284,6 +288,10 @@ bool LbxCoMssSolver::hasAModel() {
 
 std::vector<bool>& LbxCoMssSolver::getModel() {
 	return this->models[this->models.size()-1];
+}
+
+void LbxCoMssSolver::resetModels() {
+	this->models.clear();
 }
 
 

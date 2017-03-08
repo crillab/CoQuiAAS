@@ -34,6 +34,8 @@ public:
 
 	virtual std::vector<std::vector<int> >& getAllMss() = 0;
 
+	virtual void resetAllMss() = 0;
+
 	static std::vector<int> extractMssFromCoMss(Minisat::vec<int>& coMss, int nSoftCstrs) {
 		std::vector<int> tmpmss;
 		for(int j=1; j<=nSoftCstrs; ++j) tmpmss.push_back(j);

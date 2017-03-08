@@ -237,5 +237,9 @@ std::vector<std::vector<bool> >& ExternalSatSolver::getModels() {
 	return this->models;
 }
 
+void ExternalSatSolver::resetModels() {
+	this->models.clear();
+}
+
 ExternalSatSolver::~ExternalSatSolver() {}
 

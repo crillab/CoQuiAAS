@@ -45,11 +45,7 @@ public:
 	virtual bool computeModel(std::vector<int> &assumps);
 
 	virtual bool computeModel(std::vector<int> &assumps, bool clearModelVec);
-/*
-	virtual bool computeAnotherModel();
 
-	virtual bool computeAnotherModel(std::vector<int> &assumps);
-*/
 	virtual void computeAllModels();
 
 	virtual void computeAllModels(std::vector<int> &assumps);
@@ -59,6 +55,8 @@ public:
 	virtual std::vector<bool>& getModel();
 
 	virtual std::vector<std::vector<bool> >& getModels();
+
+	virtual void resetModels();
 
 	virtual ~BuiltInSatSolver();
 

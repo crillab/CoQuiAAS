@@ -60,6 +60,8 @@ public:
 
 	virtual std::vector<std::vector<bool> >& getModels();
 
+	virtual void resetModels();
+
 	virtual ~ExternalSatSolver();
 
 protected:

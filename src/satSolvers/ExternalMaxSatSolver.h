@@ -55,6 +55,7 @@ public :
 	virtual bool hasAModel();
 	virtual std::vector<bool>& getModel();
 	virtual std::vector<std::vector<bool> >& getModels();
+	virtual void resetModels();
 
 
 private:

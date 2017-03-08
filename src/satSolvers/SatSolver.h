@@ -46,6 +46,8 @@ public:
 
 	virtual std::vector<std::vector<bool> >& getModels() = 0;
 
+	virtual void resetModels() = 0;
+
 	virtual ~SatSolver() {}
 
 protected:

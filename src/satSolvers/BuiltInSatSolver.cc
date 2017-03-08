@@ -156,6 +156,10 @@ std::vector<std::vector<bool> >& BuiltInSatSolver::getModels() {
 	return this->models;
 }
 
+void BuiltInSatSolver::resetModels() {
+	this->models.clear();
+}
+
 
 BuiltInSatSolver::~BuiltInSatSolver() {}
 
