@@ -42,7 +42,7 @@ public:
 	static TaskType getTaskType(std::string str) {
 		str = str.substr(0,2);
 		std::transform(str.begin(), str.end(), str.begin(), ::toupper);
-		if(!str.compare("DT")) return TASK_TRIATHLON;
+		if(!str.compare("D3")) return TASK_TRIATHLON;
 		if(!str.compare("SE")) return TASK_ONE_EXT;
 		if(!str.compare("EE")) return TASK_ALL_EXTS;
 		if(!str.compare("DC")) return TASK_CRED_INF;
@@ -57,7 +57,7 @@ public:
 	 */
 	static SemanticName getSemanticName(std::string str) {
 		std::transform(str.begin(), str.end(), str.begin(), ::toupper);
-		if(!str.compare("DT")) return SEM_TRIATHLON;
+		if(!str.compare("D3")) return SEM_TRIATHLON;
 		str = str.substr(3);
 		if(!str.compare("ST")) return SEM_STABLE;
 		if(!str.compare("CO")) return SEM_COMPLETE;

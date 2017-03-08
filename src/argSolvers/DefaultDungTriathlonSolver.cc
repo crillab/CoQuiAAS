@@ -37,10 +37,10 @@ void DefaultDungTriathlonSolver::computeOneExtension() {
 void DefaultDungTriathlonSolver::computeAllExtensions() {
 	this->answer = "";
 	addGroundedExtensions();
-	this->answer += "\n";
+	this->answer += ",";
 	solver->computeAllMss();
 	addStableExtensions();
-	this->answer += "\n";
+	this->answer += ",";
 	addPreferredExtensions();
 }
 
