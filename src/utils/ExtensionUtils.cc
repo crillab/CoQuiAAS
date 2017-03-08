@@ -45,7 +45,6 @@ std::vector<int> ExtensionUtils::groundedExtension() {
 					break;
 				}
 				argInExt = false;
-				break;
 			}
 			if(argInExt) {
 				grExt.push_back(var);
