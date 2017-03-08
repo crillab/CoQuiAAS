@@ -102,7 +102,7 @@ int main(int argc, char** argv){
 
 
 void setInitStats(CommandLineHelper& clh, std::unique_ptr<IParser> const &parser) {
-	std::shared_ptr<StatMap> statMap = statMap;
+  std::shared_ptr<StatMap> statMap = make_shared<FakeStatMap>();
 	statMap->setStat("solver", "CoQuiAAS v1.0");
 	statMap->setStat("instance", clh.getInstanceFile());
 	statMap->setStat("","");
