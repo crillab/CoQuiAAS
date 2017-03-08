@@ -39,7 +39,7 @@ private:
 
 	std::shared_ptr<MssSolver> solver;
 
-	void computeAllSstExtensions();
+	std::vector<std::vector<bool>> computeAllSstExtensions();
 };
 
 
