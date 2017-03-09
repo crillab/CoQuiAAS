@@ -27,7 +27,7 @@ std::vector<int> ExtensionUtils::groundedExtension() {
 		for(unsigned int i=0; i<candidates.size(); ++i) {
 			int var = candidates[i];
 			if(vm.isSelfAttacking(var)) {
-				defeated[var] = true;
+				defeated[var-1] = true;
 				candidates[i--] = candidates.back();
 				candidates.pop_back();
 				++step;
@@ -38,8 +38,8 @@ std::vector<int> ExtensionUtils::groundedExtension() {
 			std::vector<int> attacksTo = *attacks.getAttacksTo(var);
 			for(unsigned int j=0; j<attacksTo.size(); ++j) {
 				int attacker = attacksTo[j];
-				if(defeated[attacker]) continue;
-				if(inExt[attacker]) {
+				if(defeated[attacker-1]) continue;
+				if(inExt[attacker-1]) {
 					argDefeated = true;
 					argInExt = false;
 					break;
@@ -48,14 +48,14 @@ std::vector<int> ExtensionUtils::groundedExtension() {
 			}
 			if(argInExt) {
 				grExt.push_back(var);
-				inExt[var] = true;
+				inExt[var-1] = true;
 				candidates[i--] = candidates.back();
 				candidates.pop_back();
 				++step;
 				continue;
 			}
 			if(argDefeated) {
-				defeated[var] = true;
+				defeated[var-1] = true;
 				candidates[i--] = candidates.back();
 				candidates.pop_back();
 				++step;
