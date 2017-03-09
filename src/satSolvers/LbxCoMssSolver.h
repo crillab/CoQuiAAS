@@ -50,6 +50,8 @@ public:
 
 	virtual void addVariables(int nVars);
 
+	virtual void addVariables(int nVars, bool auxVar);
+
 	virtual bool addClause(std::vector<int> &clause);
 
 	virtual int addSelectedClause(std::vector<int> &clause);
@@ -90,7 +92,9 @@ private:
 
 	int nSoftCstrs;
 
-	std::string writeInstance(std::vector<int> assumps, bool onlyHardClauses);
+	std::string writeInstanceForMSS(std::vector<int> assumps);
+
+	std::string writeInstanceForSAT(std::vector<int> assumps, int realNumberOfVars);
 
 	bool launchExternalSolver(std::string instanceFile, bool allModels);
 
@@ -105,6 +109,8 @@ private:
 	std::vector<int> readIntVector(char *line);
 
 	int nVars;
+
+	int realNumberOfVars;
 
 	int nCstrs;
 

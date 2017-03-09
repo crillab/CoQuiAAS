@@ -68,7 +68,7 @@ std::vector<std::vector<bool>> DefaultStageSemanticsSolver::computeAllStgExtensi
 		}
 		std::vector<std::vector<bool>> extModels;
 		for(int i=0; i<(signed)msses.size(); ++i) {
-			extModels.push_back(oldModels[i]);
+//			extModels.push_back(oldModels[i]);
 			std::vector<int> assumps;
 			for(int j=0; j<nVars; ++j) {
 				assumps.push_back(-selectors[j]);
@@ -76,9 +76,9 @@ std::vector<std::vector<bool>> DefaultStageSemanticsSolver::computeAllStgExtensi
 			for(int j=0; j<(signed)msses[i].size(); ++j) {
 				assumps[msses[i][j]-1] = selectors[msses[i][j]-1];
 			}
-			for(int j=0; j<nVars; ++j) {
-				if(!oldModels[i][j]) assumps.push_back(j+1);
-			}
+//			for(int j=0; j<nVars; ++j) {
+//				if(!oldModels[i][j]) assumps.push_back(j+1);
+//			}
 			solver->computeAllModels(assumps);
 			std::vector<std::vector<bool>> newModels = solver->getModels();
 			for(int j=0; j<(signed)newModels.size(); ++j) {

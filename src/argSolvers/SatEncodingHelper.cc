@@ -19,7 +19,7 @@ SatEncodingHelper::SatEncodingHelper(std::shared_ptr<SatSolver> solver, Attacks 
 
 int SatEncodingHelper::reserveVars(int n) {
 	int ret = this->nbVars + 1;
-	solver->addVariables(n);
+	solver->addVariables(n, true);
 	this->nbVars += n;
 	return ret;
 }

@@ -44,6 +44,7 @@ public :
 	virtual int getOptValue();
 
 	virtual void addVariables(int nVars);
+	virtual void addVariables(int nVars, bool auxVars);
 	virtual bool addClause(std::vector<int> &clause);
 	virtual int addSelectedClause(std::vector<int> &clause);
 	virtual std::vector<int>& propagatedAtDecisionLvlZero();

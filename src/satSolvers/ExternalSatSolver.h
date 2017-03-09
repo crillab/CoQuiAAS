@@ -36,6 +36,8 @@ public:
 
 	virtual void addVariables(int nVars);
 
+	virtual void addVariables(int nVars, bool auxVar);
+
 	virtual bool addClause(std::vector<int> &clause);
 
 	virtual int addSelectedClause(std::vector<int> &clause);

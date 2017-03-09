@@ -149,6 +149,10 @@ void ExternalMaxSatSolver::addVariables(int nVars) {
 	ExternalSatSolver::addVariables(nVars);
 }
 
+void ExternalMaxSatSolver::addVariables(int nVars, bool auxVars) {
+	ExternalSatSolver::addVariables(nVars, auxVars);
+}
+
 
 bool ExternalMaxSatSolver::addClause(std::vector<int> &clause) {
 	return ExternalSatSolver::addClause(clause);

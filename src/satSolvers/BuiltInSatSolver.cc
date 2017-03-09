@@ -19,6 +19,11 @@ BuiltInSatSolver::BuiltInSatSolver() {
 
 
 void BuiltInSatSolver::addVariables(int nVars) {
+	addVariables(nVars, false);
+}
+
+
+void BuiltInSatSolver::addVariables(int nVars, bool auxVar) { // TODO: implement auxVars here
 	for(int i=0; i<nVars; ++i) {
 		solver.newVar();
 	}

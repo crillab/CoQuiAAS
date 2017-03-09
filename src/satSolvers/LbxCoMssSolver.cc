@@ -15,6 +15,7 @@ LbxCoMssSolver::LbxCoMssSolver(std::string lbxPath) {
 	this->lbxPath = lbxPath;
 	this->nSoftCstrs = 0;
 	this->nVars = 0;
+	this->realNumberOfVars = 0;
 	this->nCstrs = 0;
 }
 
@@ -44,7 +45,7 @@ bool LbxCoMssSolver::computeMss() {
 
 
 bool LbxCoMssSolver::computeMss(std::vector<int> &assumps) {
-	std::string instance = writeInstance(assumps, false);
+	std::string instance = writeInstanceForMSS(assumps);
 	int ret = launchExternalSolver(instance, false);
 	unlink(instance.c_str());
 	return ret;
@@ -58,7 +59,7 @@ void LbxCoMssSolver::computeAllMss() {
 
 
 void LbxCoMssSolver::computeAllMss(std::vector<int> &assumps) {
-	std::string instance = writeInstance(assumps, false);
+	std::string instance = writeInstanceForMSS(assumps);
 	launchExternalSolver(instance, true);
 	unlink(instance.c_str());
 }
@@ -82,7 +83,8 @@ void LbxCoMssSolver::resetAllMss() {
 	this->mss.clear();
 }
 
-std::string LbxCoMssSolver::writeInstance(std::vector<int> assumps, bool onlyHardClauses) {
+
+std::string LbxCoMssSolver::writeInstanceForMSS(std::vector<int> assumps) {
 	std::string tmpname("/tmp/tmp_CoQuiASS_ext_XXXXXX");
 	if(-1==mkstemp((char *) tmpname.c_str())) {
 		perror("ExternalSatBasedSolver::hasAModel::mkstemp");
@@ -90,16 +92,39 @@ std::string LbxCoMssSolver::writeInstance(std::vector<int> assumps, bool onlyHar
 	}
 	std::ofstream f(tmpname.c_str());
 	int hardCstrWeight = (this->nSoftCstrs+1);
-	unsigned int nClauses = onlyHardClauses ? this->nCstrs+assumps.size() : this->nSoftCstrs+this->nCstrs+assumps.size();
+	unsigned int nClauses = this->nSoftCstrs+this->nCstrs+assumps.size();
 	f << "p wcnf " << this->nVars << " " << nClauses << " " << hardCstrWeight <<std::endl;
 	std::string line;
-	if(!onlyHardClauses) {
-		std::istringstream softCstrsStream(this->dimacsSoftCstrs.str());
-		while (std::getline(softCstrsStream, line)) {
-			f << "1 " << line << std::endl;
-		}
+	std::istringstream softCstrsStream(this->dimacsSoftCstrs.str());
+	while (std::getline(softCstrsStream, line)) {
+		f << "1 " << line << std::endl;
 	}
 	std::istringstream hardCstrsStream(this->dimacsCstrs.str());
+	while (std::getline(hardCstrsStream, line)) {
+		f << hardCstrWeight << " " << line << std::endl;
+	}
+	for(std::vector<int>::iterator it = assumps.begin(); it != assumps.end(); ++it) {
+		f << hardCstrWeight << " " << *it << " 0" << std::endl;
+	}
+	f.close();
+	return tmpname;
+}
+
+
+std::string LbxCoMssSolver::writeInstanceForSAT(std::vector<int> assumps, int realNumberOfVars) {
+	std::string tmpname("/tmp/tmp_CoQuiASS_ext_XXXXXX");
+	if(-1==mkstemp((char *) tmpname.c_str())) {
+		perror("ExternalSatBasedSolver::hasAModel::mkstemp");
+		exit(2);
+	}
+	std::ofstream f(tmpname.c_str());
+	int hardCstrWeight = (2*realNumberOfVars+1);
+	unsigned int nClauses = this->nCstrs+assumps.size()+realNumberOfVars;
+	f << "p wcnf " << this->nVars << " " << nClauses << " " << hardCstrWeight <<std::endl;
+	std::string line;
+	std::istringstream hardCstrsStream(this->dimacsCstrs.str());
+	for(int i=1; i<=realNumberOfVars; ++i) f << "1 " << i << " 0" << std::endl;
+	for(int i=1; i<=realNumberOfVars; ++i) f << "1 " << (-i) << " 0" << std::endl;
 	while (std::getline(hardCstrsStream, line)) {
 		f << hardCstrWeight << " " << line << std::endl;
 	}
@@ -219,7 +244,12 @@ std::vector<bool> LbxCoMssSolver::extractModel(char *line) {
 
 
 void LbxCoMssSolver::addVariables(int nVars) {
+	addVariables(nVars, false);
+}
+
+void LbxCoMssSolver::addVariables(int nVars, bool auxVar) {
 	this->nVars += nVars;
+	if(auxVar) this->realNumberOfVars += nVars;
 }
 
 
@@ -234,7 +264,7 @@ bool LbxCoMssSolver::addClause(std::vector<int> &clause) {
 
 
 int LbxCoMssSolver::addSelectedClause(std::vector<int> &clause) {
-	addVariables(1);
+	addVariables(1, true);
 	int selector = this->nVars;
 	clause.push_back(-selector);
 	addClause(clause);
@@ -261,9 +291,12 @@ bool LbxCoMssSolver::computeModel() {
 
 
 bool LbxCoMssSolver::computeModel(std::vector<int> &assumps) {
-	std::string instance = writeInstance(assumps, true);
+	auto oldNSoftCstrs = this->nSoftCstrs;
+	this->nSoftCstrs = 2*realNumberOfVars;
+	std::string instance = writeInstanceForSAT(assumps, this->realNumberOfVars);
 	int ret = launchExternalSolver(instance, false);
 	unlink(instance.c_str());
+	this->nSoftCstrs = oldNSoftCstrs;
 	return ret;
 }
 
@@ -275,9 +308,12 @@ void LbxCoMssSolver::computeAllModels() {
 
 
 void LbxCoMssSolver::computeAllModels(std::vector<int> &assumps) {
-	std::string instance = writeInstance(assumps, true);
-	launchExternalSolver(instance, false);
+	auto oldNSoftCstrs = this->nSoftCstrs;
+	this->nSoftCstrs = 2*realNumberOfVars;
+	std::string instance = writeInstanceForSAT(assumps, this->realNumberOfVars);
+	launchExternalSolver(instance, true);
 	unlink(instance.c_str());
+	this->nSoftCstrs = oldNSoftCstrs;
 }
 
 

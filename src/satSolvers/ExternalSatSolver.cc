@@ -20,6 +20,11 @@ ExternalSatSolver::ExternalSatSolver(std::string command) {
 
 
 void ExternalSatSolver::addVariables(int nVars) {
+	addVariables(nVars, false);
+}
+
+
+void ExternalSatSolver::addVariables(int nVars, bool auxVar) { // TODO: implement aux vars
 	this->nVars += nVars;
 }
 
