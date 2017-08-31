@@ -51,7 +51,7 @@ void DefaultStableSemanticsSolver::computeAllExtensions() {
 void DefaultStableSemanticsSolver::isCredulouslyAccepted() {
 	std::vector<int> assumps;
 	assumps.push_back(varMap.getVar(this->acceptanceQueryArgument));
-	solver->computeModel();
+	solver->computeModel(assumps);
 	this->answer = solver->hasAModel() ? "YES" : "NO";
 }
 
@@ -59,7 +59,7 @@ void DefaultStableSemanticsSolver::isCredulouslyAccepted() {
 void DefaultStableSemanticsSolver::isSkepticallyAccepted() {
 	std::vector<int> assumps;
 	assumps.push_back(-varMap.getVar(this->acceptanceQueryArgument));
-	solver->computeModel();
+	solver->computeModel(assumps);
 	this->answer = solver->hasAModel() ? "NO" : "YES";
 }
 
