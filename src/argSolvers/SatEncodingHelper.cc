@@ -103,9 +103,8 @@ void SatEncodingHelper::createStableEncodingConstraints() {
 		std::vector<int, std::allocator<int> >* attacksToCurrentVar = attacks.getAttacksTo(var);
 		for(std::vector<int>::iterator itAttackers = attacksToCurrentVar->begin(); itAttackers != attacksToCurrentVar->end(); ++itAttackers) {
 			int attacker = *itAttackers;
-			if(var == attacker) continue;
 			binaryCl.push_back(-(var));
-			binaryCl.push_back(-(attacker));
+			if(var != attacker) binaryCl.push_back(-(attacker));
 			solver->addClause(binaryCl); // -a \lor -b
 			binaryCl.clear();
 			completeCl.push_back(attacker);

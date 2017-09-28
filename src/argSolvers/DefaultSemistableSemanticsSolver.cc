@@ -101,41 +101,28 @@ std::vector<std::vector<bool>> DefaultSemistableSemanticsSolver::computeAllSstEx
 
 
 void DefaultSemistableSemanticsSolver::isCredulouslyAccepted() {
-	computeAllSstExtensions();
-	std::vector<std::vector<int> > allMss = solver->getAllMss();
-	int arg = varMap.getVar(this->acceptanceQueryArgument);
-	for(unsigned int i=0; i<allMss.size(); ++i) {
-		std::vector<int> mss = allMss[i];
-		for(unsigned int j=0; i<mss.size(); ++j) {
-			if(mss[j] == arg) {
-				this->answer = "YES";
-				return;
-			}
-		}
-	}
-	this->answer = "NO";
+  std::vector<std::vector<bool> > models = computeAllSstExtensions();
+  int arg = varMap.getVar(this->acceptanceQueryArgument);
+  for(unsigned int i=0; i<models.size(); ++i) {
+    if(models[i][arg-1]) {
+      this->answer = "YES";
+      return;
+    }
+  }
+  this->answer = "NO";
 }
 
 
 void DefaultSemistableSemanticsSolver::isSkepticallyAccepted() {
-	computeAllSstExtensions();
-	std::vector<std::vector<int> > allMss = solver->getAllMss();
-	int arg = varMap.getVar(this->acceptanceQueryArgument);
-	for(unsigned int i=0; i<allMss.size(); ++i) {
-		std::vector<int> mss = allMss[i];
-		bool found = false;
-		for(unsigned int j=0; i<mss.size(); ++j) {
-			if(mss[j] == arg) {
-				found = true;
-				break;
-			}
-		}
-		if(!found) {
-			this->answer = "NO";
-			return;
-		}
-	}
-	this->answer = "YES";
+  std::vector<std::vector<bool> > models = computeAllSstExtensions();
+  int arg = varMap.getVar(this->acceptanceQueryArgument);
+  for(unsigned int i=0; i<models.size(); ++i) {
+    if(!models[i][arg-1]) {
+      this->answer = "NO";
+      return;
+    }
+  }
+  this->answer = "YES";
 }
 
 

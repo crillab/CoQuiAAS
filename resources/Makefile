@@ -241,6 +241,7 @@ pdfdir = ${docdir}
 prefix = /usr/local
 program_transform_name = s,x,x,
 psdir = ${docdir}
+runstatedir = ${localstatedir}/run
 sbindir = ${exec_prefix}/sbin
 sharedstatedir = ${prefix}/com
 srcdir = .
