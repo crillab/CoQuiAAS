@@ -17,12 +17,7 @@ DefaultIdealSemanticsSolver::DefaultIdealSemanticsSolver(std::shared_ptr<MssSolv
 
 void DefaultIdealSemanticsSolver::init() {
 	MssEncodingHelper helper(solver, attacks, varMap);
-	switch(taskType) {
-	case TASK_CRED_INF:
-		break;
-	default:
-		helper.setMaxExtensionNeeded();
-	}
+	helper.setMaxExtensionNeeded();
 	int disjId = helper.reserveDisjunctionVars();
 	helper.createAttackersDisjunctionVars(disjId);
 	helper.createCompleteEncodingConstraints(disjId);

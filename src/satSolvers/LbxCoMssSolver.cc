@@ -196,7 +196,10 @@ std::vector<int> LbxCoMssSolver::extractCoMss(char *line) {
 	std::vector<int> tmpMss;
 	for(int i=1; i<=nSoftCstrs; ++i) tmpMss.push_back(i);
 	std::vector<int> mcs = readIntVector(line);
-	for(unsigned int i=0; i<mcs.size(); ++i) tmpMss[mcs[i]-1] = -1;
+	for(unsigned int i=0; i<mcs.size(); ++i) {
+	  fflush(stdout);
+	  tmpMss[mcs[i]-1] = -1;
+	}
 	std::vector<int> newMss;
 	for(unsigned int i=0; i<tmpMss.size(); ++i) {
 		if(tmpMss[i] > 0) {
