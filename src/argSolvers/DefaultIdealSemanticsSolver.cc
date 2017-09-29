@@ -78,7 +78,7 @@ void DefaultIdealSemanticsSolver::isCredulouslyAccepted() {
 
 
 void DefaultIdealSemanticsSolver::isSkepticallyAccepted() {
-	return isCredulouslyAccepted();
+	isCredulouslyAccepted();
 }
 
 
