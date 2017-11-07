@@ -21,6 +21,7 @@
 #include "BuiltInMssSolver.h"
 #include "LbxCoMssSolver.h"
 #include "ExternalMaxSatSolver.h"
+#include "ExternalCoMssSolver.h"
 
 
 namespace CoQuiAAS {
@@ -79,6 +80,9 @@ public:
 	static std::shared_ptr<MssSolver> createMssSolver(std::map<std::string,std::string>& additionalParams) {
 		if(additionalParams.find("-lbx") != additionalParams.end()) {
 			return std::shared_ptr<MssSolver>(std::make_shared<LbxCoMssSolver>(additionalParams["-lbx"]));
+		}
+		if(additionalParams.find("-comssextractor") != additionalParams.end()) {
+			return std::shared_ptr<MssSolver>(std::make_shared<ExternalCoMssSolver>(additionalParams["-comssextractor"]));
 		}
 		std::cerr << "ERROR:: no builtin coMSS solver" << std::endl;
 		std::exit(1);
