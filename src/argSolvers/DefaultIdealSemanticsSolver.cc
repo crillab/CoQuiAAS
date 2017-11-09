@@ -59,7 +59,7 @@ void DefaultIdealSemanticsSolver::computeAllExtensions() {
 
 
 void DefaultIdealSemanticsSolver::isCredulouslyAccepted() {
-	solver->computeMss();
+	computeOneExtension();
 	int arg = varMap.getVar(this->acceptanceQueryArgument);
 	std::vector<int> mss = solver->getMss();
 	for(unsigned int j=0; j<mss.size(); ++j) {

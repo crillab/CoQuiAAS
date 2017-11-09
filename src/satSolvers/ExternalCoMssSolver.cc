@@ -197,6 +197,7 @@ std::string ExternalCoMssSolver::writeInstanceForMSS(std::vector<int> assumps) {
 	for(std::vector<int>::iterator it = assumps.begin(); it != assumps.end(); ++it) {
 		f << hardCstrWeight << " " << *it << " 0" << std::endl;
 	}
+	
 	f.close();
 	return tmpname;
 }
@@ -276,6 +277,7 @@ bool ExternalCoMssSolver::handleForkAncestor(int pipe[], bool allModels, bool ex
       continue;
     }
     if(!strncmp(buffer, "v ", 2)) {
+      // std::cout << buffer << std::endl;
       this->mss.push_back(extractCoMss(buffer+2));
       ret = true;
       continue;
@@ -346,9 +348,9 @@ std::vector<bool> ExternalCoMssSolver::extractModelFromMss(std::vector<int> mss)
   if(-1 == pipe(pfds)) {perror("CoQuiAAS");exit(1);}
   if(-1 == (pid = fork())) {perror("CoQuiAAS");exit(1);}
   if(!pid) {
-    handleForkChild(f, false, pfds);
+    handleForkChild(f, true, pfds);
   }
-  handleForkAncestor(pfds, false, false);
+  handleForkAncestor(pfds, true, false);
   std::vector<int>& lastMss = this->mss.back();
   std::vector<bool> newModel;
   for(int i=0; i<this->realNumberOfVars; ++i) {
@@ -361,36 +363,64 @@ std::vector<bool> ExternalCoMssSolver::extractModelFromMss(std::vector<int> mss)
 
 
 std::string ExternalCoMssSolver::writeInstanceForSAT(std::vector<int> assumps, int realNumberOfVars, std::vector<int> mssAssumps) {
-	std::string tmpname("/tmp/tmp_CoQuiASS_ext_XXXXXX");
-	if(-1==mkstemp((char *) tmpname.c_str())) {
-		perror("ExternalCoMssSolver::hasAModel::mkstemp");
-		exit(2);
-	}
-	std::ofstream f(tmpname.c_str());
-	int hardCstrWeight = (2*realNumberOfVars+1);
-	unsigned int nClauses = this->realNumberOfVars*2 + this->nCstrs + mssAssumps.size() + assumps.size();
-	f << "p wcnf " << this->nVars << " " << nClauses << " " << hardCstrWeight <<std::endl;
-	std::string line;
-	for(int i=1; i<=realNumberOfVars; ++i) f << "1 " << i << " 0" << std::endl;
-	for(int i=1; i<=realNumberOfVars; ++i) f << "1 " << (-i) << " 0" << std::endl;
-	std::istringstream hardCstrsStream(this->dimacsCstrs.str());
-	std::istringstream softCstrsStream(this->dimacsSoftCstrs.str());
-	int cpt=0;
-	int mssAssumpsIndex=0;
-	while (std::getline(softCstrsStream, line)) {
-	  if(mssAssumpsIndex >= (signed)mssAssumps.size()) break;
-	  ++cpt;
-	  if(mssAssumps[mssAssumpsIndex] == cpt) {
-	    f << hardCstrWeight << " " << line << std::endl;
-	    ++mssAssumpsIndex;
-	  }
-	}
-	while (std::getline(hardCstrsStream, line)) {
-		f << hardCstrWeight << " " << line << std::endl;
-	}
-	for(std::vector<int>::iterator it = assumps.begin(); it != assumps.end(); ++it) {
-		f << hardCstrWeight << " " << *it << " 0" << std::endl;
-	}
-	f.close();
-	return tmpname;
+  std::string tmpname("/tmp/tmp_CoQuiASS_ext_XXXXXX");
+  if(-1==mkstemp((char *) tmpname.c_str())) {
+    perror("ExternalCoMssSolver::hasAModel::mkstemp");
+    exit(2);
+  }
+  std::ofstream f(tmpname.c_str());
+  int hardCstrWeight = (2*realNumberOfVars+1);
+  unsigned int nClauses = this->realNumberOfVars*2 + this->nCstrs + mssAssumps.size() + assumps.size();
+  f << "p wcnf " << this->nVars << " " << nClauses << " " << hardCstrWeight <<std::endl;
+  std::string line;
+  for(int i=1; i<=realNumberOfVars; ++i) {
+    f << "1 " << i << " 0" << std::endl;
+    f << "1 " << (-i) << " 0" << std::endl;
+  }
+  std::istringstream hardCstrsStream(this->dimacsCstrs.str());
+  std::istringstream softCstrsStream(this->dimacsSoftCstrs.str());
+  int cpt=0;
+  int mssAssumpsIndex=0;
+  while (std::getline(softCstrsStream, line)) {
+    if(mssAssumpsIndex >= (signed)mssAssumps.size()) break;
+    ++cpt;
+    if(mssAssumps[mssAssumpsIndex] == cpt) {
+      f << hardCstrWeight << " " << line << std::endl;
+      ++mssAssumpsIndex;
+    }
+  }
+  while (std::getline(hardCstrsStream, line)) {
+    f << hardCstrWeight << " " << line << std::endl;
+  }
+  for(std::vector<int>::iterator it = assumps.begin(); it != assumps.end(); ++it) {
+    f << hardCstrWeight << " " << *it << " 0" << std::endl;
+  }
+  f.close();
+
+  // std::cout << "p wcnf " << this->nVars << " " << nClauses << " " << hardCstrWeight <<std::endl;
+  // std::string line2;
+  // for(int i=1; i<=realNumberOfVars; ++i) {
+  //   std::cout << "1 " << i << " 0" << std::endl;
+  //   std::cout << "1 " << (-i) << " 0" << std::endl;
+  // }
+  // std::istringstream hardCstrsStream2(this->dimacsCstrs.str());
+  // std::istringstream softCstrsStream2(this->dimacsSoftCstrs.str());
+  // int cpt2=0;
+  // int mssAssumpsIndex2=0;
+  // while (std::getline(softCstrsStream2, line2)) {
+  //   if(mssAssumpsIndex2 >= (signed)mssAssumps.size()) break;
+  //   ++cpt2;
+  //   if(mssAssumps[mssAssumpsIndex2] == cpt2) {
+  //     std::cout << hardCstrWeight << " " << line2 << std::endl;
+  //     ++mssAssumpsIndex2;
+  //   }
+  // }
+  // while (std::getline(hardCstrsStream2, line2)) {
+  //   std::cout << hardCstrWeight << " " << line2 << std::endl;
+  // }
+  // for(std::vector<int>::iterator it = assumps.begin(); it != assumps.end(); ++it) {
+  //   std::cout << hardCstrWeight << " " << *it << " 0" << std::endl;
+  // }
+  
+  return tmpname;
 }
