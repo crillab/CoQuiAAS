@@ -22,48 +22,37 @@ std::vector<int> ExtensionUtils::groundedExtension() {
 	std::vector<bool> defeated;
 	for(unsigned int i=0; i<allVars.size(); ++i) defeated.push_back(false);
 	std::vector<int> candidates(allVars);
-	while(candidates.size() > 0) {
-		unsigned int step = 0;
+	bool didSomething = false;
+	do {
+		didSomething = false;
 		for(unsigned int i=0; i<candidates.size(); ++i) {
 			int var = candidates[i];
-			if(vm.isSelfAttacking(var)) {
-				defeated[var-1] = true;
-				candidates[i--] = candidates.back();
-				candidates.pop_back();
-				++step;
-				continue;
-			}
-			bool argInExt = true;
-			bool argDefeated = false;
 			std::vector<int> attacksTo = *attacks.getAttacksTo(var);
+			bool argDefeated = false;
+			bool argAttacked = false;
 			for(unsigned int j=0; j<attacksTo.size(); ++j) {
 				int attacker = attacksTo[j];
 				if(defeated[attacker-1]) continue;
+				argAttacked = true;
 				if(inExt[attacker-1]) {
+					defeated[var-1] = true;
+					candidates[i--] = candidates.back();
+					candidates.pop_back();
 					argDefeated = true;
-					argInExt = false;
+					didSomething = true;
 					break;
 				}
-				argInExt = false;
 			}
-			if(argInExt) {
+			if(argDefeated) continue;
+			if(!argAttacked) {
 				grExt.push_back(var);
 				inExt[var-1] = true;
 				candidates[i--] = candidates.back();
 				candidates.pop_back();
-				++step;
-				continue;
-			}
-			if(argDefeated) {
-				defeated[var-1] = true;
-				candidates[i--] = candidates.back();
-				candidates.pop_back();
-				++step;
-				continue;
+				didSomething = true;
 			}
 		}
-		if(step == 0) break;
-	}
+	} while(didSomething);
 	return grExt;
 }
 
