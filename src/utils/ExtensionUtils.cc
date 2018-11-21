@@ -14,7 +14,6 @@ ExtensionUtils::ExtensionUtils(Attacks &attacks) : attacks(attacks) {}
 
 
 std::vector<int> ExtensionUtils::groundedExtension() {
-	VarMap& vm = attacks.getVarMap();
 	std::vector<int> grExt;
 	std::vector<int>& allVars = attacks.getVarMap().intVars();
 	std::vector<bool> inExt;
