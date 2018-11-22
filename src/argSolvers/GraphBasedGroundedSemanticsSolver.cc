@@ -11,7 +11,8 @@
 using namespace CoQuiAAS;
 
 
-GraphBasedGroundedSemanticsSolver::GraphBasedGroundedSemanticsSolver(Attacks &attacks, VarMap &varMap, TaskType taskType) : SemanticsProblemSolver(attacks, varMap, taskType) {}
+GraphBasedGroundedSemanticsSolver::GraphBasedGroundedSemanticsSolver(Attacks &attacks, VarMap &varMap, TaskType taskType, SolverOutputFormatter &formatter):
+	SemanticsProblemSolver(attacks, varMap, taskType, formatter) {}
 
 
 void GraphBasedGroundedSemanticsSolver::init() {}

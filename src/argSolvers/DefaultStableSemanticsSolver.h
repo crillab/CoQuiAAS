@@ -23,7 +23,7 @@ class DefaultStableSemanticsSolver : public SemanticsProblemSolver {
 
 public:
 
-	DefaultStableSemanticsSolver(std::shared_ptr<SatSolver> solver, Attacks &attacks, VarMap &varMap, TaskType taskType);
+	DefaultStableSemanticsSolver(std::shared_ptr<SatSolver> solver, Attacks &attacks, VarMap &varMap, TaskType taskType, SolverOutputFormatter &formatter);
 
 	void init();
 

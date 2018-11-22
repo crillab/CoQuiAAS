@@ -11,7 +11,8 @@
 using namespace CoQuiAAS;
 
 
-DefaultGroundedSemanticsSolver::DefaultGroundedSemanticsSolver(std::shared_ptr<SatSolver> solver, Attacks &attacks, VarMap &varMap, TaskType taskType) : SemanticsProblemSolver(attacks, varMap, taskType), solver(solver) {}
+DefaultGroundedSemanticsSolver::DefaultGroundedSemanticsSolver(std::shared_ptr<SatSolver> solver, Attacks &attacks, VarMap &varMap, TaskType taskType, SolverOutputFormatter &formatter)
+	: SemanticsProblemSolver(attacks, varMap, taskType, formatter), solver(solver) {}
 
 
 void DefaultGroundedSemanticsSolver::init() {
@@ -24,30 +25,21 @@ void DefaultGroundedSemanticsSolver::init() {
 
 void DefaultGroundedSemanticsSolver::computeOneExtension() {
 	std::vector<int>& propagated = solver->propagatedAtDecisionLvlZero();
-	this->answer = "[";
-	int nPropagated = (signed) propagated.size();
-	int nArgs = varMap.nVars();
-	int nPropagatedArgs = 0;
-	for(int i=0; i<nPropagated; ++i) {
-		if(propagated[i] <= nArgs) {
-			if(nPropagatedArgs > 0) this->answer = this->answer+",";
-			++nPropagatedArgs;
-			this->answer = this->answer+varMap.getName(propagated[i]);
-		}
-	}
-	this->answer = this->answer + "]";
+	this->answer = this->formatter.formatSingleExtension(propagated);
 }
 
 
 void DefaultGroundedSemanticsSolver::computeAllExtensions() {
-	computeOneExtension();
-	this->answer = "["+this->answer+"]";
+	std::vector<int>& propagated = solver->propagatedAtDecisionLvlZero();
+	std::vector<std::vector<int>> vec;
+	vec.push_back(propagated);
+	this->answer = this->formatter.formatEveryExtension(vec);
 }
 
 
 void DefaultGroundedSemanticsSolver::isCredulouslyAccepted() {
 	bool isPropagated = solver->isPropagatedAtDecisionLvlZero(varMap.getVar(this->acceptanceQueryArgument));
-	this->answer = isPropagated ? "YES" : "NO";
+	this->answer = this->formatter.formatArgAcceptance(isPropagated);
 }
 
 

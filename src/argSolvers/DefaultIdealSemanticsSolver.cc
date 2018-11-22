@@ -12,7 +12,8 @@
 using namespace CoQuiAAS;
 
 
-DefaultIdealSemanticsSolver::DefaultIdealSemanticsSolver(std::shared_ptr<MssSolver> solver, Attacks &attacks, VarMap &varMap, TaskType taskType)  : SemanticsProblemSolver(attacks, varMap, taskType), solver(solver) {}
+DefaultIdealSemanticsSolver::DefaultIdealSemanticsSolver(std::shared_ptr<MssSolver> solver, Attacks &attacks, VarMap &varMap, TaskType taskType, SolverOutputFormatter &formatter):
+	SemanticsProblemSolver(attacks, varMap, taskType, formatter), solver(solver) {}
 
 
 void DefaultIdealSemanticsSolver::init() {
@@ -48,13 +49,15 @@ void DefaultIdealSemanticsSolver::computeOneExtension() {
 	}
 	solver->computeMss(assumps);
 	std::vector<int> mss = solver->getMss();
-	this->answer = modelToString(mss);
+	this->answer = this->formatter.formatSingleExtension(mss);
 }
 
 
 void DefaultIdealSemanticsSolver::computeAllExtensions() {
 	computeOneExtension();
-	this->answer = "["+this->answer+"]";
+	std::vector<std::vector<int>> vec;
+	vec.push_back(solver->getMss());
+	this->answer = this->formatter.formatEveryExtension(vec);
 }
 
 
@@ -64,11 +67,11 @@ void DefaultIdealSemanticsSolver::isCredulouslyAccepted() {
 	std::vector<int> mss = solver->getMss();
 	for(unsigned int j=0; j<mss.size(); ++j) {
 		if(mss[j] == arg) {
-			this->answer = "YES";
+			this->answer = this->formatter.formatArgAcceptance(true);
 			return;
 		}
 	}
-	this->answer = "NO";
+	this->answer = this->formatter.formatArgAcceptance(false);
 }
 
 

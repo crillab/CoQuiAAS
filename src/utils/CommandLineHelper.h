@@ -7,6 +7,7 @@
 
 #include "SolverFactory.h"
 #include "ParserFactory.h"
+#include "SolverOutputFormatterFactory.h"
 
 
 namespace CoQuiAAS {
@@ -53,6 +54,8 @@ class CommandLineHelper {
    * \return an InstanceFormat object representing the instance format
    */
   InstanceFormat getInstanceFormat();
+
+  string getOutputFormatter();
 
   /**
    * \fn getInstanceFile
@@ -103,6 +106,7 @@ class CommandLineHelper {
   SemanticName semName;
   TaskType taskType;
   InstanceFormat instanceFormat;
+  string outputFormatter = "";
   string instanceFile;
   map<string,string> additionalParams;
 

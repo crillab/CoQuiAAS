@@ -3,14 +3,17 @@
 
 #define CLH_MISS_FORMED_MSG "ERR:: WRONG USAGE\n\
 CoQuiAAS invocation:\n\
-  CoQuiAAS -p XX-YYY -fo ZZ -f instanceFile [-a variable] [OPTIONS]\n\
+  CoQuiAAS -p XX-YY [-a variable] -fo ZZ -f instanceFile [OPTIONS]\n\
+                  where XX-YYY in {D3} and -a is not present\n\
+                  or\n\
                        where XX in {SE, EE, DC, DS}\n\
                        where YY in {ST, CO, GR, PR, SST, STG, ID}\n\
-                       where ZZ in {apx, cnf, tgf}\n\
-                       where \"-a variable\" must be present if XX in {DC, DS}\n\
+                       where \"-a variable\" must be present iff XX in {DC, DS}\n\
+                  where ZZ in {apx, cnf, tgf}\n\
 \n\
   OPTIONS:\n\
-    -externalSatSolver \"satSolver FILE\"     : launch an external SAT solver using the command \"satSolver FILE\" where FILE is replaced by a DIMACS cnf formatted file ; solver output must be compatible with SAT competitions output ; available for XX-ST and XX-CO problems\n\
+    -of XX : specify the output format where XX in {ICCMA17} (default: ICCMA17)\n\
+    -externalSatSolver \"satSolver FILE\" : launch an external SAT solver using the command \"satSolver FILE\" where FILE is replaced by a DIMACS cnf formatted file ; solver output must be compatible with SAT competitions output ; available for XX-ST and XX-CO problems\n\
     -lbx \"path\" : launch an external lbx-like coMss solver located at \"path\" ; solver must handle \"-wm\" and \"-num n\" lbx options, and respect its input/output format ; mandatory for problems in the second level of the polynomial hierarchy\n\
 \n\
 show authors and version:\n\
@@ -82,6 +85,11 @@ void CommandLineHelper::parseCommandLine() {
       instanceFormat = ParserFactory::getInstanceFormat(args[i]);
       continue;
     }
+    if(!args[i].compare("-of")) {
+      if(!assertWellFormed(++i < args.size())) return;
+      outputFormatter = args[i];
+      continue;
+    }
     if(!args[i].compare("--formats")) {
       cout << CLH_SUPPORTED_FORMATS_MSG << endl;
       mustExit = true;
@@ -118,6 +126,10 @@ TaskType CommandLineHelper::getTaskType() {
 
 InstanceFormat CommandLineHelper::getInstanceFormat() {
   return instanceFormat;
+}
+
+string CommandLineHelper::getOutputFormatter() {
+  return outputFormatter;
 }
 
 string CommandLineHelper::getInstanceFile() {

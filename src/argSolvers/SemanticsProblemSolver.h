@@ -15,6 +15,7 @@
 #include "Types.h"
 #include "Attacks.h"
 #include "VarMap.h"
+#include "SolverOutputFormatter.h"
 
 
 namespace CoQuiAAS {
@@ -24,7 +25,7 @@ class SemanticsProblemSolver {
 
 public:
 
-	SemanticsProblemSolver(Attacks &attacks, VarMap &varMap, TaskType taskType);
+	SemanticsProblemSolver(Attacks &attacks, VarMap &varMap, TaskType taskType, SolverOutputFormatter &formatter);
 
 	virtual void init() = 0;
 
@@ -52,13 +53,11 @@ protected:
 
 	VarMap &varMap;
 
+	SolverOutputFormatter &formatter;
+
 	std::string acceptanceQueryArgument;
 
 	std::string answer;
-
-	std::string modelToString(std::vector<bool>& model);
-
-	std::string modelToString(std::vector<int>& model);
 };
 
 

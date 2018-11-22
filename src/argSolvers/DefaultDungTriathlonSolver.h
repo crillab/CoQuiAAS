@@ -13,6 +13,7 @@
 #include "MssSolver.h"
 #include "MssEncodingHelper.h"
 #include "ExtensionUtils.h"
+#include "SolverOutputFormatter.h"
 
 
 namespace CoQuiAAS {
@@ -21,7 +22,7 @@ class DefaultDungTriathlonSolver : public SemanticsProblemSolver {
 
 public:
 
-	DefaultDungTriathlonSolver(std::shared_ptr<MssSolver> solver, Attacks &attacks, VarMap &varMap);
+	DefaultDungTriathlonSolver(std::shared_ptr<MssSolver> solver, Attacks &attacks, VarMap &varMap, SolverOutputFormatter &formatter);
 
 	void init();
 
@@ -37,11 +38,11 @@ public:
 
 private:
 
-	void addGroundedExtensions();
+	std::string groundedExtensions();
 
-	void addPreferredExtensions();
+	std::string preferredExtensions();
 
-	void addStableExtensions();
+	std::string stableExtensions();
 
 	std::shared_ptr<MssSolver> solver;
 };

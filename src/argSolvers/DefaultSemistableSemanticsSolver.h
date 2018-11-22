@@ -21,7 +21,7 @@ namespace CoQuiAAS {
 class DefaultSemistableSemanticsSolver : public SemanticsProblemSolver {
 
 public:
-	DefaultSemistableSemanticsSolver(std::shared_ptr<MssSolver> solver, Attacks &attacks, VarMap &varMap, TaskType taskType);
+	DefaultSemistableSemanticsSolver(std::shared_ptr<MssSolver> solver, Attacks &attacks, VarMap &varMap, TaskType taskType, SolverOutputFormatter &formatter);
 
 	void init();
 

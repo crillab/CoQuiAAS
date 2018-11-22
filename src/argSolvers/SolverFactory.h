@@ -22,6 +22,7 @@
 #include "LbxCoMssSolver.h"
 #include "ExternalMaxSatSolver.h"
 #include "ExternalCoMssSolver.h"
+#include "SolverOutputFormatter.h"
 
 
 namespace CoQuiAAS {
@@ -96,11 +97,11 @@ public:
 		std::exit(1);
 	}
 
-	static std::unique_ptr<SemanticsProblemSolver> groundedSolver(TaskType task, std::map<std::string,std::string>& additionalParams, Attacks &attacks, VarMap &varMap) {
+	static std::unique_ptr<SemanticsProblemSolver> groundedSolver(TaskType task, std::map<std::string,std::string>& additionalParams, Attacks &attacks, VarMap &varMap, SolverOutputFormatter &outputFormatter) {
 		if(additionalParams.find("--graphBased") != additionalParams.end()) {
-			return std::unique_ptr<SemanticsProblemSolver>(new GraphBasedGroundedSemanticsSolver(attacks, varMap, task));
+			return std::unique_ptr<SemanticsProblemSolver>(new GraphBasedGroundedSemanticsSolver(attacks, varMap, task, outputFormatter));
 		}
-		return std::unique_ptr<SemanticsProblemSolver>(new DefaultGroundedSemanticsSolver(createSatSolver(additionalParams), attacks, varMap, task));
+		return std::unique_ptr<SemanticsProblemSolver>(new DefaultGroundedSemanticsSolver(createSatSolver(additionalParams), attacks, varMap, task, outputFormatter));
 	}
 
 	/**
@@ -110,25 +111,25 @@ public:
 	 * \param task : the task that is required
 	 * \param additionalParams the additional parameters from the command line
 	 */
-	static std::unique_ptr<SemanticsProblemSolver> getProblemInstance(SemanticName semantic, TaskType task, std::map<std::string,std::string>& additionalParams, Attacks &attacks, VarMap &varMap) {
+	static std::unique_ptr<SemanticsProblemSolver> getProblemInstance(SemanticName semantic, TaskType task, std::map<std::string,std::string>& additionalParams, Attacks &attacks, VarMap &varMap, SolverOutputFormatter &outputFormatter) {
 		if(task == TASK_UNDEFINED) return NULL;
 		switch(semantic) {
 		case SEM_STABLE:
-			return std::unique_ptr<SemanticsProblemSolver>(new DefaultStableSemanticsSolver(createSatSolver(additionalParams), attacks, varMap, task));
+			return std::unique_ptr<SemanticsProblemSolver>(new DefaultStableSemanticsSolver(createSatSolver(additionalParams), attacks, varMap, task, outputFormatter));
 		case SEM_COMPLETE:
-			return std::unique_ptr<SemanticsProblemSolver>(new DefaultCompleteSemanticsSolver(createSatSolver(additionalParams), attacks, varMap, task));
+			return std::unique_ptr<SemanticsProblemSolver>(new DefaultCompleteSemanticsSolver(createSatSolver(additionalParams), attacks, varMap, task, outputFormatter));
 		case SEM_GROUNDED:
-			return groundedSolver(task, additionalParams, attacks, varMap);
+			return groundedSolver(task, additionalParams, attacks, varMap, outputFormatter);
 		case SEM_PREFERRED:
-			return std::unique_ptr<SemanticsProblemSolver>(new DefaultPreferredSemanticsSolver(createMssSolver(additionalParams), attacks, varMap, task));
+			return std::unique_ptr<SemanticsProblemSolver>(new DefaultPreferredSemanticsSolver(createMssSolver(additionalParams), attacks, varMap, task, outputFormatter));
 		case SEM_SEMISTABLE:
-			return std::unique_ptr<SemanticsProblemSolver>(new DefaultSemistableSemanticsSolver(createMssSolver(additionalParams), attacks, varMap, task));
+			return std::unique_ptr<SemanticsProblemSolver>(new DefaultSemistableSemanticsSolver(createMssSolver(additionalParams), attacks, varMap, task, outputFormatter));
 		case SEM_STAGE:
-			return std::unique_ptr<SemanticsProblemSolver>(new DefaultStageSemanticsSolver(createMssSolver(additionalParams), attacks, varMap, task));
+			return std::unique_ptr<SemanticsProblemSolver>(new DefaultStageSemanticsSolver(createMssSolver(additionalParams), attacks, varMap, task, outputFormatter));
 		case SEM_IDEAL:
-			return std::unique_ptr<SemanticsProblemSolver>(new DefaultIdealSemanticsSolver(createMssSolver(additionalParams), attacks, varMap, task));
+			return std::unique_ptr<SemanticsProblemSolver>(new DefaultIdealSemanticsSolver(createMssSolver(additionalParams), attacks, varMap, task, outputFormatter));
 		case SEM_TRIATHLON:
-			return std::unique_ptr<SemanticsProblemSolver>(new DefaultDungTriathlonSolver(createMssSolver(additionalParams), attacks, varMap));
+			return std::unique_ptr<SemanticsProblemSolver>(new DefaultDungTriathlonSolver(createMssSolver(additionalParams), attacks, varMap, outputFormatter));
 		default:
 			return nullptr;
 		}

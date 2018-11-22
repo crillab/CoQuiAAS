@@ -19,7 +19,7 @@ class GraphBasedGroundedSemanticsSolver : public SemanticsProblemSolver {
 
 public:
 
-	GraphBasedGroundedSemanticsSolver(Attacks &attacks, VarMap &varMap, TaskType taskType);
+	GraphBasedGroundedSemanticsSolver(Attacks &attacks, VarMap &varMap, TaskType taskType, SolverOutputFormatter &formatter);
 
 	void init();
 

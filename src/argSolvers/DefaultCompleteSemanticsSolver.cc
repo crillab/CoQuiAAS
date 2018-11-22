@@ -12,7 +12,8 @@
 using namespace CoQuiAAS;
 
 
-DefaultCompleteSemanticsSolver::DefaultCompleteSemanticsSolver(std::shared_ptr<SatSolver> solver, Attacks &attacks, VarMap &varMap, TaskType taskType)  : SemanticsProblemSolver(attacks, varMap, taskType), solver(solver) {}
+DefaultCompleteSemanticsSolver::DefaultCompleteSemanticsSolver(std::shared_ptr<SatSolver> solver, Attacks &attacks, VarMap &varMap, TaskType taskType, SolverOutputFormatter &formatter):
+	SemanticsProblemSolver(attacks, varMap, taskType, formatter), solver(solver) {}
 
 
 void DefaultCompleteSemanticsSolver::init() {
@@ -26,27 +27,17 @@ void DefaultCompleteSemanticsSolver::init() {
 void DefaultCompleteSemanticsSolver::computeOneExtension() {
 	solver->computeModel();
 	if(!solver->hasAModel()) {
-		this->answer = "NO";
+		this->answer = this->formatter.formatNoExt();
 		return;
 	}
 	std::vector<bool> model = solver->getModel();
-	this->answer = modelToString(model);
+	this->answer = this->formatter.formatSingleExtension(model);
 }
 
 
 void DefaultCompleteSemanticsSolver::computeAllExtensions() {
 	solver->computeAllModels();
-	if(!solver->hasAModel()) {
-		this->answer = "[]";
-		return;
-	}
-	this->answer = "[";
-	std::vector<vector<bool> > models = solver->getModels();
-	int nModels = (signed) models.size();
-	for(int i=0; i<nModels-1; ++i) {
-		this->answer = this->answer + modelToString(models[i]) + ",";
-	}
-	this->answer = this->answer + modelToString(models[models.size()-1]) + "]";
+	this->answer = this->formatter.formatEveryExtension(solver->getModels());
 }
 
 
@@ -54,7 +45,7 @@ void DefaultCompleteSemanticsSolver::isCredulouslyAccepted() {
 	std::vector<int> assumps;
 	assumps.push_back(varMap.getVar(this->acceptanceQueryArgument));
 	solver->computeModel(assumps);
-	this->answer = solver->hasAModel() ? "YES" : "NO";
+	this->answer = this->formatter.formatArgAcceptance(solver->hasAModel());
 }
 
 
@@ -62,7 +53,7 @@ void DefaultCompleteSemanticsSolver::isSkepticallyAccepted() {
 	std::vector<int> assumps;
 	assumps.push_back(-varMap.getVar(this->acceptanceQueryArgument));
 	solver->computeModel(assumps);
-	this->answer = solver->hasAModel() ? "NO" : "YES";
+	this->answer = this->formatter.formatArgAcceptance(!solver->hasAModel());
 }
 
 

@@ -12,7 +12,8 @@
 using namespace CoQuiAAS;
 
 
-DefaultDungTriathlonSolver::DefaultDungTriathlonSolver(std::shared_ptr<MssSolver> solver, Attacks &attacks, VarMap &varMap)  : SemanticsProblemSolver(attacks, varMap, TASK_ALL_EXTS), solver(solver) {}
+DefaultDungTriathlonSolver::DefaultDungTriathlonSolver(std::shared_ptr<MssSolver> solver, Attacks &attacks, VarMap &varMap, SolverOutputFormatter &formatter):
+	SemanticsProblemSolver(attacks, varMap, TASK_ALL_EXTS, formatter), solver(solver) {}
 
 
 void DefaultDungTriathlonSolver::init() {
@@ -35,65 +36,37 @@ void DefaultDungTriathlonSolver::computeOneExtension() {
 
 
 void DefaultDungTriathlonSolver::computeAllExtensions() {
-	this->answer = "";
-	addGroundedExtensions();
-	this->answer += ",";
+	auto gr = groundedExtensions();
 	solver->computeAllMss();
-	addStableExtensions();
-	this->answer += ",";
-	addPreferredExtensions();
+	auto st = stableExtensions();
+	auto pr = preferredExtensions();
+	this->answer = this->formatter.formatD3(gr, st, pr);
 }
 
 
-void DefaultDungTriathlonSolver::addPreferredExtensions() {
-	if(!solver->hasAMss()) {
-		this->answer += "[]";
-		return;
-	}
-	this->answer += "[";
+std::string DefaultDungTriathlonSolver::preferredExtensions() {
 	std::vector<std::vector<int> > allMss = solver->getAllMss();
-	int nMss = (signed) allMss.size();
-	for(int i=0; i<nMss-1; ++i) {
-		this->answer = this->answer + modelToString(allMss[i]) + ",";
-	}
-	if(nMss) this->answer = this->answer + modelToString(allMss[allMss.size()-1]);
-	this->answer = this->answer + "]";
+	return this->formatter.formatEveryExtension(allMss);
 }
 
-void DefaultDungTriathlonSolver::addGroundedExtensions() {
+std::string DefaultDungTriathlonSolver::groundedExtensions() {
 	ExtensionUtils extUtils(attacks);
 	std::vector<int> propagated = extUtils.groundedExtension();
-	this->answer += "[[";
-	int nPropagated = (signed) propagated.size();
-	int nArgs = varMap.nVars();
-	int nPropagatedArgs = 0;
-	for(int i=0; i<nPropagated; ++i) {
-		if(propagated[i] <= nArgs) {
-			if(nPropagatedArgs > 0) this->answer = this->answer+",";
-			++nPropagatedArgs;
-			this->answer = this->answer+varMap.getName(propagated[i]);
-		}
-	}
-	this->answer = this->answer + "]]";
+	std::vector<std::vector<int>> vec;
+	vec.push_back(propagated);
+	return this->formatter.formatEveryExtension(vec);
 }
 
 
-void DefaultDungTriathlonSolver::addStableExtensions() {
-	if(!solver->hasAMss()) {
-		this->answer += "[]";
-		return;
-	}
-	this->answer += "[";
+std::string DefaultDungTriathlonSolver::stableExtensions() {
+	std::vector<std::vector<int>> stExts;
 	std::vector<std::vector<int> > allMss = solver->getAllMss();
 	int nMss = (signed) allMss.size();
 	ExtensionUtils extUtils(attacks);
-	bool first = true;
 	for(int i=0; i<nMss; ++i) {
-		if(!extUtils.isMaxRange(allMss[i])) continue;
-		if(first) first = false; else this->answer += ",";
-		this->answer = this->answer + modelToString(allMss[i]);
+		if(extUtils.isMaxRange(allMss[i])) stExts.push_back(allMss[i]);
 	}
-	this->answer = this->answer + "]";
+	return this->formatter.formatEveryExtension(stExts);
 }
 
 

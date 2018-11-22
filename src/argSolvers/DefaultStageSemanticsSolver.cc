@@ -13,7 +13,8 @@
 using namespace CoQuiAAS;
 
 
-DefaultStageSemanticsSolver::DefaultStageSemanticsSolver(std::shared_ptr<MssSolver> solver, Attacks &attacks, VarMap &varMap, TaskType taskType)  : SemanticsProblemSolver(attacks, varMap, taskType), solver(solver) {}
+DefaultStageSemanticsSolver::DefaultStageSemanticsSolver(std::shared_ptr<MssSolver> solver, Attacks &attacks, VarMap &varMap, TaskType taskType, SolverOutputFormatter &formatter):
+	SemanticsProblemSolver(attacks, varMap, taskType, formatter), solver(solver) {}
 
 
 void DefaultStageSemanticsSolver::init() {
@@ -28,19 +29,16 @@ void DefaultStageSemanticsSolver::init() {
 void DefaultStageSemanticsSolver::computeOneExtension() {
 	solver->computeMss();
 	if(!solver->hasAMss()) {
-		this->answer = "NO";
+		this->answer = this->formatter.formatNoExt();
+		return;
 	}
-	this->answer = modelToString(solver->getModel());
+	this->answer = this->formatter.formatSingleExtension(solver->getModel());
 }
 
 
 void DefaultStageSemanticsSolver::computeAllExtensions() {
 	std::vector<std::vector<bool> > models = computeAllStgExtensions();
-	this->answer = "[" + modelToString(models[0]);
-	for(unsigned int i=1; i<models.size(); ++i) {
-		this->answer = this->answer + "," + modelToString(models[i]);
-	}
-	this->answer = this->answer + "]";
+	this->answer = this->formatter.formatEveryExtension(models);
 }
 
 
@@ -106,11 +104,11 @@ void DefaultStageSemanticsSolver::isCredulouslyAccepted() {
   int arg = varMap.getVar(this->acceptanceQueryArgument);
   for(unsigned int i=0; i<models.size(); ++i) {
     if(models[i][arg-1]) {
-      this->answer = "YES";
+      this->answer = this->formatter.formatArgAcceptance(true);
       return;
     }
   }
-  this->answer = "NO";
+  this->answer = this->formatter.formatArgAcceptance(false);
 }
 
 
@@ -119,11 +117,11 @@ void DefaultStageSemanticsSolver::isSkepticallyAccepted() {
   int arg = varMap.getVar(this->acceptanceQueryArgument);
   for(unsigned int i=0; i<models.size(); ++i) {
     if(!models[i][arg-1]) {
-      this->answer = "NO";
+      this->answer = this->formatter.formatArgAcceptance(false);
       return;
     }
   }
-  this->answer = "YES";
+  this->answer = this->formatter.formatArgAcceptance(true);
 }
 
 

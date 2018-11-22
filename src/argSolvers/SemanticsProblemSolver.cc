@@ -12,7 +12,7 @@
 using namespace CoQuiAAS;
 
 
-SemanticsProblemSolver::SemanticsProblemSolver(Attacks &attacks, VarMap &varMap, TaskType taskType) : attacks(attacks), varMap(varMap) {
+SemanticsProblemSolver::SemanticsProblemSolver(Attacks &attacks, VarMap &varMap, TaskType taskType, SolverOutputFormatter &formatter) : attacks(attacks), varMap(varMap), formatter(formatter) {
 	this->taskType = taskType;
 }
 
@@ -40,43 +40,6 @@ void SemanticsProblemSolver::compute() {
 
 void SemanticsProblemSolver::setAcceptanceQueryArgument(std::string arg) {
 	this->acceptanceQueryArgument = arg;
-}
-
-
-std::string SemanticsProblemSolver::modelToString(std::vector<bool>& model) {
-  std::string res;
-
-  bool noneFoundYet = true;
-  res = "[";
-  int nVars = varMap.nVars();
-  for (int i = 0; i < nVars; i++) {
-    if (model[i]) {
-      if(noneFoundYet) noneFoundYet=false; else res=res + ",";
-      res = res + varMap.getName(i+1);
-    }
-  }
-  res = res + "]";
-  return res;
-}
-
-
-std::string SemanticsProblemSolver::modelToString(std::vector<int>& model) {
-  std::string res;
-
-  bool noneFoundYet = true;
-  res = "[";
-  int size = (signed) model.size();
-  for(int i=0; i<size; ++i) {
-	  if(model[i] < 0) continue;
-	  if(noneFoundYet) {
-		  noneFoundYet = false;
-	  } else {
-		  res = res + ",";
-	  }
-	  res = res + varMap.getName(model[i]);
-  }
-  res = res + "]";
-  return res;
 }
 
 
