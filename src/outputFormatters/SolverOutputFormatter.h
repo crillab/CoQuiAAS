@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+#include "VarMap.h"
+
 namespace CoQuiAAS {
 
     class SolverOutputFormatter {
@@ -11,6 +13,16 @@ namespace CoQuiAAS {
         protected:
         
         SolverOutputFormatter() {}
+
+        std::string acceptance_status_str(bool status);
+
+        std::string argArray(std::vector<bool>& model, VarMap& vmap);
+
+        std::string argArray(std::vector<int>& lits, VarMap& vmap);
+
+        const std::string YES_STR = "YES";
+
+        const std::string NO_STR = "NO";
 
         public:
 

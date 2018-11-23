@@ -5,6 +5,7 @@
 
 #include "SolverOutputFormatter.h"
 #include "ICCMA17SolverOutputFormatter.h"
+#include "ICCMA19SolverOutputFormatter.h"
 
 namespace CoQuiAAS {
 
@@ -16,6 +17,9 @@ namespace CoQuiAAS {
             std::transform(str.begin(), str.end(), str.begin(), ::toupper);
             if(!str.compare("ICCMA2017")) {
                 return new ICCMA17SolverOutputFormatter(varMap);
+            }
+            if(!str.compare("ICCMA2019")) {
+                return new ICCMA19SolverOutputFormatter(varMap);
             }
             return new ICCMA17SolverOutputFormatter(varMap);
         }
