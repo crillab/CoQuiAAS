@@ -100,6 +100,11 @@ void CommandLineHelper::parseCommandLine() {
       instanceFile = args[i];
       continue;
     }
+    if(!args[i].compare("-m")) {
+      if(!assertWellFormed(++i < args.size())) return;
+      dynamicsFile = args[i];
+      continue;
+    }
     if(args[i][0] == '-' && args[i].size()>1 && args[i][1] != '-') {
       if(!assertWellFormed(++i < args.size())) return;
       additionalParams.insert(pair<string,string>(args[i-1],args[i]));
@@ -134,6 +139,10 @@ string CommandLineHelper::getOutputFormatter() {
 
 string CommandLineHelper::getInstanceFile() {
   return instanceFile;
+}
+
+string CommandLineHelper::getDynamicsFile() {
+  return this->dynamicsFile;
 }
 
 string CommandLineHelper::getAdditionalParameter(string param) {

@@ -78,6 +78,11 @@ int main(int argc, char** argv){
 		return 2;
 	}
 	parser->parseInstance();
+	if(clh.getDynamicsFile().size() > 0) {
+		ifstream dynfile(clh.getDynamicsFile().c_str(),ios::in);
+		parser->parseDynamics(&dynfile);
+		dynfile.close();
+	}
 	file.close();
 
 	// initialize the StatMap

@@ -64,6 +64,8 @@ class CommandLineHelper {
    */
   string getInstanceFile();
 
+  string getDynamicsFile();
+
   /**
    * \fn getAdditionalParameter
    * \brief returns the additional parameter, or an empty string if none
@@ -108,6 +110,7 @@ class CommandLineHelper {
   InstanceFormat instanceFormat;
   string outputFormatter = "";
   string instanceFile;
+  string dynamicsFile = "";
   map<string,string> additionalParams;
 
   bool assertWellFormed(bool test);
