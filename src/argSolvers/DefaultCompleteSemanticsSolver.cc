@@ -28,12 +28,10 @@ void DefaultCompleteSemanticsSolver::computeOneExtension() {
 	solver->computeModel();
 	if(!solver->hasAModel()) {
 		this->formatter.writeNoExt();
-		this->answer = "";
 		return;
 	}
 	std::vector<bool> model = solver->getModel();
 	this->formatter.writeSingleExtension(model);
-	this->answer = "";
 }
 
 
@@ -46,7 +44,6 @@ void DefaultCompleteSemanticsSolver::computeAllExtensions() {
 		*firstpt = false;
 	});
 	this->formatter.writeExtensionListEnd();
-	this->answer = "";
 }
 
 
@@ -55,7 +52,6 @@ void DefaultCompleteSemanticsSolver::isCredulouslyAccepted() {
 	assumps.push_back(varMap.getVar(this->acceptanceQueryArgument));
 	solver->computeModel(assumps);
 	this->formatter.writeArgAcceptance(solver->hasAModel());
-	this->answer = "";
 }
 
 
@@ -64,7 +60,6 @@ void DefaultCompleteSemanticsSolver::isSkepticallyAccepted() {
 	assumps.push_back(-varMap.getVar(this->acceptanceQueryArgument));
 	solver->computeModel(assumps);
 	this->formatter.writeArgAcceptance(!solver->hasAModel());
-	this->answer = "";
 }
 
 

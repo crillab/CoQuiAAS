@@ -29,11 +29,9 @@ void DefaultSemistableSemanticsSolver::computeOneExtension() {
 	solver->computeMss();
 	if(!solver->hasAMss()) {
 		this->formatter.writeNoExt();
-		this->answer = "";
 		return;
 	}
 	this->formatter.writeSingleExtension(this->solver->getModel());
-	this->answer = "";
 }
 
 
@@ -45,7 +43,6 @@ void DefaultSemistableSemanticsSolver::computeAllExtensions() {
 		first = false;
 	});
 	this->formatter.writeExtensionListEnd();
-	this->answer = "";
 }
 
 
@@ -115,7 +112,6 @@ void DefaultSemistableSemanticsSolver::isCredulouslyAccepted() {
 		}
 	});
 	this->formatter.writeArgAcceptance(status);
-	this->answer = "";
 }
 
 
@@ -129,7 +125,6 @@ void DefaultSemistableSemanticsSolver::isSkepticallyAccepted() {
 		}
 	});
 	this->formatter.writeArgAcceptance(status);
-	this->answer = "";
 }
 
 

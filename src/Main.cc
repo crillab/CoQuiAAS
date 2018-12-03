@@ -102,8 +102,6 @@ int main(int argc, char** argv){
 	// compute the problem pointed at init time
 	problem->compute();
 	// display statistics (if StatMap is not "fake")
-	// display solution depending of the problem pointed at init time
-	std::cout << problem->answerToString() << std::endl;
 
 	return 0;
 }

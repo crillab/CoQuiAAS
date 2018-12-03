@@ -30,11 +30,9 @@ void DefaultStageSemanticsSolver::computeOneExtension() {
 	solver->computeMss();
 	if(!solver->hasAMss()) {
 		this->formatter.writeNoExt();
-		this->answer = "";
 		return;
 	}
 	this->formatter.writeSingleExtension(solver->getModel());
-	this->answer = "";
 }
 
 
@@ -46,7 +44,6 @@ void DefaultStageSemanticsSolver::computeAllExtensions() {
 		first = false;
 	});
 	this->formatter.writeExtensionListEnd();
-	this->answer = "";
 }
 
 std::vector<std::vector<bool>> DefaultStageSemanticsSolver::computeAllStgExtensions(std::function<void(std::vector<bool>&)> callback) {
@@ -115,7 +112,6 @@ void DefaultStageSemanticsSolver::isCredulouslyAccepted() {
 		}
 	});
 	this->formatter.writeArgAcceptance(status);
-	this->answer = "";
 }
 
 
@@ -129,7 +125,6 @@ void DefaultStageSemanticsSolver::isSkepticallyAccepted() {
 		}
 	});
 	this->formatter.writeArgAcceptance(status);
-	this->answer = "";
 }
 
 

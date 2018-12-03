@@ -28,7 +28,6 @@ void DefaultIdealSemanticsSolver::init() {
 void DefaultIdealSemanticsSolver::computeOneExtension() {
 	std::vector<int> mss = justComputeOneExtension();
 	this->formatter.writeSingleExtension(mss);
-	this->answer = "";
 }
 
 
@@ -64,7 +63,6 @@ void DefaultIdealSemanticsSolver::computeAllExtensions() {
 	this->formatter.writeExtensionListBegin();
 	this->formatter.writeExtensionListElmt(mss, true);
 	this->formatter.writeExtensionListEnd();
-	this->answer = "";
 }
 
 
@@ -74,12 +72,10 @@ void DefaultIdealSemanticsSolver::isCredulouslyAccepted() {
 	for(unsigned int j=0; j<mss.size(); ++j) {
 		if(mss[j] == arg) {
 			this->formatter.writeArgAcceptance(true);
-			this->answer = "";
 			return;
 		}
 	}
 	this->formatter.writeArgAcceptance(false);
-	this->answer = "";
 }
 
 

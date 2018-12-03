@@ -34,12 +34,10 @@ void DefaultPreferredSemanticsSolver::computeOneExtension() {
 	solver->computeMss();
 	if(!solver->hasAMss()) {
 		this->formatter.writeNoExt();
-		this->answer = "";
 		return;
 	}
 	std::vector<int> mss = solver->getMss();
 	this->formatter.writeSingleExtension(mss);
-	this->answer = "";
 }
 
 
@@ -52,7 +50,6 @@ void DefaultPreferredSemanticsSolver::computeAllExtensions() {
 		*firstpt = false;
 	});
 	this->formatter.writeExtensionListEnd();
-	this->answer = "";
 }
 
 
@@ -61,7 +58,6 @@ void DefaultPreferredSemanticsSolver::isCredulouslyAccepted() {
 	assumps.push_back(varMap.getVar(this->acceptanceQueryArgument));
 	solver->computeModel(assumps);
 	this->formatter.writeArgAcceptance(solver->hasAModel());
-	this->answer = "";
 }
 
 
@@ -80,12 +76,10 @@ void DefaultPreferredSemanticsSolver::isSkepticallyAccepted() {
 		}
 		if(!found) {
 			this->formatter.writeArgAcceptance(false);
-			this->answer = "";
 			return;
 		}
 	}
 	this->formatter.writeArgAcceptance(true);
-	this->answer = "";
 }
 
 

@@ -41,8 +41,6 @@ public:
 
 	virtual void isSkepticallyAccepted() = 0;
 
-	std::string answerToString();
-
 	virtual ~SemanticsProblemSolver();
 
 protected:
@@ -56,8 +54,6 @@ protected:
 	SolverOutputFormatter &formatter;
 
 	std::string acceptanceQueryArgument;
-
-	std::string answer;
 };
 
 

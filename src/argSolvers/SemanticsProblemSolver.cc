@@ -43,10 +43,5 @@ void SemanticsProblemSolver::setAcceptanceQueryArgument(std::string arg) {
 }
 
 
-std::string SemanticsProblemSolver::answerToString() {
-	return this->answer;
-}
-
-
 SemanticsProblemSolver::~SemanticsProblemSolver() {}
 

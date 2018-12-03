@@ -32,6 +32,10 @@ public:
 	void isSkepticallyAccepted();
 
 	virtual ~GraphBasedGroundedSemanticsSolver();
+
+private:
+
+	SolverOutputFormatter& formatter;
 };
 
 } /* namespace CoQuiAAS */
