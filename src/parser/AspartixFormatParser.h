@@ -43,6 +43,7 @@ class AspartixFormatParser : public IParser {
    */
   virtual ~AspartixFormatParser(){}
   void parseInstance();
+  void parseDynamics(std::istream *input);
   Attacks& getAttacks();
   VarMap& getVarMap();
 

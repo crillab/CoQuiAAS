@@ -44,6 +44,7 @@ class CNFFormatParser : public IParser {
   virtual ~CNFFormatParser(){}
 
   void parseInstance();
+  void parseDynamics(std::istream *input);
   Attacks& getAttacks();
   VarMap& getVarMap();
 

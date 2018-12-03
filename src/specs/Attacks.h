@@ -13,6 +13,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <tuple>
 
 #include "VarMap.h"
 
@@ -64,6 +65,10 @@ class Attacks {
    */
   unsigned int maxAttacks();
 
+  std::vector<std::tuple<bool, int, int> >& getDynAttacks();
+
+  void addDynAttack(bool add, std::string from, std::string to);
+
   VarMap &getVarMap();
 
  protected :
@@ -76,6 +81,7 @@ class Attacks {
  private:
   unsigned int nbAttacks;
   unsigned int nMaxAttacks;
+  std::vector<std::tuple<bool, int, int> > dynAttacks;
   
 };
 

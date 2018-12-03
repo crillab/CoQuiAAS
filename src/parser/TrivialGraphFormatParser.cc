@@ -32,6 +32,21 @@ void TrivialGraphFormatParser::parseInstance() {
   }
 }
 
+void TrivialGraphFormatParser::parseDynamics(std::istream *is) {
+  std::string word, secondWord;
+  while(*is >> word) {
+    *is >> secondWord;
+    bool add;
+    if(word[0] == '-') add = false;
+    else if(word[0] == '+') add = true;
+    else {
+      std::cerr << "The dynamic attack " << word << " --> " << secondWord << " contains an error (no/wrong dynamics operator)" << std::endl;
+	    exit(-3);
+    }
+    attacks.addDynAttack(add, word.substr(1), secondWord);
+  }
+}
+
 
 inline Attacks& TrivialGraphFormatParser::getAttacks() {
   return attacks;

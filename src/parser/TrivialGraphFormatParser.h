@@ -42,6 +42,7 @@ class TrivialGraphFormatParser : public IParser {
   virtual ~TrivialGraphFormatParser(){}
 
   void parseInstance();
+  void parseDynamics(std::istream *input);
   Attacks& getAttacks();
   VarMap& getVarMap();
 

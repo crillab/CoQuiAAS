@@ -37,30 +37,55 @@ void AspartixFormatParser::parseInstance() {
     // Reading the args
     while(getline(*is,line)){
       if(!line.empty() && notOnlySpace(line)){
-	if((line.find("att") == 0)){
-	  // adding an attack
-	  unsigned long commaIndex = line.find(",");
-	  unsigned long closingParIndex = line.find(")");
-	  if(commaIndex == std::string::npos || closingParIndex == std::string::npos){
-	    std::cerr << "The line " << line << " contains an error (comma/closing paranthesis)" << std::endl ;
-	    exit(-3) ;
-	  }
-	  std::string attacking = line.substr(4,commaIndex-4);
-	  std::string attacked = line.substr(commaIndex+1,closingParIndex-commaIndex-1);
-	  attacks.addAttack(attacking,attacked) ;
-	}else{
-	  // adding an argument if not already present
-	  unsigned long closingParIndex = line.find(")");
-	  if(closingParIndex == std::string::npos){
-	    std::cerr << "The line " << line << " contains an error (closing paranthesis)" << std::endl ;
-	    exit(-3) ;
-	  }
-	  std::string argName = line.substr(4, closingParIndex-4) ;
-	  varMap.addEntry(argName);
-	}
+				if((line.find("att") == 0)){
+	  			// adding an attack
+	  			unsigned long commaIndex = line.find(",");
+	  			unsigned long closingParIndex = line.find(")");
+	  			if(commaIndex == std::string::npos || closingParIndex == std::string::npos){
+	    			std::cerr << "The line " << line << " contains an error (comma/closing paranthesis)" << std::endl ;
+	    			exit(-3) ;
+	  			}
+	  			std::string attacking = line.substr(4,commaIndex-4);
+	  			std::string attacked = line.substr(commaIndex+1,closingParIndex-commaIndex-1);
+	  			attacks.addAttack(attacking,attacked) ;
+				}else{
+	  			// adding an argument if not already present
+	  			unsigned long closingParIndex = line.find(")");
+	  			if(closingParIndex == std::string::npos){
+	    			std::cerr << "The line " << line << " contains an error (closing paranthesis)" << std::endl ;
+	    			exit(-3) ;
+	  			}
+	  			std::string argName = line.substr(4, closingParIndex-4) ;
+	  			varMap.addEntry(argName);
+				}
       }
     }
   }
+}
+
+
+void AspartixFormatParser::parseDynamics(std::istream *input) {
+	if(*is) {
+		std::string line;
+		while(getline(*is, line)) {
+			bool add;
+			if(line[0] == '-') add = false;
+			else if(line[0] == '+') add = true;
+			else {
+				std::cerr << "The line " << line << " contains an error (no/wrong dynamics operator)" << std::endl;
+	    	exit(-3);
+			}
+			unsigned long commaIndex = line.find(",");
+	  	unsigned long closingParIndex = line.find(")");
+	  	if(commaIndex == std::string::npos || closingParIndex == std::string::npos){
+	    	std::cerr << "The line " << line << " contains an error (comma/closing paranthesis)" << std::endl ;
+	    	exit(-3) ;
+	  	}
+	  	std::string attacking = line.substr(4,commaIndex-4);
+	  	std::string attacked = line.substr(commaIndex+1,closingParIndex-commaIndex-1);
+			attacks.addDynAttack(add, attacking, attacked);
+		}
+	}
 }
     
 

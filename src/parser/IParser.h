@@ -35,6 +35,8 @@ class IParser {
    */
   virtual void parseInstance() = 0;
 
+  virtual void parseDynamics(std::istream *input) = 0;
+
   /**
    * \fn getAttacks()
    * \brief Returns the attack relation corresponding to the input file
@@ -48,8 +50,6 @@ class IParser {
    * \return the mapping between the arguments and the literals
    */
   virtual VarMap& getVarMap() = 0;
-
-  virtual ~IParser(){}
 
 };
 

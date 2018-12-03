@@ -39,6 +39,11 @@ void CNFFormatParser::parseInstance() {
   }
 }
 
+void CNFFormatParser::parseDynamics(std::istream *is) {
+  std::cerr << "dynamics is not allowed for the CNF format" << std::endl;
+  std::exit(1);
+}
+
 
 inline Attacks& CNFFormatParser::getAttacks() {
   return attacks;

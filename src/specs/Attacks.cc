@@ -44,3 +44,11 @@ unsigned int Attacks::maxAttacks() {
 VarMap &Attacks::getVarMap() {
 	return varMap;
 }
+
+std::vector<std::tuple<bool, int, int> >& Attacks::getDynAttacks() {
+  return this->dynAttacks;
+}
+
+void Attacks::addDynAttack(bool add, std::string from, std::string to) {
+  this->dynAttacks.push_back(std::make_tuple(add, varMap.getVar(from), varMap.getVar(to)));
+}
