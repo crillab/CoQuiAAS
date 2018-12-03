@@ -83,7 +83,7 @@ int main(int argc, char** argv){
 	// initialize the StatMap
 	setInitStats(clh, parser);
 	// request a semantic instance depending on the problem to compute
-	SolverOutputFormatter& formatter = *SolverOutputFormatterFactory::getInstance(clh.getOutputFormatter(), parser->getVarMap());
+	SolverOutputFormatter& formatter = *SolverOutputFormatterFactory::getInstance(clh.getOutputFormatter(), parser->getVarMap(), [] (std::string s) {std::cout << s; std::cout.flush();});
 	std::unique_ptr<SemanticsProblemSolver> problem = SolverFactory::getProblemInstance(clh.getSemanticName(), clh.getTaskType(), clh.getAdditionalParams(), parser->getAttacks(), parser->getVarMap(), formatter);
 	if(!clh.getAdditionalParameter("-a").empty()){
 		if(undefinedArgument(clh.getAdditionalParameter("-a"),parser->getVarMap())){

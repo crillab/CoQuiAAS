@@ -13,15 +13,15 @@ namespace CoQuiAAS {
 
         public:
 
-        static SolverOutputFormatter* getInstance(std::string str, VarMap &varMap) {
+        static SolverOutputFormatter* getInstance(std::string str, VarMap &varMap, void (*displayFct)(std::string)) {
             std::transform(str.begin(), str.end(), str.begin(), ::toupper);
             if(!str.compare("ICCMA2017")) {
-                return new ICCMA17SolverOutputFormatter(varMap);
+                return new ICCMA17SolverOutputFormatter(varMap, displayFct);
             }
             if(!str.compare("ICCMA2019")) {
-                return new ICCMA19SolverOutputFormatter(varMap);
+                return new ICCMA19SolverOutputFormatter(varMap, displayFct);
             }
-            return new ICCMA17SolverOutputFormatter(varMap);
+            return new ICCMA19SolverOutputFormatter(varMap, displayFct);
         }
 
     };

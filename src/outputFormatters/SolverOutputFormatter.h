@@ -12,7 +12,9 @@ namespace CoQuiAAS {
 
         protected:
         
-        SolverOutputFormatter() {}
+        SolverOutputFormatter(void (*displayFct)(std::string)) {
+            this->displayFct = displayFct;
+        }
 
         std::string acceptance_status_str(bool status);
 
@@ -24,21 +26,35 @@ namespace CoQuiAAS {
 
         const std::string NO_STR = "NO";
 
+        void (*displayFct)(std::string);
+
         public:
 
-        virtual std::string formatArgAcceptance(bool status) = 0;
+        virtual void writeArgAcceptance(bool status) = 0;
 
-        virtual std::string formatNoExt() = 0;
+        virtual void writeNoExt() = 0;
 
-        virtual std::string formatSingleExtension(std::vector<bool>& model) = 0;
+        virtual void writeSingleExtension(std::vector<bool>& model) = 0;
 
-        virtual std::string formatEveryExtension(std::vector<std::vector<bool>>& model) = 0;
+        virtual void writeSingleExtension(std::vector<int>& lits) = 0;
 
-        virtual std::string formatSingleExtension(std::vector<int>& lits) = 0;
+        virtual void writeExtensionListBegin() = 0;
 
-        virtual std::string formatEveryExtension(std::vector<std::vector<int>>& lits) = 0;
+        virtual void writeExtensionListElmt(std::vector<bool>& model, bool isFirst) = 0;
 
-        virtual std::string formatD3(std::string grExts, std::string stExts, std::string prExts) = 0;
+        virtual void writeExtensionListElmt(std::vector<int>& lits, bool isFirst) = 0;
+
+        virtual void writeExtensionListEnd() = 0;
+
+        virtual void writeD3Begin() = 0;
+
+        virtual void writeD3GrExts(std::vector<int>& ext) = 0;
+
+        virtual void writeD3StExts(std::vector<std::vector<int> >& exts) = 0;
+
+        virtual void writeD3PrExts(std::vector<std::vector<int> >& exts) = 0;
+
+        virtual void writeD3End() = 0;
 
     };
 

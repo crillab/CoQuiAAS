@@ -25,21 +25,24 @@ void DefaultGroundedSemanticsSolver::init() {
 
 void DefaultGroundedSemanticsSolver::computeOneExtension() {
 	std::vector<int>& propagated = solver->propagatedAtDecisionLvlZero();
-	this->answer = this->formatter.formatSingleExtension(propagated);
+	this->formatter.writeSingleExtension(propagated);
+	this->answer = "";
 }
 
 
 void DefaultGroundedSemanticsSolver::computeAllExtensions() {
 	std::vector<int>& propagated = solver->propagatedAtDecisionLvlZero();
-	std::vector<std::vector<int>> vec;
-	vec.push_back(propagated);
-	this->answer = this->formatter.formatEveryExtension(vec);
+	this->formatter.writeExtensionListBegin();
+	this->formatter.writeExtensionListElmt(propagated, true);
+	this->formatter.writeExtensionListEnd();
+	this->answer = "";
 }
 
 
 void DefaultGroundedSemanticsSolver::isCredulouslyAccepted() {
 	bool isPropagated = solver->isPropagatedAtDecisionLvlZero(varMap.getVar(this->acceptanceQueryArgument));
-	this->answer = this->formatter.formatArgAcceptance(isPropagated);
+	this->formatter.writeArgAcceptance(isPropagated);
+	this->answer = "";
 }
 
 

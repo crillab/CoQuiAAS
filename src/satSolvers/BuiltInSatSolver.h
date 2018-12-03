@@ -48,9 +48,9 @@ public:
 
 	virtual bool computeModel(std::vector<int> &assumps, bool clearModelVec);
 
-	virtual void computeAllModels();
+	virtual void computeAllModels(std::function<void(std::vector<bool>&)> callback);
 
-	virtual void computeAllModels(std::vector<int> &assumps);
+	virtual void computeAllModels(std::function<void(std::vector<bool>&)> callback, std::vector<int> &assumps);
 
 	virtual bool hasAModel();
 

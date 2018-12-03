@@ -50,13 +50,14 @@ bool BuiltInMssSolver::computeMss(std::vector<int> &assumps) {
 }
 
 
-void BuiltInMssSolver::computeAllMss() {
+void BuiltInMssSolver::computeAllMss(void (*callback)(std::vector<int>&)) {
 	std::vector<int> assumps;
-	computeAllMss(assumps);
+	computeAllMss(callback, assumps);
 }
 
 
-void BuiltInMssSolver::computeAllMss(std::vector<int> &assumps) {
+void BuiltInMssSolver::computeAllMss(void (*callback)(std::vector<int>&), std::vector<int> &assumps) {
+	this->shouldStopMssEnum = false;
 	clearMss();
 	solver.setSoftInstance(true);
 	solver.bigRestart();
@@ -65,9 +66,15 @@ void BuiltInMssSolver::computeAllMss(std::vector<int> &assumps) {
 	solver.enumAllCoMssBlocked();
 	for(int i = 0 ; i < solver.computedMCS.size() ; i++){
 		vector<int> mss = extractMssFromCoMss(solver.computedMCS[i], this->nSoftCstrs);
+		callback(mss);
 		this->mss.push_back(mss);
 	}
 	solver.foundUnsat = false;
+}
+
+
+void stopMssEnum() {
+	// TODO
 }
 
 
@@ -131,22 +138,22 @@ bool BuiltInMssSolver::computeModel(std::vector<int> &assumps) {
 }
 
 
-void BuiltInMssSolver::computeAllModels() {
+void BuiltInMssSolver::computeAllModels(void (*callback)(std::vector<bool>& model)) {
 	solver.verbosity = 0;
 	//
 	solver.bigRestart();
 	solver.setSoftInstance(false);
 	solver.optSaveMCS = false;
 	solver.useAsCompleteSolver();
-	BuiltInSatSolver::computeAllModels();
+	BuiltInSatSolver::computeAllModels(callback);
 }
 
 
-void BuiltInMssSolver::computeAllModels(std::vector<int> &assumps) {
+void BuiltInMssSolver::computeAllModels(void (*callback)(std::vector<bool>& model), std::vector<int> &assumps) {
 	solver.bigRestart();
 	solver.setSoftInstance(false);
 	solver.useAsCompleteSolver();
-	BuiltInSatSolver::computeAllModels(assumps);
+	BuiltInSatSolver::computeAllModels(callback, assumps);
 }
 
 

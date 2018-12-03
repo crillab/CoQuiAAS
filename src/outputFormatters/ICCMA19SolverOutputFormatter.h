@@ -10,21 +10,33 @@ namespace CoQuiAAS {
 
         public:
 
-        ICCMA19SolverOutputFormatter(VarMap &varMap);
+        ICCMA19SolverOutputFormatter(VarMap &varMap, void (*displayFct)(std::string));
 
-        std::string formatArgAcceptance(bool status);
+        void writeArgAcceptance(bool status);
 
-        std::string formatNoExt();
+        void writeNoExt();
 
-        std::string formatSingleExtension(std::vector<bool>& model);
+        void writeSingleExtension(std::vector<bool>& model);
 
-        std::string formatEveryExtension(std::vector<std::vector<bool>>& models);
+        void writeSingleExtension(std::vector<int>& lits);
 
-        std::string formatSingleExtension(std::vector<int>& lits);
+        void writeExtensionListBegin();
 
-        std::string formatEveryExtension(std::vector<std::vector<int>>& lits);
+        void writeExtensionListElmt(std::vector<bool>& model, bool isFirst);
 
-        std::string formatD3(std::string grExts, std::string stExts, std::string prExts);
+        void writeExtensionListElmt(std::vector<int>& lits, bool isFirst);
+
+        void writeExtensionListEnd();
+
+        void writeD3Begin();
+
+        void writeD3GrExts(std::vector<int>& ext);
+
+        void writeD3StExts(std::vector<std::vector<int> >& exts);
+
+        void writeD3PrExts(std::vector<std::vector<int> >& exts);
+
+        void writeD3End();
 
         virtual ~ICCMA19SolverOutputFormatter();
 

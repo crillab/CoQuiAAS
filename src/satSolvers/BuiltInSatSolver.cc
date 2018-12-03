@@ -23,7 +23,7 @@ void BuiltInSatSolver::addVariables(int nVars) {
 }
 
 
-void BuiltInSatSolver::addVariables(int nVars, bool auxVar) { // TODO: implement auxVars here
+void BuiltInSatSolver::addVariables(int nVars, bool auxVar) {
 	for(int i=0; i<nVars; ++i) {
 		solver.newVar();
 	}
@@ -113,18 +113,19 @@ void BuiltInSatSolver::extractBuiltInSolverModel() {
 }
 
 
-void BuiltInSatSolver::computeAllModels() {
+void BuiltInSatSolver::computeAllModels(std::function<void(std::vector<bool>&)> callback) {
 	std::vector<int> assumps;
-	return computeAllModels(assumps);
+	return computeAllModels(callback, assumps);
 }
 
 
-void BuiltInSatSolver::computeAllModels(vector<int> &assumps) {
+void BuiltInSatSolver::computeAllModels(std::function<void(std::vector<bool>&)> callback, std::vector<int> &assumps) {
 	clearModels();
 	for(;;) {
 		bool newModel = computeModel(assumps, false);
 		solver.bigRestart();
 		if(!newModel) break;
+		if(callback) callback(this->models[this->models.size()-1]);
 		int sel = addBlockingClause();
 		blockingSelectors.push_back(sel);
 		assumps.push_back(sel);

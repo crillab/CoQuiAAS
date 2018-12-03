@@ -11,6 +11,7 @@
 
 #include <vector>
 #include <iostream>
+#include <functional>
 #include "core/SolverTypes.h"
 #include "mtl/Vec.h"
 
@@ -38,9 +39,9 @@ public:
 
 	virtual bool computeModel(std::vector<int> &assumps) = 0;
 
-	virtual void computeAllModels() = 0;
+	virtual void computeAllModels(std::function<void(std::vector<bool>&)> callback) = 0;
 
-	virtual void computeAllModels(std::vector<int> &assumps) = 0;
+	virtual void computeAllModels(std::function<void(std::vector<bool>&)> callback, std::vector<int> &assumps) = 0;
 
 	virtual bool hasAModel() = 0;
 

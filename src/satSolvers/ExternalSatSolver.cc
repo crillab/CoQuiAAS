@@ -24,7 +24,7 @@ void ExternalSatSolver::addVariables(int nVars) {
 }
 
 
-void ExternalSatSolver::addVariables(int nVars, bool auxVar) { // TODO: implement aux vars
+void ExternalSatSolver::addVariables(int nVars, bool auxVar) {
 	this->nVars += nVars;
 }
 
@@ -195,17 +195,18 @@ void ExternalSatSolver::handleForkChild(std::string instanceFile, int pfds[]) {
 }
 
 
-void ExternalSatSolver::computeAllModels() {
+void ExternalSatSolver::computeAllModels(std::function<void(std::vector<bool>&)> callback) {
 	std::vector<int> assumps;
-	return computeAllModels(assumps);
+	return computeAllModels(callback, assumps);
 }
 
 
-void ExternalSatSolver::computeAllModels(std::vector<int> &assumps) {
+void ExternalSatSolver::computeAllModels(std::function<void(std::vector<bool>&)> callback, std::vector<int> &assumps) {
 	this->models.clear();
 	for(;;) {
 		bool modelFound = computeModel(assumps, false);
 		if(!modelFound) break;
+		callback(this->models[this->models.size()-1]);
 		int sel = addBlockingClause();
 		blockingSelectors.push_back(sel);
 		assumps.push_back(sel);

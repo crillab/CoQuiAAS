@@ -38,13 +38,8 @@ public:
 
 private:
 
-	std::string groundedExtensions();
-
-	std::string preferredExtensions();
-
-	std::string stableExtensions();
-
 	std::shared_ptr<MssSolver> solver;
+
 };
 
 

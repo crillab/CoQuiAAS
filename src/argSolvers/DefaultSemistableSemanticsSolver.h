@@ -39,7 +39,9 @@ private:
 
 	std::shared_ptr<MssSolver> solver;
 
-	std::vector<std::vector<bool>> computeAllSstExtensions();
+	std::vector<std::vector<bool>> computeAllSstExtensions(std::function<void(std::vector<bool>&)> callback);
+
+	bool stopEnum = false;
 };
 
 

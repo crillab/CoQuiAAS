@@ -9,6 +9,7 @@
 #define SRC_SOLVERS_MSSSOLVER_H_
 
 #include "SatSolver.h"
+#include <functional>
 
 
 namespace CoQuiAAS {
@@ -24,9 +25,9 @@ public:
 
 	virtual bool computeMss(std::vector<int> &assumps) = 0;
 
-	virtual void computeAllMss() = 0;
+	virtual void computeAllMss(std::function<void(std::vector<int>&)> callback) = 0;
 
-	virtual void computeAllMss(std::vector<int> &assumps) = 0;
+	virtual void computeAllMss(std::function<void(std::vector<int>&)> callback, std::vector<int> &assumps) = 0;
 
 	virtual bool hasAMss() = 0;
 
@@ -35,6 +36,8 @@ public:
 	virtual std::vector<std::vector<int> >& getAllMss() = 0;
 
 	virtual void resetAllMss() = 0;
+
+	virtual void stopMssEnum() = 0;
 
 	static std::vector<int> extractMssFromCoMss(Minisat::vec<int>& coMss, int nSoftCstrs) {
 		std::vector<int> tmpmss;

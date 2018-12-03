@@ -26,7 +26,14 @@ void DefaultIdealSemanticsSolver::init() {
 
 
 void DefaultIdealSemanticsSolver::computeOneExtension() {
-	solver->computeAllMss();
+	std::vector<int> mss = justComputeOneExtension();
+	this->formatter.writeSingleExtension(mss);
+	this->answer = "";
+}
+
+
+std::vector<int> DefaultIdealSemanticsSolver::justComputeOneExtension() {
+	solver->computeAllMss(NULL);
 	std::vector<std::vector<int> > allMss = solver->getAllMss();
 	std::vector<bool> argAllowed(varMap.nVars(), true);
 	int nMss = (signed) allMss.size();
@@ -48,30 +55,31 @@ void DefaultIdealSemanticsSolver::computeOneExtension() {
 		}
 	}
 	solver->computeMss(assumps);
-	std::vector<int> mss = solver->getMss();
-	this->answer = this->formatter.formatSingleExtension(mss);
+	return solver->getMss();
 }
 
 
 void DefaultIdealSemanticsSolver::computeAllExtensions() {
-	computeOneExtension();
-	std::vector<std::vector<int>> vec;
-	vec.push_back(solver->getMss());
-	this->answer = this->formatter.formatEveryExtension(vec);
+	std::vector<int> mss = justComputeOneExtension();
+	this->formatter.writeExtensionListBegin();
+	this->formatter.writeExtensionListElmt(mss, true);
+	this->formatter.writeExtensionListEnd();
+	this->answer = "";
 }
 
 
 void DefaultIdealSemanticsSolver::isCredulouslyAccepted() {
-	computeOneExtension();
+	std::vector<int> mss = justComputeOneExtension();
 	int arg = varMap.getVar(this->acceptanceQueryArgument);
-	std::vector<int> mss = solver->getMss();
 	for(unsigned int j=0; j<mss.size(); ++j) {
 		if(mss[j] == arg) {
-			this->answer = this->formatter.formatArgAcceptance(true);
+			this->formatter.writeArgAcceptance(true);
+			this->answer = "";
 			return;
 		}
 	}
-	this->answer = this->formatter.formatArgAcceptance(false);
+	this->formatter.writeArgAcceptance(false);
+	this->answer = "";
 }
 
 

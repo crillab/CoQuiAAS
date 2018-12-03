@@ -2,57 +2,83 @@
 
 using namespace CoQuiAAS;
 
-ICCMA19SolverOutputFormatter::ICCMA19SolverOutputFormatter(VarMap &varMap) : SolverOutputFormatter(), vmap(varMap) {
+ICCMA19SolverOutputFormatter::ICCMA19SolverOutputFormatter(VarMap &varMap, void (*displayFct)(std::string)) : SolverOutputFormatter(displayFct), vmap(varMap) {
     // nothing to do here
 }
 
-std::string ICCMA19SolverOutputFormatter::formatArgAcceptance(bool status) {
-    return acceptance_status_str(status);
+void ICCMA19SolverOutputFormatter::writeArgAcceptance(bool status) {
+    this->displayFct(acceptance_status_str(status)+"\n");
 }
 
-std::string ICCMA19SolverOutputFormatter::formatNoExt() {
-    return NO_STR;
+void ICCMA19SolverOutputFormatter::writeNoExt() {
+    this->displayFct(NO_STR+"\n");
 }
 
-std::string ICCMA19SolverOutputFormatter::formatSingleExtension(std::vector<bool>& model) {
-    return argArray(model, this->vmap);
-}
-
-std::string ICCMA19SolverOutputFormatter::formatEveryExtension(std::vector<std::vector<bool>>& models) {
-    std::vector<std::string> exts;
-    for(unsigned int i=0; i<models.size(); ++i) {
-        exts.push_back(formatSingleExtension(models[i]));
-    }
-    return formatSequenceOfExtensions(exts);
+void ICCMA19SolverOutputFormatter::writeSingleExtension(std::vector<bool>& model) {
+    this->displayFct(argArray(model, this->vmap)+"\n");
 }
 
 std::string ICCMA19SolverOutputFormatter::formatSequenceOfExtensions(std::vector<std::string> exts) {
     if(exts.size() == 0) return "[]";
     std::string res;
-    bool first = true;
     res = "[";
     for(unsigned int i=0; i<exts.size(); ++i) {
-        if(first) first=false; else res = res+"\n";
-        res = res + exts[i];
+        res = res + "\n" + exts[i];
     }
     res = res+"\n]";
     return res;
 }
 
-std::string ICCMA19SolverOutputFormatter::formatSingleExtension(std::vector<int>& lits) {
-    return argArray(lits, this->vmap);
+void ICCMA19SolverOutputFormatter::writeSingleExtension(std::vector<int>& lits) {
+    this->displayFct(argArray(lits, this->vmap)+"\n");
 }
 
-std::string ICCMA19SolverOutputFormatter::formatEveryExtension(std::vector<std::vector<int>>& lits) {
-    std::vector<std::string> exts;
-    for(unsigned int i=0; i<lits.size(); ++i) {
-        exts.push_back(formatSingleExtension(lits[i]));
+void ICCMA19SolverOutputFormatter::writeExtensionListBegin() {
+    this->displayFct("[");
+}
+
+void ICCMA19SolverOutputFormatter::writeExtensionListElmt(std::vector<bool>& model, bool isFirst) {
+    this->displayFct("\n"+argArray(model, this->vmap));
+}
+
+void ICCMA19SolverOutputFormatter::writeExtensionListElmt(std::vector<int>& lits, bool isFirst) {
+    this->displayFct("\n"+argArray(lits, this->vmap));
+}
+
+void ICCMA19SolverOutputFormatter::writeExtensionListEnd() {
+    this->displayFct("\n]\n");
+}
+
+void ICCMA19SolverOutputFormatter::writeD3Begin() {
+    // nothing to do here
+}
+
+void ICCMA19SolverOutputFormatter::writeD3GrExts(std::vector<int>& ext) {
+    writeExtensionListBegin();
+    writeExtensionListElmt(ext, true);
+    writeExtensionListEnd();
+    this->displayFct("\n");
+}
+
+void ICCMA19SolverOutputFormatter::writeD3StExts(std::vector<std::vector<int> >& exts) {
+    writeExtensionListBegin();
+    for(unsigned int i=0; i<exts.size(); ++i) {
+        writeExtensionListElmt(exts[i], i==0);
     }
-    return formatSequenceOfExtensions(exts);
+    writeExtensionListEnd();
+    this->displayFct("\n");
 }
 
-std::string ICCMA19SolverOutputFormatter::formatD3(std::string grExts, std::string stExts, std::string prExts) {
-    return grExts+"\n"+stExts+"\n"+prExts;
+void ICCMA19SolverOutputFormatter::writeD3PrExts(std::vector<std::vector<int> >& exts) {
+    writeExtensionListBegin();
+    for(unsigned int i=0; i<exts.size(); ++i) {
+        writeExtensionListElmt(exts[i], i==0);
+    }
+    writeExtensionListEnd();
+}
+
+void ICCMA19SolverOutputFormatter::writeD3End() {
+    // nothing to do here
 }
 
 ICCMA19SolverOutputFormatter::~ICCMA19SolverOutputFormatter() {

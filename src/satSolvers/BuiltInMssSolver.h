@@ -28,9 +28,11 @@ public:
 
 	virtual bool computeMss(std::vector<int> &assumps);
 
-	virtual void computeAllMss();
+	virtual void computeAllMss(void (*callback)(std::vector<int>&));
 
-	virtual void computeAllMss(std::vector<int> &assumps);
+	virtual void computeAllMss(void (*callback)(std::vector<int>&), std::vector<int> &assumps);
+
+	virtual void stopMssEnum() = 0;
 
 	virtual bool hasAMss();
 
@@ -47,8 +49,8 @@ public:
 	virtual bool isPropagatedAtDecisionLvlZero(int lit);
 	virtual bool computeModel();
 	virtual bool computeModel(std::vector<int> &assumps);
-	virtual void computeAllModels();
-	virtual void computeAllModels(std::vector<int> &assumps);
+	virtual void computeAllModels(void (*callback)(std::vector<bool>& model));
+	virtual void computeAllModels(void (*callback)(std::vector<bool>& model), std::vector<int> &assumps);
 	virtual bool hasAModel();
 	virtual std::vector<bool>& getModel();
 	virtual std::vector<std::vector<bool> >& getModels();
@@ -60,6 +62,8 @@ private:
 	void clearMss();
 
 	int nSoftCstrs;
+
+	bool shouldStopMssEnum = false;
 };
 
 

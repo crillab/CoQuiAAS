@@ -11,6 +11,7 @@
 #include <fstream>
 #include <sstream>
 #include <cstring>
+#include <functional>
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -36,9 +37,11 @@ public:
 
 	virtual bool computeMss(std::vector<int> &assumps);
 
-	virtual void computeAllMss();
+	virtual void computeAllMss(std::function<void(std::vector<int>&)> callback);
 
-	virtual void computeAllMss(std::vector<int> &assumps);
+	virtual void computeAllMss(std::function<void(std::vector<int>&)> callback, std::vector<int> &assumps);
+
+	virtual void stopMssEnum();
 
 	virtual bool hasAMss();
 
@@ -64,9 +67,9 @@ public:
 
 	virtual bool computeModel(std::vector<int> &assumps);
 
-	virtual void computeAllModels();
+	virtual void computeAllModels(std::function<void(std::vector<bool>&)> callback);
 
-	virtual void computeAllModels(std::vector<int> &assumps);
+	virtual void computeAllModels(std::function<void(std::vector<bool>&)> callback, std::vector<int> &assumps);
 
 	virtual bool hasAModel();
 
@@ -98,9 +101,9 @@ private:
 
 	std::string writeInstanceForSAT(std::vector<int> assumps, int realNumberOfVars, std::vector<int> mssAssumps);
 
-	bool launchExternalSolver(std::string instanceFile, bool allModels);
+	bool launchExternalSolver(std::string instanceFile, bool allModels, std::function<void(std::vector<int>&)> callback);
 
-	bool handleForkAncestor(int pipe[], bool allModels, bool extract);
+	bool handleForkAncestor(int childId, int pipe[], bool allModels, bool extract);
 
 	void handleForkChild(std::string instanceFile, bool allModels, int pfds[]);
 
@@ -119,6 +122,8 @@ private:
 	int nCstrs;
 
 	std::stringstream dimacsCstrs;
+
+	bool shouldStopMssEnum = false;
 };
 
 }

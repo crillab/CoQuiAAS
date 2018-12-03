@@ -189,16 +189,16 @@ bool ExternalMaxSatSolver::computeModel(std::vector<int> &assumps) {
 }
 
 
-void ExternalMaxSatSolver::computeAllModels() {
+void ExternalMaxSatSolver::computeAllModels(std::function<void(std::vector<bool>&)> callback) {
 	this->computingModel = true;
-	ExternalSatSolver::computeAllModels();
+	ExternalSatSolver::computeAllModels(callback);
 	this->computingModel = false;
 }
 
 
-void ExternalMaxSatSolver::computeAllModels(std::vector<int> &assumps) {
+void ExternalMaxSatSolver::computeAllModels(std::function<void(std::vector<bool>&)> callback, std::vector<int> &assumps) {
 	this->computingModel = true;
-	ExternalSatSolver::computeAllModels(assumps);
+	ExternalSatSolver::computeAllModels(callback, assumps);
 	this->computingModel = false;
 }
 

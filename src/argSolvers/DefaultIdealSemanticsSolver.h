@@ -37,6 +37,8 @@ public:
 
 private:
 
+	std::vector<int> justComputeOneExtension();
+
 	std::shared_ptr<MssSolver> solver;
 };
 

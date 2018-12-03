@@ -36,37 +36,20 @@ void DefaultDungTriathlonSolver::computeOneExtension() {
 
 
 void DefaultDungTriathlonSolver::computeAllExtensions() {
-	auto gr = groundedExtensions();
-	solver->computeAllMss();
-	auto st = stableExtensions();
-	auto pr = preferredExtensions();
-	this->answer = this->formatter.formatD3(gr, st, pr);
-}
-
-
-std::string DefaultDungTriathlonSolver::preferredExtensions() {
-	std::vector<std::vector<int> > allMss = solver->getAllMss();
-	return this->formatter.formatEveryExtension(allMss);
-}
-
-std::string DefaultDungTriathlonSolver::groundedExtensions() {
+	this->formatter.writeD3Begin();
 	ExtensionUtils extUtils(attacks);
 	std::vector<int> propagated = extUtils.groundedExtension();
-	std::vector<std::vector<int>> vec;
-	vec.push_back(propagated);
-	return this->formatter.formatEveryExtension(vec);
-}
-
-
-std::string DefaultDungTriathlonSolver::stableExtensions() {
+	this->formatter.writeD3GrExts(propagated);
+	solver->computeAllMss(NULL);
 	std::vector<std::vector<int>> stExts;
 	std::vector<std::vector<int> > allMss = solver->getAllMss();
 	int nMss = (signed) allMss.size();
-	ExtensionUtils extUtils(attacks);
 	for(int i=0; i<nMss; ++i) {
 		if(extUtils.isMaxRange(allMss[i])) stExts.push_back(allMss[i]);
 	}
-	return this->formatter.formatEveryExtension(stExts);
+	this->formatter.writeD3StExts(stExts);
+	this->formatter.writeD3PrExts(allMss);
+	this->formatter.writeD3End();
 }
 
 

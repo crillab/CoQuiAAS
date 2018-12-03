@@ -46,22 +46,28 @@ bool ExternalCoMssSolver::computeMss() {
 
 bool ExternalCoMssSolver::computeMss(std::vector<int> &assumps) {
 	std::string instance = writeInstanceForMSS(assumps);
-	int ret = launchExternalSolver(instance, false);
+	int ret = launchExternalSolver(instance, false, NULL);
 	unlink(instance.c_str());
 	return ret;
 }
 
 
-void ExternalCoMssSolver::computeAllMss() {
+void ExternalCoMssSolver::computeAllMss(std::function<void(std::vector<int>&)> callback) {
 	std::vector<int> assumps;
-	computeAllMss(assumps);
+	computeAllMss(callback, assumps);
 }
 
 
-void ExternalCoMssSolver::computeAllMss(std::vector<int> &assumps) {
+void ExternalCoMssSolver::computeAllMss(std::function<void(std::vector<int>&)> callback, std::vector<int> &assumps) {
+  this->shouldStopMssEnum = false;
 	std::string instance = writeInstanceForMSS(assumps);
-	launchExternalSolver(instance, true);
+	launchExternalSolver(instance, true,  callback);
 	unlink(instance.c_str());
+}
+
+
+void ExternalCoMssSolver::stopMssEnum() {
+  this->shouldStopMssEnum = true;
 }
 
 
@@ -134,24 +140,27 @@ bool ExternalCoMssSolver::computeModel(std::vector<int> &assumps) {
 	auto oldNSoftCstrs = this->nSoftCstrs;
 	this->nSoftCstrs = 2*realNumberOfVars;
 	std::string instance = writeInstanceForSAT(assumps, this->realNumberOfVars);
-	int ret = launchExternalSolver(instance, false);
+	int ret = launchExternalSolver(instance, false, NULL);
 	unlink(instance.c_str());
 	this->nSoftCstrs = oldNSoftCstrs;
 	return ret;
 }
 
 
-void ExternalCoMssSolver::computeAllModels() {
+void ExternalCoMssSolver::computeAllModels(std::function<void(std::vector<bool>&)> callback) {
 	std::vector<int> assumps;
-	return computeAllModels(assumps);
+	return computeAllModels(callback, assumps);
 }
 
 
-void ExternalCoMssSolver::computeAllModels(std::vector<int> &assumps) {
+void ExternalCoMssSolver::computeAllModels(std::function<void(std::vector<bool>&)> callback, std::vector<int> &assumps) {
 	auto oldNSoftCstrs = this->nSoftCstrs;
 	this->nSoftCstrs = 2*realNumberOfVars;
 	std::string instance = writeInstanceForSAT(assumps, this->realNumberOfVars);
-	launchExternalSolver(instance, true);
+	launchExternalSolver(instance, true, [this, callback](std::vector<int>& mss){
+    std::vector<bool> model = extractModelFromMss(mss);
+    callback(model);
+  });
 	unlink(instance.c_str());
 	this->nSoftCstrs = oldNSoftCstrs;
 }
@@ -228,14 +237,14 @@ std::string ExternalCoMssSolver::writeInstanceForSAT(std::vector<int> assumps, i
 }
 
 
-bool ExternalCoMssSolver::launchExternalSolver(std::string instanceFile, bool allModels) {
+bool ExternalCoMssSolver::launchExternalSolver(std::string instanceFile, bool allModels, std::function<void(std::vector<int>&)> callback) {
   pid_t pid;
   int pfds[2];
   
   if(-1 == pipe(pfds)) {perror("CoQuiAAS");exit(1);}
   if(-1 == (pid = fork())) {perror("CoQuiAAS");exit(1);}
   if(pid > 0) {
-    return handleForkAncestor(pfds, allModels, true);
+    return handleForkAncestor(pid, pfds, allModels, true);
   } else {
     handleForkChild(instanceFile, allModels, pfds);
     return true; // will never be returned since exec() is called in fork child
@@ -262,7 +271,7 @@ void ExternalCoMssSolver::handleForkChild(std::string instanceFile, bool allMode
 }
 
 
-bool ExternalCoMssSolver::handleForkAncestor(int pipe[], bool allModels, bool extract) {
+bool ExternalCoMssSolver::handleForkAncestor(int childId, int pipe[], bool allModels, bool extract) {
   wait(NULL);
   close(pipe[1]);
   bool ret = false;
@@ -274,12 +283,19 @@ bool ExternalCoMssSolver::handleForkAncestor(int pipe[], bool allModels, bool ex
       for(begin=buffer+6; *begin!=' '; ++begin);
       this->mss.push_back(extractCoMss(begin+1));
       ret = true;
+      if(this->shouldStopMssEnum) {
+					kill(childId, SIGTERM);
+					break;
+			}
       continue;
     }
     if(!strncmp(buffer, "v ", 2)) {
-      // std::cout << buffer << std::endl;
       this->mss.push_back(extractCoMss(buffer+2));
       ret = true;
+      if(this->shouldStopMssEnum) {
+					kill(childId, SIGTERM);
+					break;
+			}
       continue;
     }
   }
@@ -350,7 +366,7 @@ std::vector<bool> ExternalCoMssSolver::extractModelFromMss(std::vector<int> mss)
   if(!pid) {
     handleForkChild(f, true, pfds);
   }
-  handleForkAncestor(pfds, true, false);
+  handleForkAncestor(pid, pfds, true, false);
   std::vector<int>& lastMss = this->mss.back();
   std::vector<bool> newModel;
   for(int i=0; i<this->realNumberOfVars; ++i) {

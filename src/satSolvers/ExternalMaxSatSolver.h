@@ -51,8 +51,8 @@ public :
 	virtual bool isPropagatedAtDecisionLvlZero(int lit);
 	virtual bool computeModel();
 	virtual bool computeModel(std::vector<int> &assumps);
-	virtual void computeAllModels();
-	virtual void computeAllModels(std::vector<int> &assumps);
+	virtual void computeAllModels(std::function<void(std::vector<bool>&)> callback);
+	virtual void computeAllModels(std::function<void(std::vector<bool>&)> callback, std::vector<int> &assumps);
 	virtual bool hasAModel();
 	virtual std::vector<bool>& getModel();
 	virtual std::vector<std::vector<bool> >& getModels();

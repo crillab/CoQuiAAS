@@ -46,22 +46,27 @@ bool LbxCoMssSolver::computeMss() {
 
 bool LbxCoMssSolver::computeMss(std::vector<int> &assumps) {
 	std::string instance = writeInstanceForMSS(assumps);
-	int ret = launchExternalSolver(instance, false);
+	int ret = launchExternalSolver(instance, false, NULL, NULL);
 	unlink(instance.c_str());
 	return ret;
 }
 
 
-void LbxCoMssSolver::computeAllMss() {
+void LbxCoMssSolver::computeAllMss(std::function<void(std::vector<int>&)> callback) {
 	std::vector<int> assumps;
-	computeAllMss(assumps);
+	computeAllMss(callback, assumps);
 }
 
 
-void LbxCoMssSolver::computeAllMss(std::vector<int> &assumps) {
+void LbxCoMssSolver::computeAllMss(std::function<void(std::vector<int>&)> callback, std::vector<int> &assumps) {
+	this->shouldStopMssEnum = false;
 	std::string instance = writeInstanceForMSS(assumps);
-	launchExternalSolver(instance, true);
+	launchExternalSolver(instance, true, callback, NULL);
 	unlink(instance.c_str());
+}
+
+void LbxCoMssSolver::stopMssEnum(){
+	this->shouldStopMssEnum = true;
 }
 
 
@@ -136,14 +141,14 @@ std::string LbxCoMssSolver::writeInstanceForSAT(std::vector<int> assumps, int re
 }
 
 
-bool LbxCoMssSolver::launchExternalSolver(std::string instanceFile, bool allModels) {
+bool LbxCoMssSolver::launchExternalSolver(std::string instanceFile, bool allModels, std::function<void(std::vector<int>&)> mssCallback, std::function<void(std::vector<bool>&)> modelCallback) {
 	pid_t pid;
 	int pfds[2];
 
 	if(-1 == pipe(pfds)) {perror("CoQuiAAS");exit(1);}
 	if(-1 == (pid = fork())) {perror("CoQuiAAS");exit(1);}
 	if(pid > 0) {
-		return handleForkAncestor(pfds);
+		return handleForkAncestor(pid, pfds, mssCallback, modelCallback);
 	} else {
 		handleForkChild(instanceFile, allModels, pfds);
 		return true; // will never be returned since exec() is called in fork child
@@ -169,7 +174,7 @@ void LbxCoMssSolver::handleForkChild(std::string instanceFile, bool allModels, i
 }
 
 
-bool LbxCoMssSolver::handleForkAncestor(int pipe[]) {
+bool LbxCoMssSolver::handleForkAncestor(int childId, int pipe[], std::function<void(std::vector<int>&)> mssCallback, std::function<void(std::vector<bool>&)> modelCallback) {
 	wait(NULL);
 	close(pipe[1]);
 	bool ret = false;
@@ -177,12 +182,30 @@ bool LbxCoMssSolver::handleForkAncestor(int pipe[]) {
 	char buffer[BUF_READ_SIZE];
 	while(fgets(buffer, BUF_READ_SIZE, childOutFile)) {
 		if(!strncmp(buffer, "c MCS: ", 7)) {
-			this->mss.push_back(extractCoMss(buffer+7));
+			std::vector<int> mss = extractCoMss(buffer+7);
+			this->mss.push_back(mss);
 			ret = true;
+			if(this->mss.size() == this->models.size()) {
+				if(mssCallback) mssCallback(mss);
+				if(modelCallback) modelCallback(this->models[this->models.size()-1]);
+				if(this->shouldStopMssEnum) {
+					kill(childId, SIGTERM);
+					break;
+				}
+			}
 			continue;
 		}
 		if(!strncmp(buffer, "c model: ", 9)) {
-			this->models.push_back(extractModel(buffer+9));
+			std::vector<bool> model = extractModel(buffer+9);
+			this->models.push_back(model);
+			if(this->mss.size() == this->models.size()) {
+				if(mssCallback) mssCallback(this->mss[this->mss.size()-1]);
+				if(modelCallback) modelCallback(model);
+				if(this->shouldStopMssEnum) {
+					kill(childId, SIGTERM);
+					break;
+				}
+			}
 			continue;
 		}
 	}
@@ -297,24 +320,24 @@ bool LbxCoMssSolver::computeModel(std::vector<int> &assumps) {
 	auto oldNSoftCstrs = this->nSoftCstrs;
 	this->nSoftCstrs = 2*realNumberOfVars;
 	std::string instance = writeInstanceForSAT(assumps, this->realNumberOfVars);
-	int ret = launchExternalSolver(instance, false);
+	int ret = launchExternalSolver(instance, false, NULL, NULL);
 	unlink(instance.c_str());
 	this->nSoftCstrs = oldNSoftCstrs;
 	return ret;
 }
 
 
-void LbxCoMssSolver::computeAllModels() {
+void LbxCoMssSolver::computeAllModels(std::function<void(std::vector<bool>&)> callback) {
 	std::vector<int> assumps;
-	return computeAllModels(assumps);
+	return computeAllModels(callback, assumps);
 }
 
 
-void LbxCoMssSolver::computeAllModels(std::vector<int> &assumps) {
+void LbxCoMssSolver::computeAllModels(std::function<void(std::vector<bool>&)> callback, std::vector<int> &assumps) {
 	auto oldNSoftCstrs = this->nSoftCstrs;
 	this->nSoftCstrs = 2*realNumberOfVars;
 	std::string instance = writeInstanceForSAT(assumps, this->realNumberOfVars);
-	launchExternalSolver(instance, true);
+	launchExternalSolver(instance, true, NULL, callback);
 	unlink(instance.c_str());
 	this->nSoftCstrs = oldNSoftCstrs;
 }

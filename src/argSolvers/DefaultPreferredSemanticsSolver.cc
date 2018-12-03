@@ -33,17 +33,26 @@ void DefaultPreferredSemanticsSolver::init() {
 void DefaultPreferredSemanticsSolver::computeOneExtension() {
 	solver->computeMss();
 	if(!solver->hasAMss()) {
-		this->answer = this->formatter.formatNoExt();
+		this->formatter.writeNoExt();
+		this->answer = "";
 		return;
 	}
 	std::vector<int> mss = solver->getMss();
-	this->answer = this->formatter.formatSingleExtension(mss);
+	this->formatter.writeSingleExtension(mss);
+	this->answer = "";
 }
 
 
 void DefaultPreferredSemanticsSolver::computeAllExtensions() {
-	solver->computeAllMss();
-	this->answer = this->formatter.formatEveryExtension(solver->getAllMss());
+	this->formatter.writeExtensionListBegin();
+	bool first = true;
+	bool* firstpt = &first;
+	solver->computeAllMss([this, firstpt](std::vector<int>& model){
+		this->formatter.writeExtensionListElmt(model, *firstpt);
+		*firstpt = false;
+	});
+	this->formatter.writeExtensionListEnd();
+	this->answer = "";
 }
 
 
@@ -51,12 +60,13 @@ void DefaultPreferredSemanticsSolver::isCredulouslyAccepted() {
 	std::vector<int> assumps;
 	assumps.push_back(varMap.getVar(this->acceptanceQueryArgument));
 	solver->computeModel(assumps);
-	this->answer = this->formatter.formatArgAcceptance(solver->hasAModel());
+	this->formatter.writeArgAcceptance(solver->hasAModel());
+	this->answer = "";
 }
 
 
 void DefaultPreferredSemanticsSolver::isSkepticallyAccepted() {
-	solver->computeAllMss();
+	solver->computeAllMss(NULL); // TODO
 	std::vector<std::vector<int> > allMss = solver->getAllMss();
 	int arg = varMap.getVar(this->acceptanceQueryArgument);
 	for(unsigned int i=0; i<allMss.size(); ++i) {
@@ -69,11 +79,13 @@ void DefaultPreferredSemanticsSolver::isSkepticallyAccepted() {
 			}
 		}
 		if(!found) {
-			this->answer = this->formatter.formatArgAcceptance(false);
+			this->formatter.writeArgAcceptance(false);
+			this->answer = "";
 			return;
 		}
 	}
-	this->answer = this->formatter.formatArgAcceptance(true);
+	this->formatter.writeArgAcceptance(true);
+	this->answer = "";
 }
 
 

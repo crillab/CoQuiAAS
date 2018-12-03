@@ -25,17 +25,26 @@ void DefaultStableSemanticsSolver::init() {
 void DefaultStableSemanticsSolver::computeOneExtension() {
 	solver->computeModel();
 	if(!solver->hasAModel()) {
-		this->answer = this->formatter.formatNoExt();
+		this->formatter.writeNoExt();
+		this->answer = "";
 		return;
 	}
 	std::vector<bool> model = solver->getModel();
-	this->answer = this->formatter.formatSingleExtension(model);
+	this->formatter.writeSingleExtension(model);
+	this->answer = "";
 }
 
 
 void DefaultStableSemanticsSolver::computeAllExtensions() {
-	solver->computeAllModels();
-	this->answer = this->formatter.formatEveryExtension(this->solver->getModels());
+	this->formatter.writeExtensionListBegin();
+	bool first = true;
+	bool* firstpt = &first;
+	solver->computeAllModels([this, firstpt](std::vector<bool>& model){
+		this->formatter.writeExtensionListElmt(model, *firstpt);
+		*firstpt = false;
+	});
+	this->formatter.writeExtensionListEnd();
+	this->answer = "";
 }
 
 
@@ -43,7 +52,8 @@ void DefaultStableSemanticsSolver::isCredulouslyAccepted() {
 	std::vector<int> assumps;
 	assumps.push_back(varMap.getVar(this->acceptanceQueryArgument));
 	solver->computeModel(assumps);
-	this->answer = this->formatter.formatArgAcceptance(solver->hasAModel());
+	this->formatter.writeArgAcceptance(solver->hasAModel());
+	this->answer = "";
 }
 
 
@@ -51,7 +61,8 @@ void DefaultStableSemanticsSolver::isSkepticallyAccepted() {
 	std::vector<int> assumps;
 	assumps.push_back(-varMap.getVar(this->acceptanceQueryArgument));
 	solver->computeModel(assumps);
-	this->answer = this->formatter.formatArgAcceptance(!solver->hasAModel());
+	this->formatter.writeArgAcceptance(!solver->hasAModel());
+	this->answer = "";
 }
 
 

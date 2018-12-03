@@ -29,31 +29,38 @@ void DefaultStageSemanticsSolver::init() {
 void DefaultStageSemanticsSolver::computeOneExtension() {
 	solver->computeMss();
 	if(!solver->hasAMss()) {
-		this->answer = this->formatter.formatNoExt();
+		this->formatter.writeNoExt();
+		this->answer = "";
 		return;
 	}
-	this->answer = this->formatter.formatSingleExtension(solver->getModel());
+	this->formatter.writeSingleExtension(solver->getModel());
+	this->answer = "";
 }
 
 
 void DefaultStageSemanticsSolver::computeAllExtensions() {
-	std::vector<std::vector<bool> > models = computeAllStgExtensions();
-	this->answer = this->formatter.formatEveryExtension(models);
+	this->formatter.writeExtensionListBegin();
+	bool first = true;
+	std::vector<std::vector<bool> > models = computeAllStgExtensions([this, &first](std::vector<bool>& model) {
+		this->formatter.writeExtensionListElmt(model, first);
+		first = false;
+	});
+	this->formatter.writeExtensionListEnd();
+	this->answer = "";
 }
 
-
-std::vector<std::vector<bool>> DefaultStageSemanticsSolver::computeAllStgExtensions() {
-	solver->computeAllMss();
-	auto solverMsses = solver->getAllMss();
+std::vector<std::vector<bool>> DefaultStageSemanticsSolver::computeAllStgExtensions(std::function<void(std::vector<bool>&)> callback) {
+	this->stopEnum = false;
 	std::vector<std::vector<int>> msses;
-	for(int i=0; i<(signed)solverMsses.size(); ++i) {
-		msses.push_back(std::vector<int>(solverMsses[i]));
-	}
-	auto solverModels = solver->getModels();
 	std::vector<std::vector<bool>> oldModels;
-	for(int i=0; i<(signed)solverModels.size(); ++i) {
-		oldModels.push_back(std::vector<bool>(solverModels[i]));
-	}
+	std::vector<std::vector<bool>> extModels;
+	solver->computeAllMss([this, callback, &msses, &oldModels](std::vector<int>& mss){
+		msses.push_back(mss);
+		auto mod = std::vector<bool>(solver->getModels()[oldModels.size()]);
+		oldModels.push_back(mod);
+		if(callback != NULL) callback(mod);
+		if(this->stopEnum) solver->stopMssEnum();
+	});
 	solver->resetAllMss();
 	solver->resetModels();
 	int nVars = varMap.nVars();
@@ -64,7 +71,6 @@ std::vector<std::vector<bool>> DefaultStageSemanticsSolver::computeAllStgExtensi
 		cl.push_back(i+1+nVars);
 		selectors.push_back(solver->addSelectedClause(cl));
 	}
-	std::vector<std::vector<bool>> extModels;
 	for(int i=0; i<(signed)msses.size(); ++i) {
 		extModels.push_back(oldModels[i]);
 		std::vector<int> assumps;
@@ -80,14 +86,14 @@ std::vector<std::vector<bool>> DefaultStageSemanticsSolver::computeAllStgExtensi
 		}
 		auto blockingSel = solver->addSelectedClause(cl);
 		assumps.push_back(blockingSel);
-		solver->computeAllModels(assumps);
+		solver->computeAllModels([this,callback,&extModels](std::vector<bool>& model){
+			extModels.push_back(model);
+			if(callback != NULL) callback(model);
+			if(this->stopEnum) solver->stopMssEnum();
+		}, assumps);
 		std::vector<int> unitCl;
 		unitCl.push_back(-blockingSel);
 		solver->addClause(unitCl);
-		std::vector<std::vector<bool>> newModels = solver->getModels();
-		for(int j=0; j<(signed)newModels.size(); ++j) {
-			extModels.push_back(newModels[j]);
-		}
 		solver->resetModels();
 	}
 	for(int i=0; i<(signed)selectors.size(); ++i) {
@@ -100,28 +106,30 @@ std::vector<std::vector<bool>> DefaultStageSemanticsSolver::computeAllStgExtensi
 
 
 void DefaultStageSemanticsSolver::isCredulouslyAccepted() {
-  std::vector<std::vector<bool> > models = computeAllStgExtensions();
-  int arg = varMap.getVar(this->acceptanceQueryArgument);
-  for(unsigned int i=0; i<models.size(); ++i) {
-    if(models[i][arg-1]) {
-      this->answer = this->formatter.formatArgAcceptance(true);
-      return;
-    }
-  }
-  this->answer = this->formatter.formatArgAcceptance(false);
+	bool status = false;
+	int arg = varMap.getVar(this->acceptanceQueryArgument);
+	std::vector<std::vector<bool> > models = computeAllStgExtensions([this,arg,&status](std::vector<bool>& model){
+		if(model[arg-1]) {
+			status = true;
+			this->stopEnum = true;
+		}
+	});
+	this->formatter.writeArgAcceptance(status);
+	this->answer = "";
 }
 
 
 void DefaultStageSemanticsSolver::isSkepticallyAccepted() {
-  std::vector<std::vector<bool> > models = computeAllStgExtensions();
-  int arg = varMap.getVar(this->acceptanceQueryArgument);
-  for(unsigned int i=0; i<models.size(); ++i) {
-    if(!models[i][arg-1]) {
-      this->answer = this->formatter.formatArgAcceptance(false);
-      return;
-    }
-  }
-  this->answer = this->formatter.formatArgAcceptance(true);
+	bool status = true;
+	int arg = varMap.getVar(this->acceptanceQueryArgument);
+	std::vector<std::vector<bool> > models = computeAllStgExtensions([this,arg,&status](std::vector<bool>& model){
+		if(!model[arg-1]) {
+			status = false;
+			this->stopEnum = true;
+		}
+	});
+	this->formatter.writeArgAcceptance(status);
+	this->answer = "";
 }
 
 
