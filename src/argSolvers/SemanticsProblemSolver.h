@@ -35,13 +35,23 @@ public:
 
 	virtual void computeAllExtensions() = 0;
 
-	void setAcceptanceQueryArgument(std::string arg);
+	virtual void setAcceptanceQueryArgument(std::string arg);
 
 	virtual void isCredulouslyAccepted() = 0;
 
 	virtual void isSkepticallyAccepted() = 0;
 
 	virtual ~SemanticsProblemSolver();
+
+	inline Attacks& getAttacks() {return attacks;}
+
+	inline VarMap& getVarMap() {return varMap;}
+
+	inline TaskType getTaskType() {return taskType;}
+
+	inline SolverOutputFormatter& getFormatter() {return formatter;}
+
+	inline void setDynStep(int step) {this->dynStep = step;}
 
 protected:
 
@@ -54,6 +64,8 @@ protected:
 	SolverOutputFormatter &formatter;
 
 	std::string acceptanceQueryArgument;
+
+	int dynStep = -1;
 };
 
 

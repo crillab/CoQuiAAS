@@ -23,6 +23,7 @@
 #include "ExternalMaxSatSolver.h"
 #include "ExternalCoMssSolver.h"
 #include "SolverOutputFormatter.h"
+#include "DynamicSemanticsSolverDecorator.h"
 
 
 namespace CoQuiAAS {
@@ -42,9 +43,11 @@ public:
 	 * \param str : the string to parse
 	 */
 	static TaskType getTaskType(std::string str) {
-		str = str.substr(0,2);
 		std::transform(str.begin(), str.end(), str.begin(), ::toupper);
 		if(!str.compare("D3")) return TASK_TRIATHLON;
+		auto indexOf = str.find("-");
+		if(indexOf == std::string::npos) return TASK_UNDEFINED;
+		str = str.substr(0,indexOf);
 		if(!str.compare("SE")) return TASK_ONE_EXT;
 		if(!str.compare("EE")) return TASK_ALL_EXTS;
 		if(!str.compare("DC")) return TASK_CRED_INF;
@@ -60,7 +63,9 @@ public:
 	static SemanticName getSemanticName(std::string str) {
 		std::transform(str.begin(), str.end(), str.begin(), ::toupper);
 		if(!str.compare("D3")) return SEM_TRIATHLON;
-		str = str.substr(3);
+		auto indexOf = str.find("-");
+		if(indexOf == std::string::npos) return SEM_UNDEFINED;
+		str = str.substr(indexOf+1);
 		if(!str.compare("ST")) return SEM_STABLE;
 		if(!str.compare("CO")) return SEM_COMPLETE;
 		if(!str.compare("GR")) return SEM_GROUNDED;
@@ -99,9 +104,9 @@ public:
 
 	static std::unique_ptr<SemanticsProblemSolver> groundedSolver(TaskType task, std::map<std::string,std::string>& additionalParams, Attacks &attacks, VarMap &varMap, SolverOutputFormatter &outputFormatter) {
 		if(additionalParams.find("--graphBased") != additionalParams.end()) {
-			return std::unique_ptr<SemanticsProblemSolver>(new GraphBasedGroundedSemanticsSolver(attacks, varMap, task, outputFormatter));
+			return std::unique_ptr<SemanticsProblemSolver>(new DynamicSemanticsSolverDecorator<GraphBasedGroundedSemanticsSolver>(*new GraphBasedGroundedSemanticsSolver(attacks, varMap, task, outputFormatter)));
 		}
-		return std::unique_ptr<SemanticsProblemSolver>(new DefaultGroundedSemanticsSolver(createSatSolver(additionalParams), attacks, varMap, task, outputFormatter));
+		return std::unique_ptr<SemanticsProblemSolver>(new DynamicSemanticsSolverDecorator<DefaultGroundedSemanticsSolver>(*new DefaultGroundedSemanticsSolver(createSatSolver(additionalParams), attacks, varMap, task, outputFormatter)));
 	}
 
 	/**
@@ -111,23 +116,31 @@ public:
 	 * \param task : the task that is required
 	 * \param additionalParams the additional parameters from the command line
 	 */
+	/* static std::unique_ptr<SemanticsProblemSolver> getProblemInstance(SemanticName semantic, TaskType task, std::map<std::string,std::string>& additionalParams, Attacks &attacks, VarMap &varMap, SolverOutputFormatter &outputFormatter) {
+		SemanticsProblemSolver* undecorated = getUndecoratedProblemInstance(semantic, task, additionalParams, attacks, varMap, outputFormatter);
+		if(undecorated == nullptr) {
+			return nullptr;
+		}
+		return std::unique_ptr<SemanticsProblemSolver>(new DynamicSemanticsSolverDecorator(*undecorated));
+	} */
+
 	static std::unique_ptr<SemanticsProblemSolver> getProblemInstance(SemanticName semantic, TaskType task, std::map<std::string,std::string>& additionalParams, Attacks &attacks, VarMap &varMap, SolverOutputFormatter &outputFormatter) {
-		if(task == TASK_UNDEFINED) return NULL;
+		if(task == TASK_UNDEFINED) return nullptr;
 		switch(semantic) {
 		case SEM_STABLE:
-			return std::unique_ptr<SemanticsProblemSolver>(new DefaultStableSemanticsSolver(createSatSolver(additionalParams), attacks, varMap, task, outputFormatter));
+			return std::unique_ptr<SemanticsProblemSolver>(new DynamicSemanticsSolverDecorator<DefaultStableSemanticsSolver>(*new DefaultStableSemanticsSolver(createSatSolver(additionalParams), attacks, varMap, task, outputFormatter)));
 		case SEM_COMPLETE:
-			return std::unique_ptr<SemanticsProblemSolver>(new DefaultCompleteSemanticsSolver(createSatSolver(additionalParams), attacks, varMap, task, outputFormatter));
+			return std::unique_ptr<SemanticsProblemSolver>(new DynamicSemanticsSolverDecorator<DefaultCompleteSemanticsSolver>(*new DefaultCompleteSemanticsSolver(createSatSolver(additionalParams), attacks, varMap, task, outputFormatter)));
 		case SEM_GROUNDED:
 			return groundedSolver(task, additionalParams, attacks, varMap, outputFormatter);
 		case SEM_PREFERRED:
-			return std::unique_ptr<SemanticsProblemSolver>(new DefaultPreferredSemanticsSolver(createMssSolver(additionalParams), attacks, varMap, task, outputFormatter));
+			return std::unique_ptr<SemanticsProblemSolver>(new DynamicSemanticsSolverDecorator<DefaultPreferredSemanticsSolver>(*new DefaultPreferredSemanticsSolver(createMssSolver(additionalParams), attacks, varMap, task, outputFormatter)));
 		case SEM_SEMISTABLE:
-			return std::unique_ptr<SemanticsProblemSolver>(new DefaultSemistableSemanticsSolver(createMssSolver(additionalParams), attacks, varMap, task, outputFormatter));
+			return std::unique_ptr<SemanticsProblemSolver>(new DynamicSemanticsSolverDecorator<DefaultSemistableSemanticsSolver>(*new DefaultSemistableSemanticsSolver(createMssSolver(additionalParams), attacks, varMap, task, outputFormatter)));
 		case SEM_STAGE:
-			return std::unique_ptr<SemanticsProblemSolver>(new DefaultStageSemanticsSolver(createMssSolver(additionalParams), attacks, varMap, task, outputFormatter));
+			return std::unique_ptr<SemanticsProblemSolver>(new DynamicSemanticsSolverDecorator<DefaultStageSemanticsSolver>(*new DefaultStageSemanticsSolver(createMssSolver(additionalParams), attacks, varMap, task, outputFormatter)));
 		case SEM_IDEAL:
-			return std::unique_ptr<SemanticsProblemSolver>(new DefaultIdealSemanticsSolver(createMssSolver(additionalParams), attacks, varMap, task, outputFormatter));
+			return std::unique_ptr<SemanticsProblemSolver>(new DynamicSemanticsSolverDecorator<DefaultIdealSemanticsSolver>(*new DefaultIdealSemanticsSolver(createMssSolver(additionalParams), attacks, varMap, task, outputFormatter)));
 		case SEM_TRIATHLON:
 			return std::unique_ptr<SemanticsProblemSolver>(new DefaultDungTriathlonSolver(createMssSolver(additionalParams), attacks, varMap, outputFormatter));
 		default:
