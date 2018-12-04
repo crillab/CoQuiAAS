@@ -45,10 +45,25 @@ VarMap &Attacks::getVarMap() {
 	return varMap;
 }
 
-std::vector<std::tuple<bool, int, int> >& Attacks::getDynAttacks() {
+std::vector<std::tuple<bool, int, int, bool> >& Attacks::getDynAttacks() {
   return this->dynAttacks;
 }
 
 void Attacks::addDynAttack(bool add, std::string from, std::string to) {
-  this->dynAttacks.push_back(std::make_tuple(add, varMap.getVar(from), varMap.getVar(to)));
+  int fromVar = varMap.getVar(from);
+  int toVar = varMap.getVar(to);
+  bool wasPresent = false;
+  for(unsigned int i=0; i<attacks[toVar].size(); ++i) {
+    if(attacks[toVar][i] == fromVar) {
+      wasPresent = true;
+      for(unsigned int j=0; j<this->dynAttacks.size(); ++j) {
+        if(std::get<1>(this->dynAttacks[j]) == fromVar && std::get<2>(this->dynAttacks[j]) == toVar) {
+          wasPresent = std::get<3>(this->dynAttacks[j]);
+          break;
+        }
+      }
+      break;
+    }
+  }
+  this->dynAttacks.push_back(std::make_tuple(add, fromVar, toVar, wasPresent));
 }

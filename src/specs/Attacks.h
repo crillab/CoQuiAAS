@@ -65,7 +65,7 @@ class Attacks {
    */
   unsigned int maxAttacks();
 
-  std::vector<std::tuple<bool, int, int> >& getDynAttacks();
+  std::vector<std::tuple<bool, int, int, bool> >& getDynAttacks();
 
   void addDynAttack(bool add, std::string from, std::string to);
 
@@ -81,7 +81,9 @@ class Attacks {
  private:
   unsigned int nbAttacks;
   unsigned int nMaxAttacks;
-  std::vector<std::tuple<bool, int, int> > dynAttacks;
+
+  // add(true=+,false=-), from, to, initState
+  std::vector<std::tuple<bool, int, int, bool> > dynAttacks;
   
 };
 
