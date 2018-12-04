@@ -3,6 +3,7 @@
 
 #include "SolverOutputFormatter.h"
 #include "VarMap.h"
+#include "Types.h"
 
 namespace CoQuiAAS {
 
@@ -37,6 +38,12 @@ namespace CoQuiAAS {
         void writeD3PrExts(std::vector<std::vector<int> >& exts);
 
         void writeD3End();
+
+        void writeDynListBegin(TaskType task);
+
+        void writeDynListElmtSep(TaskType task);
+
+        void writeDynListEnd(TaskType task);
 
         virtual ~ICCMA19SolverOutputFormatter();
 

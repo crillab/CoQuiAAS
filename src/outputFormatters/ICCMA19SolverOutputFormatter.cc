@@ -81,6 +81,21 @@ void ICCMA19SolverOutputFormatter::writeD3End() {
     // nothing to do here
 }
 
+void ICCMA19SolverOutputFormatter::writeDynListBegin(TaskType task) {
+    this->displayFct("[");
+    if(task == TASK_ONE_EXT || task == TASK_ALL_EXTS) this->displayFct("\n");
+}
+
+void ICCMA19SolverOutputFormatter::writeDynListElmtSep(TaskType task) {
+    if(task == TASK_ONE_EXT || task == TASK_ALL_EXTS) this->displayFct("\n");
+    else this->displayFct(",");
+}
+
+void ICCMA19SolverOutputFormatter::writeDynListEnd(TaskType task) {
+    if(task == TASK_ONE_EXT || task == TASK_ALL_EXTS) this->displayFct("\n");
+    this->displayFct("]\n");
+}
+
 ICCMA19SolverOutputFormatter::~ICCMA19SolverOutputFormatter() {
     // nothing to do here
 }

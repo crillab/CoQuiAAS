@@ -80,6 +80,18 @@ void ICCMA17SolverOutputFormatter::writeD3PrExts(std::vector<std::vector<int> >&
     writeExtensionListEnd();
 }
 
+void ICCMA17SolverOutputFormatter::writeDynListBegin(TaskType task) {
+    this->displayFct("[");
+}
+
+void ICCMA17SolverOutputFormatter::writeDynListElmtSep(TaskType task) {
+    this->displayFct(",");
+}
+
+void ICCMA17SolverOutputFormatter::writeDynListEnd(TaskType task) {
+    this->displayFct("]\n");
+}
+
 void ICCMA17SolverOutputFormatter::writeD3End() {
     // nothing to do here
 }

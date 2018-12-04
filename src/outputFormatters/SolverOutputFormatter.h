@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "VarMap.h"
+#include "Types.h"
 
 namespace CoQuiAAS {
 
@@ -55,6 +56,12 @@ namespace CoQuiAAS {
         virtual void writeD3PrExts(std::vector<std::vector<int> >& exts) = 0;
 
         virtual void writeD3End() = 0;
+
+        virtual void writeDynListBegin(TaskType task) = 0;
+
+        virtual void writeDynListElmtSep(TaskType task) = 0;
+
+        virtual void writeDynListEnd(TaskType task) = 0;
 
     };
 
