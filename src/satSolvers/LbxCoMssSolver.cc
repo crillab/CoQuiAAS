@@ -45,6 +45,7 @@ bool LbxCoMssSolver::computeMss() {
 
 
 bool LbxCoMssSolver::computeMss(std::vector<int> &assumps) {
+	clearMss();
 	std::string instance = writeInstanceForMSS(assumps);
 	int ret = launchExternalSolver(instance, false, NULL, NULL);
 	unlink(instance.c_str());
@@ -59,6 +60,7 @@ void LbxCoMssSolver::computeAllMss(std::function<void(std::vector<int>&)> callba
 
 
 void LbxCoMssSolver::computeAllMss(std::function<void(std::vector<int>&)> callback, std::vector<int> &assumps) {
+	clearMss();
 	this->shouldStopMssEnum = false;
 	std::string instance = writeInstanceForMSS(assumps);
 	launchExternalSolver(instance, true, callback, NULL);
@@ -317,6 +319,7 @@ bool LbxCoMssSolver::computeModel() {
 
 
 bool LbxCoMssSolver::computeModel(std::vector<int> &assumps) {
+	clearMss();
 	auto oldNSoftCstrs = this->nSoftCstrs;
 	this->nSoftCstrs = 2*realNumberOfVars;
 	std::string instance = writeInstanceForSAT(assumps, this->realNumberOfVars);
@@ -334,6 +337,7 @@ void LbxCoMssSolver::computeAllModels(std::function<void(std::vector<bool>&)> ca
 
 
 void LbxCoMssSolver::computeAllModels(std::function<void(std::vector<bool>&)> callback, std::vector<int> &assumps) {
+	clearMss();
 	auto oldNSoftCstrs = this->nSoftCstrs;
 	this->nSoftCstrs = 2*realNumberOfVars;
 	std::string instance = writeInstanceForSAT(assumps, this->realNumberOfVars);

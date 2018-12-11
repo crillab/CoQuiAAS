@@ -39,6 +39,8 @@ public:
 private:
 
 	std::shared_ptr<MssSolver> solver;
+
+	MssEncodingHelper* helper;
 };
 
 

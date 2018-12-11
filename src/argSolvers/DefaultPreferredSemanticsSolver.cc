@@ -17,21 +17,22 @@ DefaultPreferredSemanticsSolver::DefaultPreferredSemanticsSolver(std::shared_ptr
 
 
 void DefaultPreferredSemanticsSolver::init() {
-	MssEncodingHelper helper(solver, attacks, varMap);
+	this->helper = new MssEncodingHelper(solver, attacks, varMap);
 	switch(taskType) {
 	case TASK_CRED_INF:
 		break;
 	default:
-		helper.setMaxExtensionNeeded();
+		this->helper->setMaxExtensionNeeded();
 	}
-	int disjId = helper.reserveDisjunctionVars();
-	helper.createAttackersDisjunctionVars(disjId);
-	helper.createCompleteEncodingConstraints(disjId);
+	int disjId = this->helper->reserveDisjunctionVars();
+	this->helper->createAttackersDisjunctionVars(disjId);
+	this->helper->createCompleteEncodingConstraints(disjId);
 }
 
 
 void DefaultPreferredSemanticsSolver::computeOneExtension() {
-	solver->computeMss();
+	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
+	solver->computeMss(dynAssumps);
 	if(!solver->hasAMss()) {
 		this->formatter.writeNoExt();
 		return;
@@ -42,31 +43,37 @@ void DefaultPreferredSemanticsSolver::computeOneExtension() {
 
 
 void DefaultPreferredSemanticsSolver::computeAllExtensions() {
+	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
 	this->formatter.writeExtensionListBegin();
 	bool first = true;
-	bool* firstpt = &first;
-	solver->computeAllMss([this, firstpt](std::vector<int>& model){
-		this->formatter.writeExtensionListElmt(model, *firstpt);
-		*firstpt = false;
-	});
+	solver->computeAllMss([this, &first](std::vector<int>& model){
+		this->formatter.writeExtensionListElmt(model, first);
+		first = false;
+	}, dynAssumps);
 	this->formatter.writeExtensionListEnd();
 }
 
 
 void DefaultPreferredSemanticsSolver::isCredulouslyAccepted() {
-	std::vector<int> assumps;
-	assumps.push_back(varMap.getVar(this->acceptanceQueryArgument));
-	solver->computeModel(assumps);
+	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
+	dynAssumps.push_back(varMap.getVar(this->acceptanceQueryArgument));
+	solver->computeModel(dynAssumps);
 	this->formatter.writeArgAcceptance(solver->hasAModel());
 }
 
 
 void DefaultPreferredSemanticsSolver::isSkepticallyAccepted() {
-	solver->computeAllMss(NULL); // TODO
+	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
+	solver->computeAllMss(NULL, dynAssumps); // TODO stop during search if needed
 	std::vector<std::vector<int> > allMss = solver->getAllMss();
 	int arg = varMap.getVar(this->acceptanceQueryArgument);
 	for(unsigned int i=0; i<allMss.size(); ++i) {
 		std::vector<int> mss = allMss[i];
+		/*std::cerr << "mss:";
+		for(int i=0; i<mss.size(); ++i) {
+			std::cerr << " " << mss[i];
+		}
+		std::cerr << std::endl;*/
 		bool found = false;
 		for(unsigned int j=0; j<mss.size(); ++j) {
 			if(mss[j] == arg) {
