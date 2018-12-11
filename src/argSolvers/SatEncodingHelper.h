@@ -39,6 +39,8 @@ public:
 
 	void createStableEncodingConstraints(int startId);
 
+	std::vector<int> dynAssumps(int step);
+
 	virtual ~SatEncodingHelper();
 
 private:
@@ -47,9 +49,14 @@ private:
 
 protected:
 
+	void reserveDynVars();
+
 	Attacks &attacks;
 
 	VarMap &varMap;
+
+	// (argFrom, argTo, fromReplInEnc, notAttackedReplInEnc, assump)
+	std::vector<std::tuple<int, int, int, int, int> > dynVars;
 
 	int nbVars;
 };

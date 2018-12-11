@@ -78,7 +78,7 @@ int main(int argc, char** argv){
 		return 2;
 	}
 	parser->parseInstance();
-	if(clh.getDynamicsFile().size() > 0) {
+	if(clh.getSemantics().isDynamic()) {
 		ifstream dynfile(clh.getDynamicsFile().c_str(),ios::in);
 		parser->parseDynamics(&dynfile);
 		dynfile.close();
@@ -89,7 +89,7 @@ int main(int argc, char** argv){
 	setInitStats(clh, parser);
 	// request a semantic instance depending on the problem to compute
 	SolverOutputFormatter& formatter = *SolverOutputFormatterFactory::getInstance(clh.getOutputFormatter(), parser->getVarMap(), [] (std::string s) {std::cout << s; std::cout.flush();});
-	std::unique_ptr<SemanticsProblemSolver> problem = SolverFactory::getProblemInstance(clh.getSemanticName(), clh.getTaskType(), clh.getAdditionalParams(), parser->getAttacks(), parser->getVarMap(), formatter);
+	std::unique_ptr<SemanticsProblemSolver> problem = SolverFactory::getProblemInstance(clh.getSemantics(), clh.getTaskType(), clh.getAdditionalParams(), parser->getAttacks(), parser->getVarMap(), formatter);
 	if(!clh.getAdditionalParameter("-a").empty()){
 		if(undefinedArgument(clh.getAdditionalParameter("-a"),parser->getVarMap())){
 			cout << "UNDEFINED" << endl ;
@@ -103,6 +103,7 @@ int main(int argc, char** argv){
 	problem->compute();
 	// display statistics (if StatMap is not "fake")
 
+	std::cout << std::endl;
 	return 0;
 }
 

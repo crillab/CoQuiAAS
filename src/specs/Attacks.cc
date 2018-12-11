@@ -65,5 +65,6 @@ void Attacks::addDynAttack(bool add, std::string from, std::string to) {
       break;
     }
   }
+  if(!wasPresent) addAttack(from, to);
   this->dynAttacks.push_back(std::make_tuple(add, fromVar, toVar, wasPresent));
 }

@@ -53,7 +53,6 @@ using namespace CoQuiAAS;
 
 CommandLineHelper::CommandLineHelper(int argc, char** argv) {
   mustExit = errorOccured = false;
-  semName = SEM_UNDEFINED;
   taskType = TASK_UNDEFINED;
   instanceFormat = FORMAT_UNDEFINED;
   instanceFile = "";
@@ -77,7 +76,7 @@ void CommandLineHelper::parseCommandLine() {
     if(!args[i].compare("-p")) {
       if(!assertWellFormed(++i < args.size())) return;
       taskType = SolverFactory::getTaskType(args[i]);
-      semName = SolverFactory::getSemanticName(args[i]);
+      sem = SolverFactory::getSemantics(args[i]);
       continue;
     }
     if(!args[i].compare("-fo")) {
@@ -116,13 +115,13 @@ void CommandLineHelper::parseCommandLine() {
     }
     assertWellFormed(false);
   }
-  if (!errorOccured) assertWellFormed((taskType!=TASK_UNDEFINED) && (semName!=SEM_UNDEFINED) && (instanceFormat!=FORMAT_UNDEFINED) && (!instanceFile.empty()));
+  if (!errorOccured) assertWellFormed((taskType!=TASK_UNDEFINED) && (sem.getName()!=SEM_UNDEFINED) && (instanceFormat!=FORMAT_UNDEFINED) && (!instanceFile.empty()));
   if (!errorOccured) assertWellFormed((taskType!=TASK_CRED_INF) || (!additionalParams["-a"].empty()));
   if (!errorOccured) assertWellFormed((taskType!=TASK_SKEP_INF) || (!additionalParams["-a"].empty()));
 }
 
-SemanticName CommandLineHelper::getSemanticName() {
-  return semName;
+Semantics CommandLineHelper::getSemantics() {
+  return sem;
 }
 
 TaskType CommandLineHelper::getTaskType() {

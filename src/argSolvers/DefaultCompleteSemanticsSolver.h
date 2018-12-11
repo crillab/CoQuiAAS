@@ -39,6 +39,8 @@ public:
 private:
 
 	std::shared_ptr<SatSolver> solver;
+
+	SatEncodingHelper* helper;
 };
 
 

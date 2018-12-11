@@ -51,7 +51,9 @@ public:
 
 	inline SolverOutputFormatter& getFormatter() {return formatter;}
 
-	inline void setDynStep(int step) {this->dynStep = step;}
+	inline void setDynStep(int step) {
+		this->dynStep = step;
+	}
 
 protected:
 

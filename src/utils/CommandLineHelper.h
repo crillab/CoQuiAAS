@@ -34,12 +34,7 @@ class CommandLineHelper {
    */  
   void parseCommandLine();
 
-  /**
-   * \fn getSemanticName
-   * \brief returns the semantic name passed in main arguments
-   * \return a SemanticName object representing the semantic name
-   */
-  SemanticName getSemanticName();
+  Semantics getSemantics();
 
   /**
    * \fn getTaskType
@@ -105,7 +100,7 @@ class CommandLineHelper {
   vector<string> args;
   bool mustExit;
   bool errorOccured;
-  SemanticName semName;
+  Semantics sem = Semantics(SEM_UNDEFINED, false);;
   TaskType taskType;
   InstanceFormat instanceFormat;
   string outputFormatter = "";

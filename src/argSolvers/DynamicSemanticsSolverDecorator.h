@@ -29,13 +29,13 @@ public:
 
 	virtual ~DynamicSemanticsSolverDecorator();
 
-    void setDynStep(int step);
+    virtual void setDynStep(int step);
 
 private:
 
 	Impl& decorated;
 
-    void iterate(std::function<void()> toCall);
+    void iterate(std::function<void(Impl&)> toCall);
 
 };
 
@@ -58,23 +58,23 @@ void DynamicSemanticsSolverDecorator<Impl>::init() {
 }
 
 template<typename Impl>
-void DynamicSemanticsSolverDecorator<Impl>::computeOneExtension() {
-    iterate(std::bind(&SemanticsProblemSolver::computeOneExtension, this->decorated));
+void DynamicSemanticsSolverDecorator<Impl>::computeOneExtension() { 
+    iterate(&Impl::computeOneExtension);
 }
 
 template<typename Impl>
 void DynamicSemanticsSolverDecorator<Impl>::computeAllExtensions() {
-    iterate(std::bind(&SemanticsProblemSolver::computeAllExtensions, this->decorated));
+    iterate(&Impl::computeAllExtensions);
 }
 
 template<typename Impl>
 void DynamicSemanticsSolverDecorator<Impl>::isCredulouslyAccepted() {
-    iterate(std::bind(&SemanticsProblemSolver::isCredulouslyAccepted, this->decorated));
+    iterate(&Impl::isCredulouslyAccepted);
 }
 
 template<typename Impl>
 void DynamicSemanticsSolverDecorator<Impl>::isSkepticallyAccepted() {
-    iterate(std::bind(&SemanticsProblemSolver::isSkepticallyAccepted, this->decorated));
+    iterate(&Impl::isSkepticallyAccepted);
 }
 
 template<typename Impl>
@@ -83,17 +83,13 @@ void DynamicSemanticsSolverDecorator<Impl>::setDynStep(int step) {
 }
 
 template<typename Impl>
-void DynamicSemanticsSolverDecorator<Impl>::iterate(std::function<void()> toCall) {
-    if(attacks.getDynAttacks().size() == 0) {
-        toCall();
-        return;
-    }
+void DynamicSemanticsSolverDecorator<Impl>::iterate(std::function<void(Impl&)> toCall) {
     this->formatter.writeDynListBegin(this->taskType);
-    toCall();
+    toCall(this->decorated);
     for(unsigned int i=0; i<attacks.getDynAttacks().size(); ++i) {
+        this->formatter.writeDynListElmtSep(this->taskType);
         this->decorated.setDynStep(i);
-        toCall();
-        if(i != 0) this->formatter.writeDynListElmtSep(this->taskType);
+        toCall(this->decorated);
     }
     this->formatter.writeDynListEnd(this->taskType);
 }

@@ -65,9 +65,9 @@ void AspartixFormatParser::parseInstance() {
 
 
 void AspartixFormatParser::parseDynamics(std::istream *input) {
-	if(*is) {
+	if(*input) {
 		std::string line;
-		while(getline(*is, line)) {
+		while(getline(*input, line)) {
 			bool add;
 			if(line[0] == '-') add = false;
 			else if(line[0] == '+') add = true;
@@ -81,7 +81,7 @@ void AspartixFormatParser::parseDynamics(std::istream *input) {
 	    	std::cerr << "The line " << line << " contains an error (comma/closing paranthesis)" << std::endl ;
 	    	exit(-3) ;
 	  	}
-	  	std::string attacking = line.substr(4,commaIndex-4);
+	  	std::string attacking = line.substr(5,commaIndex-5);
 	  	std::string attacked = line.substr(commaIndex+1,closingParIndex-commaIndex-1);
 			attacks.addDynAttack(add, attacking, attacked);
 		}

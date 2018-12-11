@@ -7,15 +7,15 @@ ICCMA19SolverOutputFormatter::ICCMA19SolverOutputFormatter(VarMap &varMap, void 
 }
 
 void ICCMA19SolverOutputFormatter::writeArgAcceptance(bool status) {
-    this->displayFct(acceptance_status_str(status)+"\n");
+    this->displayFct(acceptance_status_str(status));
 }
 
 void ICCMA19SolverOutputFormatter::writeNoExt() {
-    this->displayFct(NO_STR+"\n");
+    this->displayFct(NO_STR);
 }
 
 void ICCMA19SolverOutputFormatter::writeSingleExtension(std::vector<bool>& model) {
-    this->displayFct(argArray(model, this->vmap)+"\n");
+    this->displayFct(argArray(model, this->vmap));
 }
 
 std::string ICCMA19SolverOutputFormatter::formatSequenceOfExtensions(std::vector<std::string> exts) {
@@ -30,7 +30,7 @@ std::string ICCMA19SolverOutputFormatter::formatSequenceOfExtensions(std::vector
 }
 
 void ICCMA19SolverOutputFormatter::writeSingleExtension(std::vector<int>& lits) {
-    this->displayFct(argArray(lits, this->vmap)+"\n");
+    this->displayFct(argArray(lits, this->vmap));
 }
 
 void ICCMA19SolverOutputFormatter::writeExtensionListBegin() {
@@ -46,7 +46,7 @@ void ICCMA19SolverOutputFormatter::writeExtensionListElmt(std::vector<int>& lits
 }
 
 void ICCMA19SolverOutputFormatter::writeExtensionListEnd() {
-    this->displayFct("\n]\n");
+    this->displayFct("\n]");
 }
 
 void ICCMA19SolverOutputFormatter::writeD3Begin() {
@@ -92,8 +92,7 @@ void ICCMA19SolverOutputFormatter::writeDynListElmtSep(TaskType task) {
 }
 
 void ICCMA19SolverOutputFormatter::writeDynListEnd(TaskType task) {
-    if(task == TASK_ONE_EXT || task == TASK_ALL_EXTS) this->displayFct("\n");
-    this->displayFct("]\n");
+    this->displayFct("\n]");
 }
 
 ICCMA19SolverOutputFormatter::~ICCMA19SolverOutputFormatter() {
