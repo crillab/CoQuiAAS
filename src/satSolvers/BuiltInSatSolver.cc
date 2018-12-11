@@ -100,6 +100,7 @@ bool BuiltInSatSolver::computeModel(vector<int> &assumps, bool clearModelVec) {
 		std::cerr << "ERR:: Minisat returned LBOOL_UNDEF" << std::endl;
 		exit(127);
 	}
+	solver.bigRestart();
 	return false;
 }
 

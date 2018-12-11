@@ -37,8 +37,6 @@ public:
 
 	void createStableEncodingConstraints();
 
-	void createStableEncodingConstraints(int startId);
-
 	std::vector<int> dynAssumps(int step);
 
 	virtual ~SatEncodingHelper();
@@ -49,7 +47,9 @@ private:
 
 protected:
 
-	void reserveDynVars();
+	void reserveDynVarsForCompleteSemantics();
+
+	void reserveDynVarsForStableSemantics();
 
 	Attacks &attacks;
 

@@ -17,13 +17,14 @@ DefaultStableSemanticsSolver::DefaultStableSemanticsSolver(std::shared_ptr<SatSo
 
 
 void DefaultStableSemanticsSolver::init() {
-	SatEncodingHelper helper(solver, attacks, varMap);
-	helper.createStableEncodingConstraints();
+	this->helper = new SatEncodingHelper(solver, attacks, varMap);
+	this->helper->createStableEncodingConstraints();
 }
 
 
 void DefaultStableSemanticsSolver::computeOneExtension() {
-	solver->computeModel();
+	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
+	solver->computeModel(dynAssumps);
 	if(!solver->hasAModel()) {
 		this->formatter.writeNoExt();
 		return;
@@ -35,28 +36,28 @@ void DefaultStableSemanticsSolver::computeOneExtension() {
 
 void DefaultStableSemanticsSolver::computeAllExtensions() {
 	this->formatter.writeExtensionListBegin();
+	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
 	bool first = true;
-	bool* firstpt = &first;
-	solver->computeAllModels([this, firstpt](std::vector<bool>& model){
-		this->formatter.writeExtensionListElmt(model, *firstpt);
-		*firstpt = false;
-	});
+	solver->computeAllModels([this, &first](std::vector<bool>& model){
+		this->formatter.writeExtensionListElmt(model, first);
+		first = false;
+	}, dynAssumps);
 	this->formatter.writeExtensionListEnd();
 }
 
 
 void DefaultStableSemanticsSolver::isCredulouslyAccepted() {
-	std::vector<int> assumps;
-	assumps.push_back(varMap.getVar(this->acceptanceQueryArgument));
-	solver->computeModel(assumps);
+	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
+	dynAssumps.push_back(varMap.getVar(this->acceptanceQueryArgument));
+	solver->computeModel(dynAssumps);
 	this->formatter.writeArgAcceptance(solver->hasAModel());
 }
 
 
 void DefaultStableSemanticsSolver::isSkepticallyAccepted() {
-	std::vector<int> assumps;
-	assumps.push_back(-varMap.getVar(this->acceptanceQueryArgument));
-	solver->computeModel(assumps);
+	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
+	dynAssumps.push_back(-varMap.getVar(this->acceptanceQueryArgument));
+	solver->computeModel(dynAssumps);
 	this->formatter.writeArgAcceptance(!solver->hasAModel());
 }
 
