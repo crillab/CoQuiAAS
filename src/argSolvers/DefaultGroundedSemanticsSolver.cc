@@ -16,21 +16,24 @@ DefaultGroundedSemanticsSolver::DefaultGroundedSemanticsSolver(std::shared_ptr<S
 
 
 void DefaultGroundedSemanticsSolver::init() {
-	SatEncodingHelper helper(this->solver, this->attacks, this->varMap);
-	int disjId = helper.reserveDisjunctionVars();
-	helper.createAttackersDisjunctionVars(disjId);
-	helper.createCompleteEncodingConstraints(disjId);
+	// SatEncodingHelper helper(this->solver, this->attacks, this->varMap);
+	this->helper = new SatEncodingHelper(solver, attacks, varMap);
+	int disjId = this->helper->reserveDisjunctionVars();
+	this->helper->createAttackersDisjunctionVars(disjId);
+	this->helper->createCompleteEncodingConstraints(disjId);
 }
 
 
 void DefaultGroundedSemanticsSolver::computeOneExtension() {
-	std::vector<int>& propagated = solver->propagatedAtDecisionLvlZero();
+	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
+	std::vector<int>& propagated = solver->propagatedAtDecisionLvlZero(dynAssumps);
 	this->formatter.writeSingleExtension(propagated);
 }
 
 
 void DefaultGroundedSemanticsSolver::computeAllExtensions() {
-	std::vector<int>& propagated = solver->propagatedAtDecisionLvlZero();
+	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
+	std::vector<int>& propagated = solver->propagatedAtDecisionLvlZero(dynAssumps);
 	this->formatter.writeExtensionListBegin();
 	this->formatter.writeExtensionListElmt(propagated, true);
 	this->formatter.writeExtensionListEnd();
@@ -38,7 +41,8 @@ void DefaultGroundedSemanticsSolver::computeAllExtensions() {
 
 
 void DefaultGroundedSemanticsSolver::isCredulouslyAccepted() {
-	bool isPropagated = solver->isPropagatedAtDecisionLvlZero(varMap.getVar(this->acceptanceQueryArgument));
+	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
+	bool isPropagated = solver->isPropagatedAtDecisionLvlZero(varMap.getVar(this->acceptanceQueryArgument), dynAssumps);
 	this->formatter.writeArgAcceptance(isPropagated);
 }
 

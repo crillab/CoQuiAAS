@@ -48,7 +48,9 @@ public :
 	virtual bool addClause(std::vector<int> &clause);
 	virtual int addSelectedClause(std::vector<int> &clause);
 	virtual std::vector<int>& propagatedAtDecisionLvlZero();
+	virtual std::vector<int>& propagatedAtDecisionLvlZero(std::vector<int> assumps);
 	virtual bool isPropagatedAtDecisionLvlZero(int lit);
+	virtual bool isPropagatedAtDecisionLvlZero(int lit, std::vector<int> assumps);
 	virtual bool computeModel();
 	virtual bool computeModel(std::vector<int> &assumps);
 	virtual void computeAllModels(std::function<void(std::vector<bool>&)> callback);

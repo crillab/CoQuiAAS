@@ -124,7 +124,19 @@ std::vector<int>& ExternalCoMssSolver::propagatedAtDecisionLvlZero() {
 }
 
 
+std::vector<int>& ExternalCoMssSolver::propagatedAtDecisionLvlZero(std::vector<int> assumps) {
+	std::cerr << "operation unavailable for external solver" << std::endl;
+	exit(1);
+}
+
+
 bool ExternalCoMssSolver::isPropagatedAtDecisionLvlZero(int lit) {
+	std::cerr << "operation unavailable for external solver" << std::endl;
+	exit(1);
+}
+
+
+bool ExternalCoMssSolver::isPropagatedAtDecisionLvlZero(int lit, std::vector<int> assumps) {
 	std::cerr << "operation unavailable for external solver" << std::endl;
 	exit(1);
 }

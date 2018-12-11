@@ -33,7 +33,11 @@ public:
 
 	virtual std::vector<int>& propagatedAtDecisionLvlZero() = 0;
 
+	virtual std::vector<int>& propagatedAtDecisionLvlZero(std::vector<int> assumps) = 0;
+
 	virtual bool isPropagatedAtDecisionLvlZero(int lit) = 0;
+
+	virtual bool isPropagatedAtDecisionLvlZero(int lit, std::vector<int> assumps) = 0;
 
 	virtual bool computeModel() = 0;
 

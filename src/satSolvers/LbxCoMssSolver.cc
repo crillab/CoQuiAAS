@@ -306,7 +306,19 @@ std::vector<int>& LbxCoMssSolver::propagatedAtDecisionLvlZero() {
 }
 
 
+std::vector<int>& LbxCoMssSolver::propagatedAtDecisionLvlZero(std::vector<int> assumps) {
+	std::cerr << "operation unavailable for external solver" << std::endl;
+	exit(1);
+}
+
+
 bool LbxCoMssSolver::isPropagatedAtDecisionLvlZero(int lit) {
+	std::cerr << "operation unavailable for external solver" << std::endl;
+	exit(1);
+}
+
+
+bool LbxCoMssSolver::isPropagatedAtDecisionLvlZero(int lit, std::vector<int> assumps) {
 	std::cerr << "operation unavailable for external solver" << std::endl;
 	exit(1);
 }

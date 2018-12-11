@@ -168,8 +168,18 @@ std::vector<int>& ExternalMaxSatSolver::propagatedAtDecisionLvlZero() {
 }
 
 
+std::vector<int>& ExternalMaxSatSolver::propagatedAtDecisionLvlZero(std::vector<int> assumps) {
+	return ExternalSatSolver::propagatedAtDecisionLvlZero(assumps);
+}
+
+
 bool ExternalMaxSatSolver::isPropagatedAtDecisionLvlZero(int lit) {
 	return ExternalSatSolver::isPropagatedAtDecisionLvlZero(lit);
+}
+
+
+bool ExternalMaxSatSolver::isPropagatedAtDecisionLvlZero(int lit, std::vector<int> assumps) {
+	return ExternalSatSolver::isPropagatedAtDecisionLvlZero(lit, assumps);
 }
 
 

@@ -54,7 +54,19 @@ std::vector<int>& ExternalSatSolver::propagatedAtDecisionLvlZero() {
 }
 
 
+std::vector<int>& ExternalSatSolver::propagatedAtDecisionLvlZero(std::vector<int> assumps) {
+	std::cerr << "operation unavailable for external solver" << std::endl;
+	exit(1);
+}
+
+
 bool ExternalSatSolver::isPropagatedAtDecisionLvlZero(int lit) {
+	std::cerr << "operation unavailable for external solver" << std::endl;
+	exit(1);
+}
+
+
+bool ExternalSatSolver::isPropagatedAtDecisionLvlZero(int lit, std::vector<int> assumps) {
 	std::cerr << "operation unavailable for external solver" << std::endl;
 	exit(1);
 }

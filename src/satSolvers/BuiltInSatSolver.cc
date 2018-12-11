@@ -50,7 +50,22 @@ int BuiltInSatSolver::addSelectedClause(std::vector<int> &clause) {
 
 
 std::vector<int>& BuiltInSatSolver::propagatedAtDecisionLvlZero() {
+	std::vector<int> assumps;
+	return propagatedAtDecisionLvlZero(assumps);
+}
+
+
+std::vector<int>& BuiltInSatSolver::propagatedAtDecisionLvlZero(std::vector<int> assumps) {
+	for (int c = solver.trail.size()-1; c >= 0; c--) solver.assigns[Minisat::var(solver.trail[c])] = Minisat::lbool((uint8_t)2);
+    solver.qhead = 0;
+    solver.trail.shrink(solver.trail.size());
+    solver.trail_lim.shrink(solver.trail_lim.size());
+	propagated.clear();
 	solver.useAsCompleteSolver();
+	for(unsigned int i=0; i<assumps.size(); ++i) {
+		int assump = assumps[i];
+		solver.enqueue(assump > 0 ? Minisat::mkLit(assump-1) : ~Minisat::mkLit(-assump-1));
+	}
 	solver.propagate();
 	for (int i = 0; i < solver.nAssigns(); i++) {
 		if (!Minisat::sign(solver.trail[i])) {
@@ -62,7 +77,13 @@ std::vector<int>& BuiltInSatSolver::propagatedAtDecisionLvlZero() {
 
 
 bool BuiltInSatSolver::isPropagatedAtDecisionLvlZero(int lit) {
-	std::vector<int>& propagated = propagatedAtDecisionLvlZero();
+	std::vector<int> assumps;
+	return isPropagatedAtDecisionLvlZero(lit, assumps);
+}
+
+
+bool BuiltInSatSolver::isPropagatedAtDecisionLvlZero(int lit, std::vector<int> assumps) {
+	std::vector<int>& propagated = propagatedAtDecisionLvlZero(assumps);
 	for(std::vector<int>::iterator it = propagated.begin(); it != propagated.end(); ++it) {
 		if(*it == lit) return true;
 	}
