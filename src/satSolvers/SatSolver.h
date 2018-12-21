@@ -12,8 +12,8 @@
 #include <vector>
 #include <iostream>
 #include <functional>
-#include "core/SolverTypes.h"
-#include "mtl/Vec.h"
+#include "cmp/ifaces/SatSolver.h"
+#include "minisat/MiniSatSolver.h"
 
 
 namespace CoQuiAAS {

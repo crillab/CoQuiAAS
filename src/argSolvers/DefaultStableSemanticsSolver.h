@@ -12,7 +12,6 @@
 #include <memory>
 
 #include "SemanticsProblemSolver.h"
-#include "core/Solver.h"
 #include "SatEncodingHelper.h"
 
 

@@ -92,7 +92,8 @@ void ICCMA19SolverOutputFormatter::writeDynListElmtSep(TaskType task) {
 }
 
 void ICCMA19SolverOutputFormatter::writeDynListEnd(TaskType task) {
-    this->displayFct("\n]");
+    if(task == TASK_ONE_EXT || task == TASK_ALL_EXTS) this->displayFct("\n");
+    this->displayFct("]");
 }
 
 ICCMA19SolverOutputFormatter::~ICCMA19SolverOutputFormatter() {

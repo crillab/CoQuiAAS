@@ -5,8 +5,8 @@
  *      Author: lonca
  */
 
-#ifndef SRC_SOLVERS_BUILTINSATSOLVER_H_
-#define SRC_SOLVERS_BUILTINSATSOLVER_H_
+#ifndef SRC_SOLVERS_BUILTINSATSOLVER_NG_H_
+#define SRC_SOLVERS_BUILTINSATSOLVER_NG_H_
 
 
 #define MINISAT_LBOOL_TRUE (Minisat::lbool((uint8_t)0))
@@ -17,18 +17,19 @@
 #include <iostream>
 
 #include "SatSolver.h"
-#include "core/Solver.h"
-#include "core/SolverTypes.h"
+#include "cmp/ifaces/SatSolver.h"
+#include "cmp/utils/wcnf.h"
+#include "minisat/MiniSatSolver.h"
 
 
 namespace CoQuiAAS {
 
 
-class BuiltInSatSolver: public SatSolver {
+class BuiltInSatSolverNG: public SatSolver {
 
 public:
 
-	BuiltInSatSolver();
+	BuiltInSatSolverNG();
 
 	virtual void addVariables(int nVars);
 
@@ -64,15 +65,15 @@ public:
 
 	virtual void resetModels();
 
-	virtual ~BuiltInSatSolver();
+	virtual ~BuiltInSatSolverNG();
 
 protected:
 
-	Minisat::Solver solver;
+	MiniSatSolver* solver;
 
-	int nVars;
+	WCNF formula;
 
-	int nCstrs;
+	WCNF newFormula;
 
 	std::vector<std::vector<bool> > models;
 
@@ -80,15 +81,21 @@ protected:
 
 	std::vector<int> propagated;
 
+	void toCmpClause(std::vector<int> &clause, CMP::vec<CMP::Lit>& cmpCl);
+
 	void extractBuiltInSolverModel();
 
 	int addBlockingClause();
 
 	void clearModels();
-};
 
+private:
+
+	void buildSolver();
+
+};
 
 }
 
 
-#endif /* SRC_SOLVERS_BUILTINSATSOLVER_H_ */
+#endif /* SRC_SOLVERS_BUILTINSATSOLVER_NG_H_ */

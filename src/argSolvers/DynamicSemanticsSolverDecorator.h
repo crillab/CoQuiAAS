@@ -2,7 +2,6 @@
 #define __ARG_SOLVERS__DYNAMIC_SEMANTICS_SOLVER_DECORATOR_H__
 
 #include "SemanticsProblemSolver.h"
-#include "core/Solver.h"
 #include "SatEncodingHelper.h"
 #include "SolverOutputFormatter.h"
 
