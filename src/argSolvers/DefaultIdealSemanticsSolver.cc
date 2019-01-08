@@ -17,11 +17,11 @@ DefaultIdealSemanticsSolver::DefaultIdealSemanticsSolver(std::shared_ptr<MssSolv
 
 
 void DefaultIdealSemanticsSolver::init() {
-	MssEncodingHelper helper(solver, attacks, varMap);
-	helper.setMaxExtensionNeeded();
-	int disjId = helper.reserveDisjunctionVars();
-	helper.createAttackersDisjunctionVars(disjId);
-	helper.createCompleteEncodingConstraints(disjId);
+	this->helper = new MssEncodingHelper(solver, attacks, varMap);
+	this->helper->setMaxExtensionNeeded();
+	int disjId = this->helper->reserveDisjunctionVars();
+	this->helper->createAttackersDisjunctionVars(disjId);
+	this->helper->createCompleteEncodingConstraints(disjId);
 }
 
 
@@ -32,8 +32,10 @@ void DefaultIdealSemanticsSolver::computeOneExtension() {
 
 
 std::vector<int> DefaultIdealSemanticsSolver::justComputeOneExtension() {
-	solver->computeAllMss(NULL);
+	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
+	solver->computeAllMss(NULL, dynAssumps);
 	std::vector<std::vector<int> > allMss = solver->getAllMss();
+	// TODO if one MSS, return it
 	std::vector<bool> argAllowed(varMap.nVars(), true);
 	int nMss = (signed) allMss.size();
 	for(int i=0; i<nMss; ++i) {
@@ -47,6 +49,7 @@ std::vector<int> DefaultIdealSemanticsSolver::justComputeOneExtension() {
 			argAllowed[j] = argAllowed[j]&argInMss[j];
 		}
 	}
+	// TODO if no allowed args, return empty extension
 	std::vector<int> assumps;
 	for(int i=0; i<varMap.nVars(); ++i) {
 		if(!argAllowed[i]) {

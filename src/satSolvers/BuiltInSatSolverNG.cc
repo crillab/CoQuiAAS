@@ -17,6 +17,7 @@ BuiltInSatSolverNG::BuiltInSatSolverNG() {}
 
 void BuiltInSatSolverNG::buildSolver() {
 	if(!this->solver) this->solver = new MiniSatSolver();
+	if(!this->newFormula.nVars() && !this->newFormula.nHards()) return;
 	for(int i=0; i<this->newFormula.nVars(); ++i) {
 		this->formula.newVar();
 		this->solver->newVar();
@@ -157,6 +158,9 @@ void BuiltInSatSolverNG::computeAllModels(std::function<void(std::vector<bool>&)
 		bool newModel = computeModel(assumps, false);
 		if(!newModel) break;
 		if(callback) callback(this->models[this->models.size()-1]);
+		/* std::cerr << "\nmodel:";
+		for(int i=0; i<this->models[this->models.size()-1].size(); ++i) std::cerr << " " << this->models[this->models.size()-1][i];
+		std::cerr << std::endl; */
 		int sel = addBlockingClause();
 		blockingSelectors.push_back(sel);
 		assumps.push_back(sel);

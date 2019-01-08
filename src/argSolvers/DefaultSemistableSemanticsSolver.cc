@@ -17,21 +17,22 @@ DefaultSemistableSemanticsSolver::DefaultSemistableSemanticsSolver(std::shared_p
 
 
 void DefaultSemistableSemanticsSolver::init() {
-	MssEncodingHelper helper(solver, attacks, varMap);
-	int disjId = helper.reserveDisjunctionVars();
-	helper.setMaxRangeNeeded(disjId);
-	helper.createAttackersDisjunctionVars(disjId);
-	helper.createCompleteEncodingConstraints(disjId);
+	this->helper = new MssEncodingHelper(solver, attacks, varMap);
+	int disjId = this->helper->reserveDisjunctionVars();
+	this->helper->setMaxRangeNeeded(disjId);
+	this->helper->createAttackersDisjunctionVars(disjId);
+	this->helper->createCompleteEncodingConstraints(disjId);
 }
 
 
 void DefaultSemistableSemanticsSolver::computeOneExtension() {
-	solver->computeMss();
+	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
+	solver->computeMss(dynAssumps);
 	if(!solver->hasAMss()) {
 		this->formatter.writeNoExt();
 		return;
 	}
-	this->formatter.writeSingleExtension(this->solver->getModel());
+	this->formatter.writeSingleExtension(solver->getModel());
 }
 
 
@@ -51,11 +52,10 @@ std::vector<std::vector<bool>> DefaultSemistableSemanticsSolver::computeAllSstEx
 	std::vector<std::vector<int>> msses;
 	std::vector<std::vector<bool>> oldModels;
 	std::vector<std::vector<bool>> extModels;
-	solver->computeAllMss([this, callback, &msses, &oldModels](std::vector<int>& mss){
+	solver->computeAllMss([this, callback, &msses, &oldModels](std::vector<int>& mss, std::vector<bool>& model){
 		msses.push_back(mss);
-		auto mod = std::vector<bool>(solver->getModels()[oldModels.size()]);
-		oldModels.push_back(mod);
-		if(callback != NULL) callback(mod);
+		oldModels.push_back(model);
+		if(callback != NULL) callback(model);
 		if(this->stopEnum) solver->stopMssEnum();
 	});
 	solver->resetAllMss();

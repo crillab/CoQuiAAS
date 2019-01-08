@@ -46,8 +46,8 @@ void DefaultPreferredSemanticsSolver::computeAllExtensions() {
 	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
 	this->formatter.writeExtensionListBegin();
 	bool first = true;
-	solver->computeAllMss([this, &first](std::vector<int>& model){
-		this->formatter.writeExtensionListElmt(model, first);
+	solver->computeAllMss([this, &first](std::vector<int>& mss, std::vector<bool>& model){
+		this->formatter.writeExtensionListElmt(mss, first);
 		first = false;
 	}, dynAssumps);
 	this->formatter.writeExtensionListEnd();

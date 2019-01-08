@@ -25,9 +25,9 @@ public:
 
 	virtual bool computeMss(std::vector<int> &assumps) = 0;
 
-	virtual void computeAllMss(std::function<void(std::vector<int>&)> callback) = 0;
+	virtual void computeAllMss(std::function<void(std::vector<int>&, std::vector<bool>&)> callback) = 0;
 
-	virtual void computeAllMss(std::function<void(std::vector<int>&)> callback, std::vector<int> &assumps) = 0;
+	virtual void computeAllMss(std::function<void(std::vector<int>&, std::vector<bool>&)> callback, std::vector<int> &assumps) = 0;
 
 	virtual bool hasAMss() = 0;
 

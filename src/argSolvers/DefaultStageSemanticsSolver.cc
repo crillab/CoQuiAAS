@@ -32,6 +32,8 @@ void DefaultStageSemanticsSolver::computeOneExtension() {
 		this->formatter.writeNoExt();
 		return;
 	}
+	std::vector<int> mss = solver->getMss();
+	// this->formatter.writeSingleExtension(mss);
 	this->formatter.writeSingleExtension(solver->getModel());
 }
 
@@ -51,11 +53,10 @@ std::vector<std::vector<bool>> DefaultStageSemanticsSolver::computeAllStgExtensi
 	std::vector<std::vector<int>> msses;
 	std::vector<std::vector<bool>> oldModels;
 	std::vector<std::vector<bool>> extModels;
-	solver->computeAllMss([this, callback, &msses, &oldModels](std::vector<int>& mss){
+	solver->computeAllMss([this, callback, &msses, &oldModels](std::vector<int>& mss, std::vector<bool>& model){
 		msses.push_back(mss);
-		auto mod = std::vector<bool>(solver->getModels()[oldModels.size()]);
-		oldModels.push_back(mod);
-		if(callback != NULL) callback(mod);
+		oldModels.push_back(model);
+		if(callback != NULL) callback(model);
 		if(this->stopEnum) solver->stopMssEnum();
 	});
 	solver->resetAllMss();

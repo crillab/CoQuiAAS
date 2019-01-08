@@ -20,7 +20,7 @@ BuiltInMssSolverNG::BuiltInMssSolverNG() : BuiltInSatSolverNG() {
 void BuiltInMssSolverNG::addSoftClause(std::vector<int> &clause) {
 	CMP::vec<CMP::Lit> cmpCl;
 	toCmpClause(clause, cmpCl);
-	this->formula.addSoft(cmpCl, this->nSoftCstrs);
+	this->newFormula.addSoft(cmpCl, this->nSoftCstrs);
 	++this->nSoftCstrs;
 }
 
@@ -41,18 +41,18 @@ bool BuiltInMssSolverNG::computeMss(std::vector<int> &assumps) {
 }
 
 
-void BuiltInMssSolverNG::computeAllMss(std::function<void(std::vector<int>&)> callback) {
+void BuiltInMssSolverNG::computeAllMss(std::function<void(std::vector<int>&, std::vector<bool>&)> callback) {
 	std::vector<int> assumps;
 	computeAllMss(callback, assumps);
 }
 
 
-void BuiltInMssSolverNG::computeAllMss(std::function<void(std::vector<int>&)> callback, std::vector<int> &assumps) {
+void BuiltInMssSolverNG::computeAllMss(std::function<void(std::vector<int>&, std::vector<bool>&)> callback, std::vector<int> &assumps) {
 	computeSomeMsses(callback, assumps, INT32_MAX);
 }
 
 
-void BuiltInMssSolverNG::computeSomeMsses(std::function<void(std::vector<int>&)> callback, std::vector<int> &assumps, int maxCount) {
+void BuiltInMssSolverNG::computeSomeMsses(std::function<void(std::vector<int>&, std::vector<bool>&)> callback, std::vector<int> &assumps, int maxCount) {
 	this->shouldStopMssEnum = false;
 	clearMss();
 	CMP::Config_CoMSSEnum config =  CMP::Config_CoMSSEnum();
@@ -65,11 +65,22 @@ void BuiltInMssSolverNG::computeSomeMsses(std::function<void(std::vector<int>&)>
 	config.appx = 0;
 	config.verb = 0;
 	config.nb = maxCount;
-	this->mcsEnumerator = new CoMSSEnum(this->formula, config);
-	this->mcsEnumerator->run([this, callback] (CMP::vec<CMP::Lit>& mcs) {
-		vector<int> mss = extractMssFromCoMss(mcs, this->nSoftCstrs);
-		if(callback) callback(mss);
+	this->mcsEnumerator = new CoMSSEnum(this->newFormula, config);
+	CMP::vec<CMP::Lit> assumptions;
+	for(std::vector<int>::iterator it = assumps.begin(); it != assumps.end(); ++it) {
+		int lit = *it;
+		CMP::Lit minisatLit = lit > 0 ? CMP::mkLit(lit-1) : ~CMP::mkLit(-lit-1);
+		assumptions.push(minisatLit);
+	}
+	this->mcsEnumerator->run(assumptions, [this, callback] (CMP::vec<int>& mcs, std::vector<CMP::lbool> model) {
+		CMP::vec<CMP::Lit> litMcs;
+		for(int i=0; i<mcs.size(); ++i) litMcs.push(CMP::mkLit(mcs[i], false));
+		vector<int> mss = extractMssFromCoMss(litMcs, this->nSoftCstrs);
+		vector<bool> mod;
+		for(unsigned int i=0; i<model.size(); ++i) mod.push_back(model[i] == l_True);
+		if(callback) callback(mss, mod);
 		this->mss.push_back(mss);
+		this->models.push_back(mod);
 	});
 }
 
@@ -94,19 +105,16 @@ BuiltInMssSolverNG::~BuiltInMssSolverNG() {
 }
 
 void BuiltInMssSolverNG::addVariables(int nVars) {
-	addVariables(nVars, false);
+	BuiltInSatSolverNG::addVariables(nVars);
 }
 
 void BuiltInMssSolverNG::addVariables(int nVars, bool auxVar) {
-	for(int i=0; i<nVars; ++i) this->formula.newVar();
+	BuiltInSatSolverNG::addVariables(nVars, auxVar);
 }
 
 
 bool BuiltInMssSolverNG::addClause(std::vector<int> &clause) {
-	CMP::vec<CMP::Lit> cmpCl;
-	toCmpClause(clause, cmpCl);
-	this->formula.addHard(cmpCl);
-	return true; // TODO
+	return BuiltInSatSolverNG::addClause(clause);
 }
 
 

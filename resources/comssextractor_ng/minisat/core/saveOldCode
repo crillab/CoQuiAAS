@@ -1,0 +1,659 @@
+/**
+   Iterate the processus of coMSS extraction in order to extract a
+   little coMSS.
+*/
+void Solver::minCoMssIteration()
+{
+  printf("c All CoMSS extraction start ...\nc\n"); 
+  printf("c We considere a instance for: %s\nc\n", (solvePartialMaxSAT) ? "Partial MaxSAT" : "MaxSAT"); 
+  printf("c Number of literals %d\n", nVars());
+  printf("c Number of clauses %d\n", clauses.size());
+  printf("c Number of unit clauses %d\n", saveLitUnit.size());
+  printf("c\n");
+
+  manageUnitLiterals(setOfSelector); // add the clause associated to the unit literals
+  for(int i = 0 ; i<unitHardPart.size() ; i++) 
+    {
+      if(value(unitHardPart[i]) == l_False){printf("s HARD PART UNSATISFIABLE\n"); exit(30);}
+      if(value(unitHardPart[i]) == l_Undef) uncheckedEnqueue(unitHardPart[i]);
+    }
+  
+  bool res = solve();
+  bigRestart();
+
+  if(!res && solvePartialMaxSAT){printf("s HARD PART UNSATISFIABLE\n"); exit(30);}
+  for(int i = 0 ; i<setOfSelector.size() && res ; i++) res = model[var(setOfSelector[i])] != l_False;  
+  if(res && !solvePartialMaxSAT){ assert(0); printSolution(true);}
+  if(res) for(int i = 0 ; i<model.size() ; i++) polarity[i] = (model[i] != l_True); // we adjust the polarity for the approximation
+
+  // the hard unit literals must be assigned to true
+  for(int i = 0 ; i<unitHardPart.size() ; i++) if(value(unitHardPart[i]) == l_Undef) uncheckedEnqueue(unitHardPart[i]);
+
+  // initialization
+  int nbRun = 0;  
+  addSelectorOnSoftClauses(setOfSelector);
+  phantom = newVar(false, false);
+  
+  // extract a coMSS
+  int initSzAssums = setOfSelector.size(), bestSizeCoMss = setOfSelector.size();
+  vec<Lit> assums, approxCoMss, saveUnitSelectors;
+  vec<Lit> identifiedCoMssClauses, bestCoMss; // best w.r.t. size  
+  int posTrail = trail.size(), limitRestart = 0;
+  bool isCoMss = true;  
+  
+  while(solve())
+    {
+      restartUntil(limitRestart);
+      
+      // prepare the next stage
+      identifiedCoMssClauses.clear();
+      limitRestart = trail.size();
+           
+      for(int i = 0 ; i<setOfSelector.size() ; i++)
+        if(model[var(setOfSelector[i])] == l_Undef) approxCoMss.push(setOfSelector[i]);
+      
+      setOfSelector.copyTo(approxCoMss);
+      collectApproximation(approxCoMss); // WARNING: we need to remove the satisfied selector for the core technique
+             
+      approxCoMss.copyTo(assums); 
+      posTrail = 0;
+      for( ; posTrail<trail.size() ; posTrail++)
+        {
+          if(var(trail[posTrail]) < nbInitVariable || var(trail[posTrail]) == phantom) continue;          
+          if(sign(trail[posTrail])) identifiedCoMssClauses.push(~trail[posTrail]);
+        }
+      
+      while(assums.size())
+        {
+          for(int i = 0 ; i<assums.size() ; i++) assert(!sign(assums[i])); // DEBUG
+          bool assumsIsCoMSS = (assums.size() < 1);
+          
+          if(optRefineApprox) assumsIsCoMSS = refineApproximation(assums);          
+      
+          if(!assumsIsCoMSS)
+            {
+              selectTransition(assums);
+              assums[0] = ~assums[0];          
+              initSzAssums = (optAddNegation) ? assums.size() : addNegationClause(assums[0], assums);
+            }
+                
+          if(!assumsIsCoMSS && !solve(assums))
+            {         
+              if(onlyContainsSelector(conflict)) putNegationList(conflict, assums);                
+              else
+                {      
+                  if(onlyContainsInitVariable(conflict)) uncheckedEnqueue(~assums[0]); 
+                  else
+                    {                  
+                      conflict.push(~assums[0]);
+                      createNewClause(blockedClauses, conflict);
+                    }
+              
+                  assums.shrink(assums.size() - initSzAssums);
+                  assums[0] = assums.last();
+                  assums.pop();
+                }
+
+              for(int i = 0 ; i<assums.size() ; i++) assert(!sign(assums[i]));
+            } else
+            { 
+              if(assumsIsCoMSS)
+                {
+                  for(int i = 0 ; i<assums.size() ; i++)
+                    {                  
+                      if(value(assums[i]) == l_Undef) uncheckedEnqueue(~assums[i]);
+                      if(optBackBone) backBone(var(assums[i])); // backbone method proposed by joao
+                    }
+                }else
+                {                  
+                  if(value(assums[0]) == l_Undef) uncheckedEnqueue(assums[0]); // transition clause          
+                  if(optBackBone) backBone(var(assums[0])); // backbone method proposed by joao
+                }
+          
+              collectApproximation(approxCoMss, assumsIsCoMSS); // collect the approximation
+              
+              // compute a new core with the current coMss approximation
+              solve(approxCoMss);          
+              putNegationList(conflict, assums);
+            }
+      
+          // update the list of detected coMss clauses
+          for( ; posTrail<trail.size() ; posTrail++)
+            {
+              if(var(trail[posTrail]) < nbInitVariable || var(trail[posTrail]) == phantom) continue;          
+              if(sign(trail[posTrail])) identifiedCoMssClauses.push(~trail[posTrail]);
+            }
+        }  
+
+      ++nbRun;  
+      if(isCoMss)
+        {
+          coMssVerification(identifiedCoMssClauses, setOfSelector);          
+          printf("c MCS(%d): ", nbRun); printIndexWrtSelectors(identifiedCoMssClauses);
+
+          if(bestSizeCoMss > identifiedCoMssClauses.size())
+            {
+              bestSizeCoMss = identifiedCoMssClauses.size();
+              identifiedCoMssClauses.copyTo(bestCoMss);
+            }
+        }//else {printf("t "); printIndexWrtSelectors(identifiedCoMssClauses);}
+  
+      restartUntil(limitRestart);
+      
+      // we can simplified identifiedCoMssClauses
+      int i, j;
+      for(i = j = 0 ; i<identifiedCoMssClauses.size() ; i++)
+        {
+          assert(value(identifiedCoMssClauses[i]) != l_True);
+          if(value(identifiedCoMssClauses[i]) == l_Undef) identifiedCoMssClauses[j++] = identifiedCoMssClauses[i];
+        }
+      identifiedCoMssClauses.shrink_(i - j);
+      assert(identifiedCoMssClauses.size());
+
+      if(identifiedCoMssClauses.size() > 1)
+        {
+          CRef cr = ca.alloc(identifiedCoMssClauses, false);
+          clauses.push(cr);
+          attachClause(cr);      
+        }else saveUnitSelectors.push(identifiedCoMssClauses[0]);    
+  
+      // the unit literals
+      for(int i = 0 ; i<saveUnitSelectors.size() ; i++)
+        if(value(saveUnitSelectors[i]) == l_Undef) uncheckedEnqueue(saveUnitSelectors[i]);
+    }
+  
+  printf("c Number of visited coMSS: %d\n", nbRun);
+  printf("o %d\n", bestSizeCoMss);
+  printf("s OPTIMUM FOUND\n");
+  printf("v "); printIndexWrtSelectors(bestCoMss);
+}// minCoMssIteration
+
+
+/**
+   Iterate the processus of coMSS extraction in order to extract all
+   the coMSS.   
+*/
+void Solver::enumAllCoMssBlocked()
+{
+  int nbRun = 0;
+  
+  // variable initialization
+  if(verbosity > 0){printf("c All CoMSS extraction start ...\nc\n"); showOptions();}
+  initCoMssExtractor(setOfSelector);
+  remove_satisfied = true;
+
+  while(solve(activeBlockedClauses))
+    {      
+      vec<Lit> assums, identifiedCoMssClauses, approxMSS, approxMCS;
+      for(int i = 0 ; i<setOfSelector.size() ; i++) 
+        if(model[var(setOfSelector[i])] == l_False)
+          approxMCS.push(setOfSelector[i]); else approxMSS.push(setOfSelector[i]);
+      
+      approxMCS.copyTo(assums);      
+
+      // extract a coMSS
+      while(assums.size())
+        {
+          Lit transitionFound = lit_Undef;
+          bool assumsIsCoMSS = (assums.size() <= 1);
+          
+          if(optRefineApprox) assumsIsCoMSS = refineApproximationAll(approxMSS, approxMCS, assums);
+          
+          // select the next transition
+          if(!assumsIsCoMSS)
+            {
+              selectTransition(assums);
+              transitionFound = assums[0];
+              assums[0] = assums.last();
+              assums.pop();
+            }         
+          
+          if(!assumsIsCoMSS && !solve(approxMSS, assums)) intersectConflict(assums, conflict);
+          else
+            {
+              if(!assumsIsCoMSS){assums.clear(); assums.push(transitionFound);}
+              assert(assums.size() <= approxMCS.size());
+              
+              // we add the transition constraint
+              transferCoMSS(assums, approxMCS, identifiedCoMssClauses);
+              if(optBackBone) backBoneAll(assums, approxMSS); // backbone method
+
+              collectApproximationAll(approxMSS, approxMCS, assumsIsCoMSS); // collect the approximation
+              
+              // compute a new core with the current coMss approximation      
+              if(approxMCS.size()) solve(approxMSS, approxMCS); else conflict.clear();              
+              approxMCS.copyTo(assums);
+                          
+              intersectConflict(assums, conflict);
+            }
+        }// extraction finished
+      
+      ++nbRun;      
+      cancelUntil(0);
+      if(verbosity > 0){ printf("c MCS(%d): ", nbRun); printIndexWrtSelectors(identifiedCoMssClauses);}
+      if(optSaveMCS) saveOneMCS(identifiedCoMssClauses);
+      // coMssVerification(identifiedCoMssClauses, setOfSelector);
+      
+      addBlockedClause(identifiedCoMssClauses);      
+    }
+    
+  if(verbosity > 0) 
+    {
+      printInfoSolver();
+      printf("c Number of visited coMSS: %d\n", nbRun);
+      printf("s OPTIMUM FOUND\n");
+    }
+}// enumAllCoMssBlocked
+
+
+/**
+   From a set of constraint obtained by model rotation we module the
+   current coMSS to build new ones.
+
+   @param[in] coMssFound, the current MCS found
+   @param[in] productFree, the set of constraints obtained by model
+   rotation (coMssFound[i] correspond to productFree[i])
+ */
+void Solver::computeNewCoMSS(vec<Lit> &coMssFound, vec< vec<Lit> > &productFree)
+{
+#if 1
+  vec< vec<Lit> > setOfCoMssFound;
+  setOfCoMssFound.push();
+  coMssFound.copyTo(setOfCoMssFound.last());
+  
+  newDecisionLevel();
+  for(int i = 0 ; i<coMssFound.size() ; i++)
+    if(value(coMssFound[i]) == l_Undef) uncheckedEnqueue(~coMssFound[i]);
+  propagate();
+
+  for(int i = 0 ; i<coMssFound.size() ; i++)
+    {
+      vec<Lit> &tmp = productFree[i];          
+      for(int j = 0 ; j<tmp.size() ; j++)
+        {
+          if(value(tmp[j]) != l_Undef) continue;
+          vec<Lit> mcsComputed;
+          for(int k = 0 ; k<coMssFound.size() ; k++)
+            {
+              if(k == i) mcsComputed.push(tmp[j]);
+              else mcsComputed.push(coMssFound[k]);
+            }
+
+          setOfCoMssFound.push();
+          mcsComputed.copyTo(setOfCoMssFound.last());          
+        }
+    }
+  cancelUntil(1);
+  
+  nbCoMssRotation += setOfCoMssFound.size() - 1;
+  for(int i = 0 ; i<setOfCoMssFound.size() ; i++) addCoMssAndBlockIt(setOfCoMssFound[i]);
+  cancelUntil(0);
+#else
+  printf("init: "); printIndexWrtSelectors(coMssFound);
+  for(int i = 0 ; i<productFree.size() ; i++)
+    {
+      productFree[i].push(coMssFound[i]);
+      printf("==> "); printIndexWrtSelectors(productFree[i]);
+    }
+  
+  // make the cartesian product
+  vec<Lit> tmpCoMss;
+  vec< vec<Lit> > setOfCoMssFound;
+  computeNewCoMSS_acc(tmpCoMss, productFree, setOfCoMssFound);
+  assert(setOfCoMssFound.size());
+
+  nbCoMssRotation += setOfCoMssFound.size() - 1;
+  for(int i = 0 ; i<setOfCoMssFound.size() ; i++) addCoMssAndBlockIt(setOfCoMssFound[i]);
+  cancelUntil(0);
+  
+  //exit(0);
+#endif
+}// computeNewCoMSS   
+
+
+void recursiveAnalyzeFinal(Lit l);  
+/**
+   Perform the analyze final on a literal in a recursive way.
+       
+   @param[in] l, the starting point
+   @param[out] v, the set of visited literals
+*/
+void Solver::recursiveAnalyzeFinal(Lit l)
+{
+  Var x = var(l);      
+  if(isCollected[x]) return;    
+
+  recCollectedCores[x].zero();
+  isCollected[x] = true;
+  
+  if(level(x) == 0) return;
+  if(reason(x) == CRef_Undef) recCollectedCores[x].push(l);
+  else
+    {
+      // collect the information
+      Clause& c = ca[reason(x)];          
+      for(int i = 1 ; i<c.size() ; i++) recursiveAnalyzeFinal(c[i]);
+
+      vec<Lit> &tmp = recCollectedCores[var(l)];
+
+      // merge it          
+      for(int i = 1 ; i<c.size() ; i++)
+        {
+          assert(isCollected[var(c[i])]);
+          vec<Lit> &tmpC = recCollectedCores[var(c[i])];
+          for(int j = 0 ; j<tmpC.size() ; j++)
+            if(!seen[var(tmpC[j])])
+              {
+                seen[var(tmpC[j])] = 1;
+                tmp.push(tmpC[j]);
+              }
+        }
+      for(int i = 0 ; i<tmp.size() ; i++) seen[var(tmp[i])] = 0;
+    }
+}// recursiveAnalyzeFinal
+
+
+/**
+   Realize the cartesian product (+ assure that the coMSS added was
+   not already computed).
+ */
+void Solver::computeNewCoMSS_acc(vec<Lit> &currentCoMss, vec< vec<Lit> > &productFree, vec< vec<Lit> > &res)
+{
+  if(currentCoMss.size() == productFree.size() - 1)
+    {
+      vec<Lit> &lP = productFree.last();
+      for(int i = 0 ; i<lP.size() ; i++)        
+        {
+          if(value(lP[i]) == l_True) continue;          
+          
+          res.push();
+          currentCoMss.copyTo(res.last());
+          (res.last()).push(lP[i]);
+        }
+    }else
+    {
+      assert(currentCoMss.size() < productFree.size());
+      vec<Lit> &lP = productFree[currentCoMss.size()];
+      for(int i = 0 ; i<lP.size() ; i++)
+        {
+          if(value(lP[i]) == l_True) continue;
+          
+          newDecisionLevel();
+          if(value(lP[i]) == l_Undef) uncheckedEnqueue(~lP[i]);
+          propagate();
+          currentCoMss.push(lP[i]);
+          computeNewCoMSS_acc(currentCoMss, productFree, res);
+          currentCoMss.pop();
+          cancelUntil(decisionLevel() - 1);
+        }
+    }
+}// computeNewCoMSS_acc
+
+
+/**
+   Take all the set and realize the intersection
+ */
+void Solver::makeCoreIntersection(vec<coreWrtLit> &coreList)
+{
+  for(int i = nbInitVariable ; i<nVars() ; i++) intersectHit[i] = 0;
+  for(int i = 0 ; i<coreList.size() ; i++)
+    {          
+      vec<Lit> &lst = coreList[i].core;         
+      for(int j = 0 ; j<lst.size() ; j++) intersectHit[var(lst[j])]++;
+    } 
+}// makeCoreIntersection
+
+
+/**
+   Collect the selector which must be transfer to the identified coMss
+   part.
+ */
+void Solver::transferAndCollect(Lit l, vec<Lit> &ccore, vec<Lit> &aCoMss, vec<Lit> &idenCoMss,
+                        vec<coreWrtLit> &collectedCore)
+{
+  // we collect the propagated identified coMss
+  int i, j;
+  for(i = j = 0 ; i<aCoMss.size() ; i++)
+    {          
+      if(var(aCoMss[i]) == var(l) || value(aCoMss[i]) == l_False)
+        {
+          idenCoMss.push(aCoMss[i]);
+          collectedCore.push();
+          (collectedCore.last()).l = aCoMss[i];
+              
+          // we visit the implication graph to extract the core
+          if(var(aCoMss[i]) == var(l)) ccore.copyTo((collectedCore.last()).core);
+          else
+            {         
+              recursiveAnalyzeFinal(aCoMss[i]);
+              recCollectedCores[var(aCoMss[i])].copyTo((collectedCore.last()).core);
+              ((collectedCore.last()).core).push(aCoMss[i]);
+            }
+        }else aCoMss[j++] = aCoMss[i];
+    }
+  aCoMss.shrink(i - j);
+}// transferAndCollect
+
+
+/**
+   Make the recursive rotation.
+   
+   @param[in] rlSolver, use the datat structure from local search (flipatom)
+   @param[in] coMssFound, the coMss found
+   @param[in] ccore, the set of associated core
+
+   \return false (not use for the moment)
+ */
+bool Solver::rotationProcessus(SolverRL &rlSolver, vec<Lit> &coMss, vec<coreWrtLit> &ccore)
+{ 
+  assert(ccore.size() == coMss.size());
+  cancelUntil(0);
+  vec< vec<Lit> > productFree;
+  
+  // make the core intersection
+  makeCoreIntersection(ccore);  
+  
+  // make the rotation
+  vec<int> indexCoMssFound;
+  vec<int> szCores;
+  int maxSize = 0;
+
+  for(int i = 0 ; i<coMss.size() ; i++)
+    {
+      indexCoMssFound.push(mapSelectorToIndex[var(coMss[i]) - nbInitVariable]);
+      vec<Lit> &tmp = ccore[i].core;
+      
+      int j,k;
+      for(j = k = 0 ; j<tmp.size() ; j++)        
+        if((var(tmp[j]) != var(coMss[i])) && intersectHit[var(tmp[j])] <= 1) tmp[k++] = tmp[j];
+      tmp.shrink_(j - k);
+      szCores.push(tmp.size());
+      
+      if(tmp.size() > maxSize) maxSize = tmp.size();
+#if 0
+      if(tmp.size()) 
+        {
+          printf("--> %d\n", selectorToIndex[var(coMss[i]) - nbInitVariable]);
+          for(int j = 0 ; j<tmp.size() ; j++)
+            {
+              showClause(ca[clauses[mapSelectorToIndex[var(tmp[j]) - nbInitVariable]]]);
+            }
+          printf("\n");
+          // exit(0);
+          getchar();
+        }
+#endif
+      //printf("%d ", tmp.size());
+    }
+  //printf("\n");
+  //getchar();
+  
+  if(maxSize || coMss.size() == 1)
+    {      
+      newDecisionLevel();
+      int start = trail.size();
+      uncheckedEnqueue(activeBlockedClauses);
+      propagate();
+      
+      for(int i = start ; i<trail.size() ; i++) canBeSelected[var(trail[i])] = false;      
+      rlSolver.makeRotation(clauses, ca, indexCoMssFound, coMss, productFree, canBeSelected, szCores, currAss);
+      for(int i = start ; i<trail.size() ; i++) canBeSelected[var(trail[i])] = true;
+      
+      assert(coMss.size() == productFree.size());        
+
+      for(int i = 0 ; i<productFree.size() ; i++) 
+        {      
+          vec<Lit> &tmp = productFree[i];
+          
+          int j,k;
+          for(j = k = 0 ; j<tmp.size() ; j++)
+            {
+              assert(value(tmp[j]) == l_Undef);
+              if(intersectHit[var(tmp[j])] <= 1) tmp[k++] = tmp[j]; 
+            }
+          tmp.shrink_(j - k);
+          //printf("%d ", tmp.size());
+        }
+      //printf("\n");
+      //getchar();
+      
+      computeNewCoMSS(coMss, productFree);
+    }else
+    {
+      cancelUntil(0);
+      ++nbComputedMCS;
+      printf("c MCS(%d/%d): ", nbComputedMCS, nbCoMssRotation); printIndexWrtSelectors(coMss);
+      // coMssVerification(coMss, setOfSelector);
+      addBlockedClause(coMss);
+    }
+
+  if(nbCoMssRotation > 1000 && !nbCoMssRotation) optRotation = false;
+  return false;
+}// rotationProcessus
+
+
+/**
+   Iterate the coMSS processus extraction in order to extract all the
+   coMSS.
+*/
+void Solver::enumAllCoMssTree()
+{  
+  vec<Lit> prevConflict, assums, identifiedMCS, approxMSS, approxMCS;
+  vec<coreWrtLit> saveCores;  
+ 
+  // variable initialization
+  printf("c All CoMSS extraction start ...\nc\n"); showOptions();
+  initCoMssExtractor(setOfSelector);
+
+  // used to perform model rotation    
+  SolverRL rlSolver(nVars() + 1, nbInitVariable);  
+  rlSolver.initWithClauses(clauses, ca);
+
+  vec<Lit> tmp;
+  for(int i = 0 ; i<saveLitUnit.size() ; i++) tmp.push(saveLitUnit[i].l); 
+  rlSolver.adjustIsAssign(tmp, tmp.size());
+
+  vec<bool> interpretation;
+  for(int i = 0 ; i<nVars() + 1 ; i++) interpretation.push(rand() % 2);
+  rlSolver.initInterpretation(interpretation);
+  rlSolver.init(clauses, ca);
+
+  unsigned int *at = rlSolver.getAtom();
+  int *fC = rlSolver.getFalseClause();
+  int *bk = rlSolver.getBreakcount();
+  int *mk = rlSolver.getMakecount();
+
+  printf("Step 1\n");
+  for(int i = 0 ; i<nVars() ; i++) printf("[%d, %d] ", i + 1, at[i]);
+  printf("\n");
+  for(int i = 0 ; i<rlSolver.getNumfalse() ; i++) showClause(ca[clauses[fC[i]]]);
+
+  printf("The number of falsified clauses is %d\n", rlSolver.getNumfalse());
+  for(int i = 0 ; i<nVars() ; i++)
+    {
+      printf("%d -> %d %d\n", i + 1, bk[i], mk[i]);
+    }
+
+  printf("\nStep 2\n");
+  rlSolver.flipatom(ca[clauses[fC[0]]][0], clauses, ca);
+
+  for(int i = 0 ; i<nVars() ; i++) printf("[%d, %d] ", i + 1, at[i]);
+  printf("\n");
+  for(int i = 0 ; i<rlSolver.getNumfalse() ; i++) showClause(ca[clauses[fC[i]]]);
+
+  printf("The number of falsified clauses is %d\n", rlSolver.getNumfalse());
+  for(int i = 0 ; i<nVars() ; i++)
+    {
+      printf("%d -> %d %d\n", i + 1, bk[i], mk[i]);
+    }
+  
+  
+  exit(0);
+
+  while(solve(activeBlockedClauses))
+    {
+      assert(decisionLevel() == 0);                  
+      initializeProcedure(setOfSelector, approxMSS, approxMCS, assums, identifiedMCS, prevConflict, saveCores);
+
+#if 0
+      printf("Initialization: \n");
+      printf("approxMCS: "); showList(approxMCS);
+      // printf("approxMSS: "); showList(approxMSS);
+      printf("assums: "); showList(assums);
+      printf("identifiedMCS: "); showList(identifiedMCS);
+#endif
+
+      // extract a coMSS
+      while(assums.size())
+        {
+          Lit transitionFound = lit_Undef;
+          bool assumsIsCoMSS = assums.size() <= 1;
+                  
+          // select the next transition
+          selectTransition(assums);
+          transitionFound = assums[0];
+          assums[0] = assums.last();
+          assums.pop();
+
+          if(assums.size() && !solve(approxMSS, assums))
+            {
+              intersectConflict(assums, conflict);
+              conflict.copyTo(prevConflict);
+            }
+          else
+            {
+              assert(transitionFound != lit_Undef);
+              
+              vec<Lit> detected;
+              transferAndCollect(transitionFound, prevConflict, approxMCS, detected, saveCores);
+              for(int i = 0 ; i<detected.size() ; i++) identifiedMCS.push(detected[i]); 
+
+              collectApproximationAll(approxMSS, approxMCS, assumsIsCoMSS); // collect the approximation
+              
+              // compute a new core with the current coMss approximation      
+              if(approxMCS.size()) solve(approxMSS, approxMCS); else conflict.clear();              
+
+              approxMCS.copyTo(assums);              
+              intersectConflict(assums, conflict);
+              conflict.copyTo(prevConflict);              
+            }
+        }// extraction finished
+      
+      if(!optRotation)
+        {
+          cancelUntil(0);
+          ++nbComputedMCS;
+          printf("c MCS(%d): ", nbComputedMCS); printIndexWrtSelectors(identifiedMCS);
+          // coMssVerification(identifiedMCS, setOfSelector);
+          addBlockedClause(identifiedMCS);
+        }else if(rotationProcessus(rlSolver, identifiedMCS, saveCores)) break;              
+      //if(nbComputedMCS > 10800) break;
+    }
+  
+  printInfoSolver();    
+  printf("c\nc Number of coMSS obtained by rotation: %d\n", nbCoMssRotation);
+  printf("c Number of clauses identified by a core: %d\n", nbIdentifiedByCore);
+  printf("c Number of flips: %lld\n", rlSolver.getNumFlip());
+  printf("c Number of visited coMSS: %d\n", nbComputedMCS);
+  printf("s OPTIMUM FOUND\n");
+}// enumAllCoMssTree

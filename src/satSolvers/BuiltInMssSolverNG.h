@@ -31,9 +31,9 @@ public:
 
 	virtual bool computeMss(std::vector<int> &assumps);
 
-	virtual void computeAllMss(std::function<void(std::vector<int>&)> callback);
+	virtual void computeAllMss(std::function<void(std::vector<int>&, std::vector<bool>&)> callback);
 
-	virtual void computeAllMss(std::function<void(std::vector<int>&)> callback, std::vector<int> &assumps);
+	virtual void computeAllMss(std::function<void(std::vector<int>&, std::vector<bool>&)> callback, std::vector<int> &assumps);
 
 	virtual void stopMssEnum();
 
@@ -95,7 +95,7 @@ private:
 		return mss;
 	}
 
-	void computeSomeMsses(std::function<void(std::vector<int>&)> callback, std::vector<int> &assumps, int maxCount);
+	void computeSomeMsses(std::function<void(std::vector<int>&, std::vector<bool>&)> callback, std::vector<int> &assumps, int maxCount);
 };
 
 

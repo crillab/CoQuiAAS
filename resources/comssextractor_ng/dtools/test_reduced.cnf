@@ -1,0 +1,13 @@
+c 2018-02-12 14:24:10 by qbfdd.py,v 1.2.2
+c qbfdd.py /tmp/test.cnf /home/izza/Documents/comssextractor/dtools/debugEnumMCSes.sh -debug '../build/debug/bin/cmp -enum -mr -nb=500'  -m ddmin -g b -q
+c 
+c mode: ddmin
+c rounds: 1
+c test runs: 10
+c time elapsed:  0.20s
+c total: clauses  : -100 (99.01%)
+c        variables: -0 (0.00%)
+c        literals : -423 (99.76%)
+c 
+p cnf 20 1
+-5 0

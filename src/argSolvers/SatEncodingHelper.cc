@@ -109,6 +109,33 @@ void SatEncodingHelper::createConflictFreenessEncodingConstraints(int startId) {
 }
 
 
+/* void SatEncodingHelper::createStableEncodingConstraints() {
+	reserveDynVarsForStableSemantics();
+	std::vector<int> binaryCl, completeCl;
+	std::vector<int, std::allocator<int> >& vars = varMap.intVars();
+	for(std::vector<int>::iterator itVars = vars.begin() ; itVars != vars.end(); ++itVars) {
+		int var = *itVars;
+		completeCl.push_back(var);
+		std::vector<int, std::allocator<int> >* attacksToCurrentVar = attacks.getAttacksTo(var);
+		for(std::vector<int>::iterator itAttackers = attacksToCurrentVar->begin(); itAttackers != attacksToCurrentVar->end(); ++itAttackers) {
+			int attacker = *itAttackers;
+			for(unsigned int i=0; i<this->dynVars.size(); ++i) {
+				if(std::get<0>(this->dynVars[i]) == attacker && std::get<1>(this->dynVars[i]) == var) {
+					attacker = std::get<2>(this->dynVars[i]);
+					break;
+				}
+			}
+			binaryCl.push_back(-(var));
+			if(var != attacker) binaryCl.push_back(-(attacker));
+			solver->addClause(binaryCl); // -a \lor -b
+			binaryCl.clear();
+			if(var != attacker) completeCl.push_back(attacker);
+		}
+		solver->addClause(completeCl); // a \lor b1 \lor ... \lor bp
+		completeCl.clear();
+	}
+} */
+
 void SatEncodingHelper::createStableEncodingConstraints() {
 	reserveDynVarsForStableSemantics();
 	std::vector<int> binaryCl, completeCl;
@@ -117,6 +144,7 @@ void SatEncodingHelper::createStableEncodingConstraints() {
 		int var = *itVars;
 		completeCl.push_back(var);
 		std::vector<int, std::allocator<int> >* attacksToCurrentVar = attacks.getAttacksTo(var);
+		// bool hasStaticAutoAttack = false;
 		for(std::vector<int>::iterator itAttackers = attacksToCurrentVar->begin(); itAttackers != attacksToCurrentVar->end(); ++itAttackers) {
 			int attacker = *itAttackers;
 			for(unsigned int i=0; i<this->dynVars.size(); ++i) {
