@@ -42,6 +42,8 @@ private:
 
 	bool stopEnum = false;
 
+	MssEncodingHelper* helper;
+
 };
 
 

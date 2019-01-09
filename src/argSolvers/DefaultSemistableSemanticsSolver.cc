@@ -52,12 +52,13 @@ std::vector<std::vector<bool>> DefaultSemistableSemanticsSolver::computeAllSstEx
 	std::vector<std::vector<int>> msses;
 	std::vector<std::vector<bool>> oldModels;
 	std::vector<std::vector<bool>> extModels;
+	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
 	solver->computeAllMss([this, callback, &msses, &oldModels](std::vector<int>& mss, std::vector<bool>& model){
 		msses.push_back(mss);
 		oldModels.push_back(model);
 		if(callback != NULL) callback(model);
 		if(this->stopEnum) solver->stopMssEnum();
-	});
+	}, dynAssumps);
 	solver->resetAllMss();
 	solver->resetModels();
 	int nVars = varMap.nVars();
@@ -78,9 +79,10 @@ std::vector<std::vector<bool>> DefaultSemistableSemanticsSolver::computeAllSstEx
 			assumps[msses[i][j]-1] = selectors[msses[i][j]-1];
 		}
 		std::vector<int> cl;
-		for(int j=0; j<(signed)oldModels[i].size(); ++j) {
+		for(int j=0; j<this->varMap.nVars(); ++j) {
 			if(!oldModels[i][j]) cl.push_back(j+1);
 		}
+		for(int j=0; j<dynAssumps.size(); ++j) assumps.push_back(dynAssumps[j]);
 		auto blockingSel = solver->addSelectedClause(cl);
 		assumps.push_back(blockingSel);
 		solver->computeAllModels([this,callback,&extModels](std::vector<bool>& model){
