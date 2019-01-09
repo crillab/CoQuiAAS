@@ -45,6 +45,10 @@ private:
 
 	std::shared_ptr<SatSolver> solver;
 
+	int lookForDynAttackerReplacement(int attacked, int attacker);
+
+	void reserveDynVars(bool reserveNotAttackedRepl);
+
 protected:
 
 	void reserveDynVarsForCompleteSemantics();
