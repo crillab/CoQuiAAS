@@ -46,11 +46,18 @@ void CoMSSEnum::run(CMP::vec<CMP::Lit>& assumps, std::function<void(vec<int>&, v
   vec<Lit> coMss, mss, prev_coMss;
   bool emptyBlockClause = false;
 
+  assumps.copyTo(exttor->getSatSolver()->strongAssums); 
   int res = exttor->getSatSolver()->solve(assumps);
-  
+ 
   while(res && !emptyBlockClause) {
-    if(exttor->rotate()) (*exttor)(mss, coMss);
-    else (*exttor)(coMss);
+    if(mss.size() == 0)
+    {      
+      assert(coMss.size() == 0);
+      assumps.copyTo(coMss);
+    }
+
+    if(max > 10 && exttor->rotate()) (*exttor)(mss, coMss); else (*exttor)(coMss);
+
     if(!coMss.size() && callback != NULL) {
       vec<int> mcs;
       exttor->in2ex(coMss, mcs);
@@ -58,7 +65,11 @@ void CoMSSEnum::run(CMP::vec<CMP::Lit>& assumps, std::function<void(vec<int>&, v
     }
     if(!coMss.size()) break;
 
-    if(verb) {printf("c coMSS(%d):\n",nbCoMSS+1); exttor->printModel(coMss);}
+    if(verb) 
+    {
+        printf("c coMSS(%d):\n",nbCoMSS+1);        
+        exttor->printModel(coMss);
+    }
 
     if(callback != NULL) {
       vec<int> mcs;

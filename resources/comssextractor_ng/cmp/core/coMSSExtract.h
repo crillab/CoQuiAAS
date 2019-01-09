@@ -87,7 +87,8 @@ class CoMSSExtract : public MetaSolver
     printf("c %s\n",(coMss.size())? "UNSATISFIABLE" : "SATISFIABLE");
     if(!coMss.size())  return;
     vec<int> model;
-    in2ex(coMss, model);
+    
+    in2ex(coMss, model);    
     sort(model);
     printf("c #coMSS : %d\n",model.size());
     printf("v "); for(int i = 0 ; i<model.size() ; i++) printf("%d ", model[i]);

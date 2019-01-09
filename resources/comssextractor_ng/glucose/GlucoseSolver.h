@@ -19,27 +19,47 @@ class GlucoseSolver : public SatSolver
   ~GlucoseSolver() {if(!slv) {delete slv; slv = NULL;}}
 
 
-  bool solve2 () {return slv->solve();}
+  bool solve2 () 
+  {
+    vec<Lit> emptyVec;
+    return solve2(emptyVec);
+  }
   bool solve2 (const vec<Lit>& assumps) {
     Glucose::vec<Glucose::Lit> m_assumps;
+    for(int i = 0 ; i<strongAssums.size() ; i++) m_assumps.push(Glucose::mkLit((int)var(strongAssums[i]), sign(strongAssums[i])));
     for(int i=0; i<assumps.size(); i++) m_assumps.push(Glucose::mkLit((int)var(assumps[i]), sign(assumps[i])));
     return slv->solve(m_assumps);
   }
-  bool solve () {return slv->solve();}
-  bool solve (Lit p) {return slv->solve(Glucose::mkLit((int)var(p), sign(p)));}
+  bool solve () 
+  {
+    vec<Lit> emptyVec;
+    return solve(emptyVec);
+  }
+  bool solve (Lit p) 
+  {
+    vec<Lit> notEmptyVec;
+    notEmptyVec.push(p);
+    return solve(notEmptyVec);
+  }
   bool solve (const vec<Lit>& assumps) {
     Glucose::vec<Glucose::Lit> m_assumps;
+    for(int i = 0 ; i<strongAssums.size() ; i++) m_assumps.push(Glucose::mkLit((int)var(strongAssums[i]), sign(strongAssums[i])));
     for(int i=0; i<assumps.size(); i++) m_assumps.push(Glucose::mkLit((int)var(assumps[i]), sign(assumps[i])));
     return slv->solve(m_assumps);
   }
   bool solve (const vec<Lit>& assumps, const vec<Lit>& mss) {
     //TODO
     Glucose::vec<Glucose::Lit> m_assumps, m_mss;
+    for(int i = 0 ; i<strongAssums.size() ; i++) m_assumps.push(Glucose::mkLit((int)var(strongAssums[i]), sign(strongAssums[i])));
     for(int i=0; i<assumps.size(); i++) m_assumps.push(Glucose::mkLit((int)var(assumps[i]), sign(assumps[i])));
     for(int i=0; i<mss.size(); i++) m_mss.push(Glucose::mkLit((int)var(mss[i]), sign(mss[i])));
     return slv->solve(m_assumps, m_mss);
   }
-  bool solve (const int lim) {return slv->solve(lim);}
+  bool solve (const int lim)
+  { 
+      assert(0);    
+     return slv->solve(lim);
+  }
 
   void initNbVariable(int n) { slv->initNbInitialVars(n);}
   Var newVar(bool polarity = true, bool dvar = true) {return slv->newVar(polarity, dvar);}

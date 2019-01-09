@@ -97,9 +97,9 @@ CoMSSExtract::~CoMSSExtract()
 
 void CoMSSExtract::operator()(vec<Lit> &coMss)
 {
-  coMss.clear();
   vec<Lit> mss, unknown;
   CoMSSApprox* approx;
+  coMss.clear();
 
   switch(optApprox) {
   case 1:
@@ -122,16 +122,19 @@ void CoMSSExtract::operator()(vec<Lit> &coMss)
 
   for(int i = 0 ; i<markedSelector.size() ; i++) markedSelector[i] = 0;
   for(int i = 0; i<mss.size(); i++) markedSelector[var(mss[i])] = sign(mss[i]) + 1;
-  for(int i = 0; i<coMss.size(); i++) if(markedSelector[var(coMss[i])] != sign(coMss[i]) + 1) unknown.push(coMss[i]);
+  for(int i = 0; i<coMss.size(); i++) 
+    if(markedSelector[var(coMss[i])] != sign(coMss[i]) + 1) unknown.push(coMss[i]);
   coMss.clear();
 
-  if(verb>1) {
+  
+  if(verb>1) 
+  {
     printf("c #MSS : %d\n", mss.size());
     printf("c #coMSS : %d\n", coMss.size());
     printf("c #unknown : %d\n", unknown.size());
   }
-
-  search(mss, unknown, coMss);
+  
+  search(mss, unknown, coMss);  
   if (verb > 1) printStats();
 }
 

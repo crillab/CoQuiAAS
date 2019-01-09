@@ -17,7 +17,10 @@ namespace CMP
     vector<lbool> model;
     //TODO update model after calling to solve()
     
+    
+
   public:
+  vec<Lit> strongAssums;
     SatSolver() {}
     virtual ~SatSolver() {}
     

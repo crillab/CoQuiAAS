@@ -19,50 +19,57 @@ class MiniSatSolver : public SatSolver
   Minisat::Solver* slv;
 
   bool solve2 () {
+    CMP::vec<CMP::Lit> m_assumps;    
+    return solve2(m_assumps);          
+  }
+
+  bool solve2 (const vec<Lit>& assumps) {
+    Minisat::vec<Minisat::Lit> m_assumps;    
+    for(int i = 0 ; i<strongAssums.size() ; i++) m_assumps.push(Minisat::mkLit((int)var(strongAssums[i]), sign(strongAssums[i])));
+    for(int i = 0 ; i<assumps.size() ; i++) m_assumps.push(Minisat::mkLit((int)var(assumps[i]), sign(assumps[i])));    
+  
     slv->deact_selector = true;
-    bool res = slv->solve();
+    bool res = slv->solve(m_assumps);
     slv->deact_selector = false;
     if(res) {model.clear(); for(int i=0; i<nVars(); i++) model.push_back(modelValue(i)); }
     return res;
   }
 
-  bool solve2 (const vec<Lit>& assumps) {
-    slv->deact_selector = true;
-    Minisat::vec<Minisat::Lit> m_assumps;
-    clone(assumps, m_assumps);
-    bool res = slv->solve(m_assumps);
-    slv->deact_selector = false;
-    if(res) {model.clear(); for(int i=0; i<nVars(); i++) model.push_back(modelValue(i)); }
-    return res;
-  }
   ///
   bool solve () {
-    bool res = slv->solve();
-    if(res) {model.clear(); for(int i=0; i<nVars(); i++) model.push_back(modelValue(i)); }
-    return res;
+    CMP::vec<CMP::Lit> m_assumps;    
+    return solve(m_assumps);        
   }
+
   bool solve (Lit p) {
-    bool res = slv->solve(Minisat::mkLit((int)var(p), sign(p)));
-    if(res) {model.clear(); for(int i=0; i<nVars(); i++) model.push_back(modelValue(i)); }
-    return res;
+    CMP::vec<CMP::Lit> m_assumps;
+    m_assumps.push(p);
+    return solve(m_assumps);    
   }
+
   bool solve (const vec<Lit>& assumps) {
-    Minisat::vec<Minisat::Lit> m_assumps;
-    clone(assumps, m_assumps);
+    Minisat::vec<Minisat::Lit> m_assumps;    
+    for(int i = 0 ; i<strongAssums.size() ; i++) m_assumps.push(Minisat::mkLit((int)var(strongAssums[i]), sign(strongAssums[i])));
+    for(int i = 0 ; i<assumps.size() ; i++) m_assumps.push(Minisat::mkLit((int)var(assumps[i]), sign(assumps[i])));    
     bool res = slv->solve(m_assumps);
     if(res) {model.clear(); for(int i=0; i<nVars(); i++) model.push_back(modelValue(i)); }
     return res;
   }
+
   bool solve (const vec<Lit>& assumps, const vec<Lit>& mss) {
     //TODO
     Minisat::vec<Minisat::Lit> m_assumps, m_mss;
-    clone(assumps, m_assumps);
+    for(int i = 0 ; i<strongAssums.size() ; i++) m_assumps.push(Minisat::mkLit((int)var(strongAssums[i]), sign(strongAssums[i])));
+    for(int i = 0 ; i<assumps.size() ; i++) m_assumps.push(Minisat::mkLit((int)var(assumps[i]), sign(assumps[i])));    
+        
     clone(mss, m_mss);
     bool res = slv->solve(m_assumps, m_mss);
     if(res) {model.clear(); for(int i=0; i<nVars(); i++) model.push_back(modelValue(i)); }
     return res;
   }
+
   bool solve (const int lim) {
+    assert(0);
     bool res = slv->solve(lim);
     if(res) {model.clear(); for(int i=0; i<nVars(); i++) model.push_back(modelValue(i)); }
     return res;
