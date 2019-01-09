@@ -35,7 +35,8 @@ std::vector<int> DefaultIdealSemanticsSolver::justComputeOneExtension() {
 	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
 	solver->computeAllMss(NULL, dynAssumps);
 	std::vector<std::vector<int> > allMss = solver->getAllMss();
-	// TODO if one MSS, return it
+	// if one MSS, return it
+	if(allMss.size() == 1) return allMss[0];
 	std::vector<bool> argAllowed(varMap.nVars(), true);
 	int nMss = (signed) allMss.size();
 	for(int i=0; i<nMss; ++i) {
@@ -49,13 +50,18 @@ std::vector<int> DefaultIdealSemanticsSolver::justComputeOneExtension() {
 			argAllowed[j] = argAllowed[j]&argInMss[j];
 		}
 	}
-	// TODO if no allowed args, return empty extension
+	// if no allowed args, return empty extension
+	if(argAllowed.size() == 0) {
+		std::vector<int> empty;
+		return empty;
+	}
 	std::vector<int> assumps;
 	for(int i=0; i<varMap.nVars(); ++i) {
 		if(!argAllowed[i]) {
 			assumps.push_back(-i-1);
 		}
 	}
+	for(int i=0; i<dynAssumps.size(); ++i) assumps.push_back(dynAssumps[i]);
 	solver->computeMss(assumps);
 	return solver->getMss();
 }
