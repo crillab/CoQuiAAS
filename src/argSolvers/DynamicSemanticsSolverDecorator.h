@@ -4,6 +4,8 @@
 #include "SemanticsProblemSolver.h"
 #include "SatEncodingHelper.h"
 #include "SolverOutputFormatter.h"
+#include "DefaultRangeBasedSemanticsSolver.h"
+#include "DefaultSemistableSemanticsSolver.h"
 
 namespace CoQuiAAS {
 
