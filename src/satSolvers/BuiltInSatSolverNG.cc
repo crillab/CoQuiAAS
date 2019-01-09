@@ -16,13 +16,21 @@ BuiltInSatSolverNG::BuiltInSatSolverNG() {}
 
 
 void BuiltInSatSolverNG::buildSolver() {
-	if(!this->solver) this->solver = new MiniSatSolver();
-	if(!this->newFormula.nVars() && !this->newFormula.nHards()) return;
+	vec<Lit> ps;
+	if(!this->solver) {
+		this->solver = new MiniSatSolver();
+		for(int i=0; i<this->formula.nVars(); ++i) {
+			this->solver->newVar();
+		}
+		for(int i=0; i<this->formula.nHards() ;++i) {
+			this->formula.getHard(i, ps);
+			this->solver->addClause(ps);
+		}
+	}
 	for(int i=0; i<this->newFormula.nVars(); ++i) {
 		this->formula.newVar();
 		this->solver->newVar();
 	}
-	vec<Lit> ps;
 	for(int i=0; i<this->newFormula.nHards() ;++i) {
 		this->newFormula.getHard(i, ps);
 		this->formula.addHard(ps);
@@ -39,6 +47,7 @@ void BuiltInSatSolverNG::addVariables(int nVars) {
 
 void BuiltInSatSolverNG::addVariables(int nVars, bool auxVar) {
 	for(int i=0; i<nVars; ++i) this->newFormula.newVar();
+	if(!auxVar) this->realNVars += nVars;
 }
 
 
@@ -46,12 +55,12 @@ bool BuiltInSatSolverNG::addClause(std::vector<int> &clause) {
 	CMP::vec<CMP::Lit> cmpCl;
 	toCmpClause(clause, cmpCl);
 	this->newFormula.addHard(cmpCl);
-	return true; // TODO
+	return true;
 }
 
 
 int BuiltInSatSolverNG::addSelectedClause(std::vector<int> &clause) {
-	addVariables(1);
+	addVariables(1, true);
 	int selector = this->formula.nVars() + this->newFormula.nVars();
 	clause.push_back(-selector);
 	addClause(clause);
@@ -158,9 +167,6 @@ void BuiltInSatSolverNG::computeAllModels(std::function<void(std::vector<bool>&)
 		bool newModel = computeModel(assumps, false);
 		if(!newModel) break;
 		if(callback) callback(this->models[this->models.size()-1]);
-		/* std::cerr << "\nmodel:";
-		for(int i=0; i<this->models[this->models.size()-1].size(); ++i) std::cerr << " " << this->models[this->models.size()-1][i];
-		std::cerr << std::endl; */
 		int sel = addBlockingClause();
 		blockingSelectors.push_back(sel);
 		assumps.push_back(sel);
@@ -176,7 +182,7 @@ void BuiltInSatSolverNG::computeAllModels(std::function<void(std::vector<bool>&)
 int BuiltInSatSolverNG::addBlockingClause() {
 	vector<bool> model = this->models[this->models.size() - 1];
 	vector<int> intCl;
-	for(int i=0; i<this->formula.nVars(); ++i) {
+	for(int i=0; i<this->realNVars; ++i) {
 		intCl.push_back(model[i] ? -(i+1) : i+1);
 	}
 	return addSelectedClause(intCl);

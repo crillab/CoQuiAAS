@@ -65,7 +65,18 @@ void BuiltInMssSolverNG::computeSomeMsses(std::function<void(std::vector<int>&, 
 	config.appx = 0;
 	config.verb = 0;
 	config.nb = maxCount;
-	this->mcsEnumerator = new CoMSSEnum(this->newFormula, config);
+	for(int i=0; i<this->newFormula.nVars(); ++i) this->formula.newVar();
+	vec<Lit> ps;
+	for(int i=0; i<this->newFormula.nHards(); ++i) {
+		this->newFormula.getHard(i, ps);
+		this->formula.addHard(ps);
+	}
+	for(int i=0; i<this->newFormula.nSofts(); ++i) {
+		this->newFormula.getSoft(i, ps);
+		this->formula.addSoft(ps, this->formula.nSofts());
+	}
+	this->newFormula = WCNF();
+	this->mcsEnumerator = new CoMSSEnum(this->formula, config);
 	CMP::vec<CMP::Lit> assumptions;
 	for(std::vector<int>::iterator it = assumps.begin(); it != assumps.end(); ++it) {
 		int lit = *it;
@@ -134,64 +145,45 @@ std::vector<int>& BuiltInMssSolverNG::propagatedAtDecisionLvlZero(std::vector<in
 
 
 bool BuiltInMssSolverNG::isPropagatedAtDecisionLvlZero(int lit) {
-	//solver.setSoftInstance(false);
 	return BuiltInSatSolverNG::isPropagatedAtDecisionLvlZero(lit);
 }
 
 bool BuiltInMssSolverNG::isPropagatedAtDecisionLvlZero(int lit, std::vector<int> assumps) {
-	//solver.setSoftInstance(false);
 	return BuiltInSatSolverNG::isPropagatedAtDecisionLvlZero(lit, assumps);
 }
 
 
 bool BuiltInMssSolverNG::computeModel() {
-	/* solver.bigRestart();
-	solver.setSoftInstance(false);
-	solver.useAsCompleteSolver(); */
 	return BuiltInSatSolverNG::computeModel();
 }
 
 
 bool BuiltInMssSolverNG::computeModel(std::vector<int> &assumps) {
-	/* solver.bigRestart();
-	solver.setSoftInstance(false);
-	solver.useAsCompleteSolver(); */
 	return BuiltInSatSolverNG::computeModel(assumps);
 }
 
 
 void BuiltInMssSolverNG::computeAllModels(std::function<void(std::vector<bool>&)> callback) {
-	/* solver.verbosity = 0;
-	solver.bigRestart();
-	solver.setSoftInstance(false);
-	solver.optSaveMCS = false;
-	solver.useAsCompleteSolver(); */
 	BuiltInSatSolverNG::computeAllModels(callback);
 }
 
 
 void BuiltInMssSolverNG::computeAllModels(std::function<void(std::vector<bool>&)> callback, std::vector<int> &assumps) {
-	/* solver.bigRestart();
-	solver.setSoftInstance(false);
-	solver.useAsCompleteSolver(); */
 	BuiltInSatSolverNG::computeAllModels(callback, assumps);
 }
 
 
 bool BuiltInMssSolverNG::hasAModel() {
-	//solver.setSoftInstance(false);
 	return BuiltInSatSolverNG::hasAModel();
 }
 
 
 std::vector<bool>& BuiltInMssSolverNG::getModel() {
-	//solver.setSoftInstance(false);
 	return BuiltInSatSolverNG::getModel();
 }
 
 
 std::vector<std::vector<bool> >& BuiltInMssSolverNG::getModels() {
-	//solver.setSoftInstance(false);
 	return BuiltInSatSolverNG::getModels();
 }
 

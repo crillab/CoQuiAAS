@@ -93,6 +93,8 @@ private:
 
 	void buildSolver();
 
+	int realNVars = 0;
+
 };
 
 }

@@ -69,8 +69,6 @@ private:
 
 	CoMSSEnum *mcsEnumerator = NULL;
 
-	WCNF formula;
-
 	std::vector<std::vector<int> > mss;
 
 	void clearMss();
