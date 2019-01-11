@@ -33,25 +33,28 @@ void DefaultIdealSemanticsSolver::computeOneExtension() {
 
 std::vector<int> DefaultIdealSemanticsSolver::justComputeOneExtension() {
 	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
-	solver->computeAllMss(NULL, dynAssumps);
-	std::vector<std::vector<int> > allMss = solver->getAllMss();
-	// if one MSS, return it
-	if(allMss.size() == 1) return allMss[0];
+	std::vector<std::vector<int> > allMss;
 	std::vector<bool> argAllowed(varMap.nVars(), true);
-	int nMss = (signed) allMss.size();
-	for(int i=0; i<nMss; ++i) {
-		std::vector<int> mss = allMss[i];
+	bool noAllowedArgs = false;
+	solver->computeAllMss([this, &allMss, &argAllowed, &noAllowedArgs](std::vector<int>& mss, std::vector<bool>& model){
+		allMss.push_back(mss);
 		std::vector<bool> argInMss(varMap.nVars(), false);
-		int mssSize = (int) mss.size();
-		for(int j=0; j<mssSize; ++j) {
+		bool noneAllowed = true;
+		for(int j=0; j<mss.size(); ++j) {
 			argInMss[mss[j]-1] = true;
 		}
 		for(int j=0; j<varMap.nVars(); ++j) {
-			argAllowed[j] = argAllowed[j]&argInMss[j];
+			bool allowed = argAllowed[j]&argInMss[j];
+			argAllowed[j] = allowed;
+			noneAllowed &= !allowed;
 		}
-	}
-	// if no allowed args, return empty extension
-	if(argAllowed.size() == 0) {
+		if(noneAllowed) {
+			this->solver->stopMssEnum();
+			noAllowedArgs = true;
+		}
+	}, dynAssumps);
+	if(allMss.size() == 1) return allMss[0];
+	if(noAllowedArgs) {
 		std::vector<int> empty;
 		return empty;
 	}
