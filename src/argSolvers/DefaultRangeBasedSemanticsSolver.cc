@@ -44,6 +44,7 @@ std::vector<std::vector<bool>> DefaultRangeBasedSemanticsSolver::computeAllExten
 	}, dynAssumps);
 	solver->resetAllMss();
 	solver->resetModels();
+	if(this->stopEnum) return extModels;
 	int nVars = varMap.nVars();
 	std::vector<int> selectors;
 	for(int i=0; i<nVars; ++i) {
@@ -77,6 +78,7 @@ std::vector<std::vector<bool>> DefaultRangeBasedSemanticsSolver::computeAllExten
 		unitCl.push_back(-blockingSel);
 		solver->addClause(unitCl);
 		solver->resetModels();
+		if(this->stopEnum) break;
 	}
 	for(int i=0; i<(signed)selectors.size(); ++i) {
 		std::vector<int> cl;
