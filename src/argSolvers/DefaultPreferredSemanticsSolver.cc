@@ -64,29 +64,15 @@ void DefaultPreferredSemanticsSolver::isCredulouslyAccepted() {
 
 void DefaultPreferredSemanticsSolver::isSkepticallyAccepted() {
 	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
-	solver->computeAllMss(NULL, dynAssumps); // TODO stop during search if needed
-	std::vector<std::vector<int> > allMss = solver->getAllMss();
+	bool status = true;
 	int arg = varMap.getVar(this->acceptanceQueryArgument);
-	for(unsigned int i=0; i<allMss.size(); ++i) {
-		std::vector<int> mss = allMss[i];
-		/*std::cerr << "mss:";
-		for(int i=0; i<mss.size(); ++i) {
-			std::cerr << " " << mss[i];
+	this->solver->computeAllMss([this,arg,&status](std::vector<int>& mss, std::vector<bool>& model){
+		if(!model[arg-1]) {
+			status = false;
+			this->solver->stopMssEnum();
 		}
-		std::cerr << std::endl;*/
-		bool found = false;
-		for(unsigned int j=0; j<mss.size(); ++j) {
-			if(mss[j] == arg) {
-				found = true;
-				break;
-			}
-		}
-		if(!found) {
-			this->formatter.writeArgAcceptance(false);
-			return;
-		}
-	}
-	this->formatter.writeArgAcceptance(true);
+	}, dynAssumps);
+	this->formatter.writeArgAcceptance(status);
 }
 
 
