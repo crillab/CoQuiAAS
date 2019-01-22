@@ -32,6 +32,7 @@
 #include "ParserFactory.h"
 #include "SolverOutputFormatter.h"
 #include "SolverOutputFormatterFactory.h"
+#include "Logger.h"
 
 
 #define MAIN_UNSUPPORTED_FILE_FORMAT_MSG "ERR:: UNSUPPORTED FILE FORMAT"
@@ -44,7 +45,7 @@ pthread_t timeoutTh;
 clock_t clk;
 
 
-inline bool undefinedArgument(string arg, VarMap& map){
+inline bool undefinedArgument(std::string arg, VarMap& map){
 	return !map.contains(arg);
 }
 
@@ -60,26 +61,27 @@ int main(int argc, char** argv){
 
 	CommandLineHelper clh = CommandLineHelper(argc, argv);
 	clh.parseCommandLine();
+	Logger::getInstance()->info("CoQuiAAS start");
 	if(clh.mustExitNow()) return clh.errorInCommandLine() ? 1 : 0;
 	StatMapFactory::createInstance(clh.getAdditionalParams().find("--printStats") == clh.getAdditionalParams().end());
 
 	// handle timeout (if any)
 	if(clh.getAdditionalParams().find("-timeout") != clh.getAdditionalParams().end()) {
-		string strTimeout = clh.getAdditionalParameter("-timeout");
+		std::string strTimeout = clh.getAdditionalParameter("-timeout");
 		pthread_create(&timeoutTh, NULL, handleTimeout, &strTimeout);
 		pthread_detach(timeoutTh);
 	}
 
 	// parse instance depending on the format and the file
-	ifstream file(clh.getInstanceFile().c_str(),ios::in);
+	std::ifstream file(clh.getInstanceFile().c_str(),std::ios::in);
 	std::unique_ptr<IParser> parser = ParserFactory::getParserInstance(clh.getInstanceFormat(), &file);
 	if(!parser) {
-		cerr << MAIN_UNSUPPORTED_FILE_FORMAT_MSG << endl;
+		std::cerr << MAIN_UNSUPPORTED_FILE_FORMAT_MSG << std::endl;
 		return 2;
 	}
 	parser->parseInstance();
 	if(clh.getSemantics().isDynamic()) {
-		ifstream dynfile(clh.getDynamicsFile().c_str(),ios::in);
+		std::ifstream dynfile(clh.getDynamicsFile().c_str(),std::ios::in);
 		parser->parseDynamics(&dynfile);
 		dynfile.close();
 	}
@@ -92,7 +94,7 @@ int main(int argc, char** argv){
 	std::unique_ptr<SemanticsProblemSolver> problem = SolverFactory::getProblemInstance(clh.getSemantics(), clh.getTaskType(), clh.getAdditionalParams(), parser->getAttacks(), parser->getVarMap(), *formatter);
 	if(!clh.getAdditionalParameter("-a").empty()){
 		if(undefinedArgument(clh.getAdditionalParameter("-a"),parser->getVarMap())){
-			cout << "UNDEFINED" << endl ;
+			std::cout << "UNDEFINED" << std::endl ;
 			return -1;
 		}
 		problem->setAcceptanceQueryArgument(clh.getAdditionalParameter("-a"));
@@ -105,12 +107,13 @@ int main(int argc, char** argv){
 
 	std::cout << std::endl;
 	delete formatter;
+	Logger::getInstance()->info("CoQuiAAS end");
 	return 0;
 }
 
 
 void setInitStats(CommandLineHelper& clh, std::unique_ptr<IParser> const &parser) {
-  std::shared_ptr<StatMap> statMap = make_shared<FakeStatMap>();
+  std::shared_ptr<StatMap> statMap = std::make_shared<FakeStatMap>();
 	statMap->setStat("solver", "CoQuiAAS v1.0");
 	statMap->setStat("instance", clh.getInstanceFile());
 	statMap->setStat("","");
@@ -139,7 +142,7 @@ void *handleTimeout(void *strSeconds) {
 	int retVal = 0;
 	std::shared_ptr<StatMap> statMap = statMap;
 
-	sscanf(((string*)strSeconds)->c_str(), "%d", &nSec);
+	sscanf(((std::string*)strSeconds)->c_str(), "%d", &nSec);
 	if(nSec <= 0) {
 		statMap->setStat("timeout (s)", "INVALID_VAL");
 		retVal = 1;

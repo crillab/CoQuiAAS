@@ -25,4 +25,10 @@ AC_PROG_CXX
 
 AX_CHECK_ZLIB
 
+AX_BOOST_BASE([1.54],,[AC_MSG_ERROR([CoQuiAAS needs Boost, but it was not found in your system])])
+AX_BOOST_LOG([1.54],,[AC_MSG_ERROR([CoQuiAAS needs Boost_LOG, but it was not found in your system])])
+AX_BOOST_LOG_SETUP([1.54],,[AC_MSG_ERROR([CoQuiAAS needs Boost_LOG_SETUP, but it was not found in your system])])
+AX_BOOST_SYSTEM([1.54],,[AC_MSG_ERROR([CoQuiAAS needs Boost_SYSTEM, but it was not found in your system])])
+AX_BOOST_THREAD([1.54],,[AC_MSG_ERROR([CoQuiAAS needs Boost_THREAD, but it was not found in your system])])
+
 AC_OUTPUT(Makefile resources/Makefile src/Makefile doc/Makefile)

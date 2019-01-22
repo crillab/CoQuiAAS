@@ -1,4 +1,5 @@
 #include "CommandLineHelper.h"
+#include "Logger.h"
 
 
 #define CLH_MISS_FORMED_MSG "ERR:: WRONG USAGE\n\
@@ -87,6 +88,11 @@ void CommandLineHelper::parseCommandLine() {
     if(!args[i].compare("-of")) {
       if(!assertWellFormed(++i < args.size())) return;
       outputFormatter = args[i];
+      continue;
+    }
+    if(!args[i].compare("-log")) {
+      if(!assertWellFormed(++i < args.size())) return;
+      Logger::getInstance()->addFile(args[i]);
       continue;
     }
     if(!args[i].compare("--formats")) {
