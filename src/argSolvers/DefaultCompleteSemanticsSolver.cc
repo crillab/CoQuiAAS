@@ -65,5 +65,7 @@ void DefaultCompleteSemanticsSolver::isSkepticallyAccepted() {
 }
 
 
-DefaultCompleteSemanticsSolver::~DefaultCompleteSemanticsSolver() {}
+DefaultCompleteSemanticsSolver::~DefaultCompleteSemanticsSolver() {
+	delete this->helper;
+}
 

@@ -57,6 +57,10 @@ public:
 
 	virtual ~SatSolver() {}
 
+	void setBlockingClauseFunction(std::function<std::vector<int>(std::vector<bool>&)> function) {
+		this->blockingClauseFunction = function;
+	}
+
 protected:
 
 	static void intClauseToBuiltInClause(std::vector<int>& intCl, Minisat::vec<Minisat::Lit>& minisatCl) {
@@ -74,6 +78,14 @@ protected:
 		}
 		std::cout << 0 << std::endl;
 	}
+
+	std::function<std::vector<int>(std::vector<bool>&)> blockingClauseFunction = [](std::vector<bool>& model) -> std::vector<int> {
+		vector<int> intCl;
+		for(int i=0; i<model.size(); ++i) {
+			intCl.push_back(model[i] ? -(i+1) : i+1);
+		}
+		return intCl;
+	};
 };
 
 

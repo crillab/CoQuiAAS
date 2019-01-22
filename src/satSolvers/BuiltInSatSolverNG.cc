@@ -12,7 +12,15 @@
 using namespace CoQuiAAS;
 
 
-BuiltInSatSolverNG::BuiltInSatSolverNG() {}
+BuiltInSatSolverNG::BuiltInSatSolverNG() {
+	this->setBlockingClauseFunction([this](std::vector<bool>& model) -> std::vector<int> {
+		vector<int> intCl;
+		for(int i=0; i<this->realNVars; ++i) {
+			intCl.push_back(model[i] ? -(i+1) : i+1);
+		}
+		return intCl;
+	});
+}
 
 
 void BuiltInSatSolverNG::buildSolver() {
@@ -166,8 +174,10 @@ void BuiltInSatSolverNG::computeAllModels(std::function<void(std::vector<bool>&)
 	for(;;) {
 		bool newModel = computeModel(assumps, false);
 		if(!newModel) break;
-		if(callback) callback(this->models[this->models.size()-1]);
-		int sel = addBlockingClause();
+        std::vector<bool> model = this->models[this->models.size()-1];
+        if(callback) callback(model);
+        std::vector<int> blockingCl = this->blockingClauseFunction(model);
+        int sel = addSelectedClause(blockingCl);
 		blockingSelectors.push_back(sel);
 		assumps.push_back(sel);
 	}
@@ -176,16 +186,6 @@ void BuiltInSatSolverNG::computeAllModels(std::function<void(std::vector<bool>&)
 		cl.push_back(-blockingSelectors[i]);
 		addClause(cl);
 	}
-}
-
-
-int BuiltInSatSolverNG::addBlockingClause() {
-	vector<bool> model = this->models[this->models.size() - 1];
-	vector<int> intCl;
-	for(int i=0; i<this->realNVars; ++i) {
-		intCl.push_back(model[i] ? -(i+1) : i+1);
-	}
-	return addSelectedClause(intCl);
 }
 
 
@@ -217,5 +217,7 @@ void BuiltInSatSolverNG::toCmpClause(std::vector<int> &clause, CMP::vec<CMP::Lit
 	}
 }
 
-BuiltInSatSolverNG::~BuiltInSatSolverNG() {}
+BuiltInSatSolverNG::~BuiltInSatSolverNG() {
+	// delete this->solver;
+}
 

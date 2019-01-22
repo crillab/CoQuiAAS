@@ -5,7 +5,15 @@ using namespace CoQuiAAS;
 
 
 DefaultRangeBasedSemanticsSolver::DefaultRangeBasedSemanticsSolver(std::shared_ptr<MssSolver> solver, Attacks &attacks, VarMap &varMap, TaskType taskType, SolverOutputFormatter &formatter):
-	SemanticsProblemSolver(attacks, varMap, taskType, formatter), solver(solver) {}
+	SemanticsProblemSolver(attacks, varMap, taskType, formatter), solver(solver) {
+	this->solver->setBlockingClauseFunction([this](std::vector<bool>& model) -> std::vector<int> {
+		std::vector<int> intCl;
+		for(int i=0; i<this->varMap.nVars(); ++i) {
+			if(model[i]) intCl.push_back(-i-1);
+		}
+		return intCl;
+	});
+}
 
 
 void DefaultRangeBasedSemanticsSolver::computeOneExtension() {

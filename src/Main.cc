@@ -88,8 +88,8 @@ int main(int argc, char** argv){
 	// initialize the StatMap
 	setInitStats(clh, parser);
 	// request a semantic instance depending on the problem to compute
-	SolverOutputFormatter& formatter = *SolverOutputFormatterFactory::getInstance(clh.getOutputFormatter(), parser->getVarMap(), [] (std::string s) {std::cout << s; std::cout.flush();});
-	std::unique_ptr<SemanticsProblemSolver> problem = SolverFactory::getProblemInstance(clh.getSemantics(), clh.getTaskType(), clh.getAdditionalParams(), parser->getAttacks(), parser->getVarMap(), formatter);
+	SolverOutputFormatter* formatter = SolverOutputFormatterFactory::getInstance(clh.getOutputFormatter(), parser->getVarMap(), [] (std::string s) {std::cout << s; std::cout.flush();});
+	std::unique_ptr<SemanticsProblemSolver> problem = SolverFactory::getProblemInstance(clh.getSemantics(), clh.getTaskType(), clh.getAdditionalParams(), parser->getAttacks(), parser->getVarMap(), *formatter);
 	if(!clh.getAdditionalParameter("-a").empty()){
 		if(undefinedArgument(clh.getAdditionalParameter("-a"),parser->getVarMap())){
 			cout << "UNDEFINED" << endl ;
@@ -104,6 +104,7 @@ int main(int argc, char** argv){
 	// display statistics (if StatMap is not "fake")
 
 	std::cout << std::endl;
+	delete formatter;
 	return 0;
 }
 
