@@ -50,7 +50,7 @@ CMP      = cmp#       Name of CMP main executable.
 CMP_SLIB = lib$(CMP).a#  Name of CMP static library.
 
 
-CMP_CXXFLAGS = -I. -D __STDC_LIMIT_MACROS -D __STDC_FORMAT_MACROS -Wall -Wno-parentheses -Wextra -Wno-unused-parameter -Wno-literal-suffix -Wno-class-memaccess -Wno-misleading-indentation -Wno-shift-negative-value -Wno-unused-but-set-variable -Wno-sign-compare -Wno-reorder -Walloc-size-larger-than=18446744073709551615
+CMP_CXXFLAGS = -I. -D __STDC_LIMIT_MACROS -D __STDC_FORMAT_MACROS -Wall -Wno-parentheses -Wextra -Wno-unused-parameter -Wno-literal-suffix -Wno-class-memaccess -Wno-misleading-indentation -Wno-shift-negative-value -Wno-unused-but-set-variable -Wno-sign-compare -Wno-reorder
 CMP_LDFLAGS  = -Wall -lz
 
 ECHO=@echo
