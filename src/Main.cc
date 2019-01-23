@@ -35,9 +35,6 @@
 #include "Logger.h"
 
 
-#define MAIN_UNSUPPORTED_FILE_FORMAT_MSG "ERR:: UNSUPPORTED FILE FORMAT"
-
-
 using namespace CoQuiAAS;
 
 
@@ -68,17 +65,31 @@ int main(int argc, char** argv){
 	// handle timeout (if any)
 	if(clh.getAdditionalParams().find("-timeout") != clh.getAdditionalParams().end()) {
 		std::string strTimeout = clh.getAdditionalParameter("-timeout");
+		Logger::getInstance()->info("timeout set to %s seconds", strTimeout);
 		pthread_create(&timeoutTh, NULL, handleTimeout, &strTimeout);
 		pthread_detach(timeoutTh);
+	} else {
+		Logger::getInstance()->info("no timeout set");
 	}
 
 	// parse instance depending on the format and the file
-	std::ifstream file(clh.getInstanceFile().c_str(),std::ios::in);
-	std::unique_ptr<IParser> parser = ParserFactory::getParserInstance(clh.getInstanceFormat(), &file);
-	if(!parser) {
-		std::cerr << MAIN_UNSUPPORTED_FILE_FORMAT_MSG << std::endl;
-		return 2;
+	InstanceFormat instanceFormat = ParserFactory::getInstanceFormat(clh.getInstanceFormat());
+	if(instanceFormat == FORMAT_UNDEFINED) {
+		Logger::getInstance()->fatal("unsupported file format: %s", clh.getInstanceFormat().c_str());
+		cerr << CommandLineHelper::USAGE << endl;
+		return 1;
 	}
+	std::ifstream file(clh.getInstanceFile().c_str(),std::ios::in);
+	if(!file.good()) {
+		Logger::getInstance()->fatal("cannot read input file: %s", clh.getInstanceFile().c_str());
+		cerr << CommandLineHelper::USAGE << endl;
+		return 1;
+	}
+	char *real_path = realpath(clh.getInstanceFile().c_str(), NULL);
+	std::string filename = real_path;
+	free(real_path);
+	std::unique_ptr<IParser> parser = ParserFactory::getParserInstance(instanceFormat, &file);
+	Logger::getInstance()->info("parsing instance file %s", filename.c_str());
 	parser->parseInstance();
 	if(clh.getSemantics().isDynamic()) {
 		std::ifstream dynfile(clh.getDynamicsFile().c_str(),std::ios::in);
@@ -91,6 +102,11 @@ int main(int argc, char** argv){
 	setInitStats(clh, parser);
 	// request a semantic instance depending on the problem to compute
 	SolverOutputFormatter* formatter = SolverOutputFormatterFactory::getInstance(clh.getOutputFormatter(), parser->getVarMap(), [] (std::string s) {std::cout << s; std::cout.flush();});
+	if(clh.getSemantics().getName() == SEM_UNDEFINED || clh.getTaskType() == TASK_UNDEFINED) {
+		Logger::getInstance()->fatal("unsupported task: %s", clh.getTask().c_str());
+		cerr << CommandLineHelper::USAGE << endl;
+		return 1;
+	}
 	std::unique_ptr<SemanticsProblemSolver> problem = SolverFactory::getProblemInstance(clh.getSemantics(), clh.getTaskType(), clh.getAdditionalParams(), parser->getAttacks(), parser->getVarMap(), *formatter);
 	if(!clh.getAdditionalParameter("-a").empty()){
 		if(undefinedArgument(clh.getAdditionalParameter("-a"),parser->getVarMap())){
@@ -107,6 +123,7 @@ int main(int argc, char** argv){
 
 	std::cout << std::endl;
 	delete formatter;
+	Logger::getInstance()->info("computation time: %.3fs", (double)(clock()-clk)/CLOCKS_PER_SEC);
 	Logger::getInstance()->info("CoQuiAAS end");
 	return 0;
 }

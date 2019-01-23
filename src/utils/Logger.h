@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
+#include <cstdarg>
 
 #include <boost/log/core.hpp>
 #include <boost/log/trivial.hpp>
@@ -34,37 +36,65 @@ namespace CoQuiAAS {
             );
         }
 
-        void trace(std::string msg) {
+        void trace(const char *format, ...) {
             if(!this->enabled) return;
-            BOOST_LOG_TRIVIAL(trace) << msg;
+            va_list args;
+            va_start(args, format);
+            vsnprintf(this->buffer, this->BUF_SIZE, format, args);
+            va_end(args);
+            BOOST_LOG_TRIVIAL(trace) << this->buffer;
         }
 
-        void debug(std::string msg) {
+        void debug(const char *format, ...) {
             if(!this->enabled) return;
-            BOOST_LOG_TRIVIAL(debug) << msg;
+            va_list args;
+            va_start(args, format);
+            vsnprintf(this->buffer, this->BUF_SIZE, format, args);
+            va_end(args);
+            BOOST_LOG_TRIVIAL(debug) << this->buffer;
         }
 
-        void info(std::string msg) {
+        void info(const char *format, ...) {
             if(!this->enabled) return;
-            BOOST_LOG_TRIVIAL(info) << msg;
+            va_list args;
+            va_start(args, format);
+            vsnprintf(this->buffer, this->BUF_SIZE, format, args);
+            va_end(args);
+            BOOST_LOG_TRIVIAL(info) << this->buffer;
         }
 
-        void warning(std::string msg) {
+        void warning(const char *format, ...) {
             if(!this->enabled) return;
-            BOOST_LOG_TRIVIAL(warning) << msg;
+            va_list args;
+            va_start(args, format);
+            vsnprintf(this->buffer, this->BUF_SIZE, format, args);
+            va_end(args);
+            BOOST_LOG_TRIVIAL(warning) << this->buffer;
         }
 
-        void error(std::string msg) {
+        void error(const char *format, ...) {
             if(!this->enabled) return;
-            BOOST_LOG_TRIVIAL(error) << msg;
+            va_list args;
+            va_start(args, format);
+            vsnprintf(this->buffer, this->BUF_SIZE, format, args);
+            va_end(args);
+            BOOST_LOG_TRIVIAL(error) << this->buffer;
         }
 
-        void fatal(std::string msg) {
+        void fatal(const char *format, ...) {
             if(!this->enabled) return;
-            BOOST_LOG_TRIVIAL(fatal) << msg;
+            va_list args;
+            va_start(args, format);
+            vsnprintf(this->buffer, this->BUF_SIZE, format, args);
+            va_end(args);
+            BOOST_LOG_TRIVIAL(fatal) << this->buffer;
         }
 
     private:
+
+        static const unsigned int BUF_SIZE = 2048;
+
+        char buffer[BUF_SIZE];
 
         static Logger* instance;
 
