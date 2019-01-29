@@ -31,6 +31,7 @@ void DefaultPreferredSemanticsSolver::init() {
 
 
 void DefaultPreferredSemanticsSolver::computeOneExtension() {
+	clock_t startTime = clock();
 	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
 	solver->computeMss(dynAssumps);
 	if(!solver->hasAMss()) {
@@ -39,30 +40,39 @@ void DefaultPreferredSemanticsSolver::computeOneExtension() {
 	}
 	std::vector<int> mss = solver->getMss();
 	this->formatter.writeSingleExtension(mss);
+	logSingleExtTime(startTime);
 }
 
 
 void DefaultPreferredSemanticsSolver::computeAllExtensions() {
+	clock_t globalStartTime = clock();
 	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
 	this->formatter.writeExtensionListBegin();
-	bool first = true;
-	solver->computeAllMss([this, &first](std::vector<int>& mss, std::vector<bool>& model){
-		this->formatter.writeExtensionListElmt(mss, first);
-		first = false;
+	int extIndex = 1;
+	clock_t startTime = clock();
+	solver->computeAllMss([this, &extIndex, &startTime](std::vector<int>& mss, std::vector<bool>& model){
+		this->formatter.writeExtensionListElmt(mss, extIndex == 1);
+		extIndex++;
+		startTime = clock();
 	}, dynAssumps);
+	logNoMoreExts(startTime);
 	this->formatter.writeExtensionListEnd();
+	logAllExtsTime(globalStartTime);
 }
 
 
 void DefaultPreferredSemanticsSolver::isCredulouslyAccepted() {
+	clock_t startTime = clock();
 	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
 	dynAssumps.push_back(varMap.getVar(this->acceptanceQueryArgument));
 	solver->computeModel(dynAssumps);
 	this->formatter.writeArgAcceptance(solver->hasAModel());
+	logAcceptanceCheckingTime(startTime);
 }
 
 
 void DefaultPreferredSemanticsSolver::isSkepticallyAccepted() {
+	clock_t startTime = clock();
 	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
 	bool status = true;
 	int arg = varMap.getVar(this->acceptanceQueryArgument);
@@ -73,6 +83,7 @@ void DefaultPreferredSemanticsSolver::isSkepticallyAccepted() {
 		}
 	}, dynAssumps);
 	this->formatter.writeArgAcceptance(status);
+	logAcceptanceCheckingTime(startTime);
 }
 
 

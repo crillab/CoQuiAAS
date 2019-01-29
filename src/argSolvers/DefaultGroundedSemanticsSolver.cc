@@ -16,7 +16,6 @@ DefaultGroundedSemanticsSolver::DefaultGroundedSemanticsSolver(std::shared_ptr<S
 
 
 void DefaultGroundedSemanticsSolver::init() {
-	// SatEncodingHelper helper(this->solver, this->attacks, this->varMap);
 	this->helper = new SatEncodingHelper(solver, attacks, varMap);
 	int disjId = this->helper->reserveDisjunctionVars();
 	this->helper->createAttackersDisjunctionVars(disjId);
@@ -25,25 +24,32 @@ void DefaultGroundedSemanticsSolver::init() {
 
 
 void DefaultGroundedSemanticsSolver::computeOneExtension() {
+	clock_t startTime = clock();
 	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
 	std::vector<int>& propagated = solver->propagatedAtDecisionLvlZero(dynAssumps);
 	this->formatter.writeSingleExtension(propagated);
+	logSingleExtTime(startTime);
 }
 
 
 void DefaultGroundedSemanticsSolver::computeAllExtensions() {
+	clock_t startTime = clock();
 	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
 	std::vector<int>& propagated = solver->propagatedAtDecisionLvlZero(dynAssumps);
 	this->formatter.writeExtensionListBegin();
 	this->formatter.writeExtensionListElmt(propagated, true);
 	this->formatter.writeExtensionListEnd();
+	logOneExtTime(startTime, 1);
+	logAllExtsTime(startTime);
 }
 
 
 void DefaultGroundedSemanticsSolver::isCredulouslyAccepted() {
+	clock_t startTime = clock();
 	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
 	bool isPropagated = solver->isPropagatedAtDecisionLvlZero(varMap.getVar(this->acceptanceQueryArgument), dynAssumps);
 	this->formatter.writeArgAcceptance(isPropagated);
+	logAcceptanceCheckingTime(startTime);
 }
 
 

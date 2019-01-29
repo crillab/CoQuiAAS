@@ -94,7 +94,7 @@ void CommandLineHelper::parseCommandLine() {
     }
     if(!args[i].compare("-log")) {
       if(!assertWellFormed(++i < args.size())) return;
-      Logger::getInstance()->addFile(args[i]);
+      Logger::getInstance()->setFile(args[i]);
       continue;
     }
     if(!args[i].compare("--formats")) {

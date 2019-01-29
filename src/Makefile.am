@@ -1,4 +1,4 @@
-AM_CPPFLAGS = -g -Wall -Wno-unknown-warning-option -Wno-parentheses -D __STDC_LIMIT_MACROS -D __STDC_FORMAT_MACROS -DBOOST_LOG_DYN_LINK -I$(srcdir)/outputFormatters -I$(srcdir)/specs -I$(srcdir)/utils -I$(srcdir)/parser -I$(srcdir)/satSolvers -I$(srcdir)/argSolvers -I$(top_srcdir)/resources/comssextractor_ng/
+AM_CPPFLAGS = -g -Wall -Wno-unknown-warning-option -Wno-parentheses -Wno-class-memaccess -D __STDC_LIMIT_MACROS -D __STDC_FORMAT_MACROS -I$(srcdir)/outputFormatters -I$(srcdir)/specs -I$(srcdir)/utils -I$(srcdir)/parser -I$(srcdir)/satSolvers -I$(srcdir)/argSolvers -I$(top_srcdir)/resources/comssextractor_ng/
 
 ## CoQuiAAS source files
 satSolversDirSources = satSolvers/SatSolver.h satSolvers/MssSolver.h satSolvers/ExternalSatSolver.cc satSolvers/ExternalSatSolver.h satSolvers/BuiltInMssSolverNG.cc satSolvers/BuiltInMssSolverNG.h satSolvers/BuiltInSatSolverNG.cc satSolvers/BuiltInSatSolverNG.h satSolvers/MaxSatSolver.h satSolvers/ExternalMaxSatSolver.h satSolvers/ExternalMaxSatSolver.cc satSolvers/LbxCoMssSolver.h satSolvers/LbxCoMssSolver.cc satSolvers/ExternalCoMssSolver.h satSolvers/ExternalCoMssSolver.cc
@@ -21,4 +21,4 @@ __top_builddir__lib_libcoquiaas_a_LIBADD = $(comssextractorObjs)
 bin_PROGRAMS = $(top_builddir)/bin/CoQuiAAS
 __top_builddir__bin_CoQuiAAS_SOURCES = $(srcDirSources)
 __top_builddir__bin_CoQuiAAS_LDADD = $(top_builddir)/lib/libcoquiaas.a
-__top_builddir__bin_CoQuiAAS_LDFLAGS = -lpthread $(BOOST_LDFLAGS) -lboost_log -lboost_log_setup -lboost_system -lboost_thread
+__top_builddir__bin_CoQuiAAS_LDFLAGS = -lpthread

@@ -81,7 +81,7 @@ protected:
 
 	std::function<std::vector<int>(std::vector<bool>&)> blockingClauseFunction = [](std::vector<bool>& model) -> std::vector<int> {
 		vector<int> intCl;
-		for(int i=0; i<model.size(); ++i) {
+		for(unsigned int i=0; i<model.size(); ++i) {
 			intCl.push_back(model[i] ? -(i+1) : i+1);
 		}
 		return intCl;

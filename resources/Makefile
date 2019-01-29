@@ -89,10 +89,10 @@ build_triplet = x86_64-unknown-linux-gnu
 host_triplet = x86_64-unknown-linux-gnu
 subdir = resources
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
-	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
-	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
-	$(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/m4/ax_check_zlib.m4 \
+	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
+	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
+	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am $(am__DIST_COMMON)
@@ -134,11 +134,11 @@ CC = gcc
 CCDEPMODE = depmode=gcc3
 CFLAGS = -g -O2
 CPP = gcc -E
-CPPFLAGS = 
+CPPFLAGS =  -I/usr/include -I/usr/include
 CXX = g++
 CXXCPP = g++ -E
 CXXDEPMODE = depmode=gcc3
-CXXFLAGS =  -std=c++11 -Wno-literal-suffix -g -O0 -DCOQUIAAS_VERSION=2.0 -pg
+CXXFLAGS =  -std=c++11 -Wno-literal-suffix -g -O3 -DCOQUIAAS_VERSION=3.0
 CYGPATH_W = echo
 DEFS = -DHAVE_CONFIG_H
 DEPDIR = .deps
@@ -153,16 +153,15 @@ EGREP = /bin/grep -E
 EXEEXT = 
 FGREP = /bin/grep -F
 GREP = /bin/grep
-HAVE_PKGCONFIG = 1
 INSTALL = /usr/bin/install -c
 INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
 INSTALL_SCRIPT = ${INSTALL}
 INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
 LD = /usr/bin/ld -m elf_x86_64
-LDFLAGS = 
+LDFLAGS =  -L/usr/lib -L/usr/lib
 LIBOBJS = 
-LIBS = 
+LIBS = -lz 
 LIBTOOL = $(SHELL) $(top_builddir)/libtool
 LIPO = 
 LN_S = ln -s
@@ -185,9 +184,6 @@ PACKAGE_TARNAME = coquiaas
 PACKAGE_URL = 
 PACKAGE_VERSION = 2.0
 PATH_SEPARATOR = :
-PKG_CONFIG = /usr/bin/pkg-config
-PKG_CONFIG_LIBDIR = 
-PKG_CONFIG_PATH = 
 RANLIB = ranlib
 SED = /bin/sed
 SET_MAKE = 
@@ -228,8 +224,6 @@ htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
 install_sh = ${SHELL} /home/lonca/projects/CoQuiAAS/config/install-sh
-libcppunit_CFLAGS = 
-libcppunit_LIBS = -lcppunit
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale

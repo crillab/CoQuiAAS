@@ -26,8 +26,10 @@ void DefaultIdealSemanticsSolver::init() {
 
 
 void DefaultIdealSemanticsSolver::computeOneExtension() {
+	clock_t startTime = clock();
 	std::vector<int> mss = justComputeOneExtension();
 	this->formatter.writeSingleExtension(mss);
+	logSingleExtTime(startTime);
 }
 
 
@@ -40,7 +42,7 @@ std::vector<int> DefaultIdealSemanticsSolver::justComputeOneExtension() {
 		allMss.push_back(mss);
 		std::vector<bool> argInMss(varMap.nVars(), false);
 		bool noneAllowed = true;
-		for(int j=0; j<mss.size(); ++j) {
+		for(unsigned int j=0; j<mss.size(); ++j) {
 			argInMss[mss[j]-1] = true;
 		}
 		for(int j=0; j<varMap.nVars(); ++j) {
@@ -64,21 +66,25 @@ std::vector<int> DefaultIdealSemanticsSolver::justComputeOneExtension() {
 			assumps.push_back(-i-1);
 		}
 	}
-	for(int i=0; i<dynAssumps.size(); ++i) assumps.push_back(dynAssumps[i]);
+	for(unsigned int i=0; i<dynAssumps.size(); ++i) assumps.push_back(dynAssumps[i]);
 	solver->computeMss(assumps);
 	return solver->getMss();
 }
 
 
 void DefaultIdealSemanticsSolver::computeAllExtensions() {
+	clock_t startTime = clock();
 	std::vector<int> mss = justComputeOneExtension();
 	this->formatter.writeExtensionListBegin();
 	this->formatter.writeExtensionListElmt(mss, true);
 	this->formatter.writeExtensionListEnd();
+	logOneExtTime(startTime, 1);
+	logNoMoreExts(startTime);
 }
 
 
 void DefaultIdealSemanticsSolver::isCredulouslyAccepted() {
+	clock_t startTime = clock();
 	std::vector<int> mss = justComputeOneExtension();
 	int arg = varMap.getVar(this->acceptanceQueryArgument);
 	for(unsigned int j=0; j<mss.size(); ++j) {
@@ -88,6 +94,7 @@ void DefaultIdealSemanticsSolver::isCredulouslyAccepted() {
 		}
 	}
 	this->formatter.writeArgAcceptance(false);
+	logAcceptanceCheckingTime(startTime);
 }
 
 

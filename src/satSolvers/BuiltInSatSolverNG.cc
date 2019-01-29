@@ -27,8 +27,9 @@ void BuiltInSatSolverNG::buildSolver() {
 	vec<Lit> ps;
 	if(!this->solver) {
 		this->solver = new MiniSatSolver();
+		this->solver->slv->phase_saving = 0;
 		for(int i=0; i<this->formula.nVars(); ++i) {
-			this->solver->newVar();
+			this->solver->newVar(true, this->solver->nVars()+1 <= this->realNVars);
 		}
 		for(int i=0; i<this->formula.nHards() ;++i) {
 			this->formula.getHard(i, ps);

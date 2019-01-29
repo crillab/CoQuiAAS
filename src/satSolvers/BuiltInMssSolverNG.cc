@@ -77,6 +77,7 @@ void BuiltInMssSolverNG::computeSomeMsses(std::function<void(std::vector<int>&, 
 	}
 	this->newFormula = WCNF();
 	this->mcsEnumerator = new CoMSSEnum(this->formula, config);
+	((MiniSatSolver*) this->mcsEnumerator->exttor->getSatSolver())->slv->phase_saving = 0;
 	CMP::vec<CMP::Lit> assumptions;
 	for(std::vector<int>::iterator it = assumps.begin(); it != assumps.end(); ++it) {
 		int lit = *it;

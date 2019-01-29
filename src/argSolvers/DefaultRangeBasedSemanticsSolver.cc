@@ -17,6 +17,7 @@ DefaultRangeBasedSemanticsSolver::DefaultRangeBasedSemanticsSolver(std::shared_p
 
 
 void DefaultRangeBasedSemanticsSolver::computeOneExtension() {
+	clock_t startTime = clock();
 	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
 	solver->computeMss(dynAssumps);
 	if(!solver->hasAMss()) {
@@ -24,17 +25,23 @@ void DefaultRangeBasedSemanticsSolver::computeOneExtension() {
 		return;
 	}
 	this->formatter.writeSingleExtension(solver->getModel());
+	logSingleExtTime(startTime);
 }
 
 
 void DefaultRangeBasedSemanticsSolver::computeAllExtensions() {
+	clock_t globalStartTime = clock();
 	this->formatter.writeExtensionListBegin();
-	bool first = true;
-	std::vector<std::vector<bool> > models = computeAllExtensions([this, &first](std::vector<bool>& model) {
-		this->formatter.writeExtensionListElmt(model, first);
-		first = false;
+	int extIndex = 1;
+	clock_t startTime = clock();
+	std::vector<std::vector<bool> > models = computeAllExtensions([this, &extIndex, &startTime](std::vector<bool>& model) {
+		this->formatter.writeExtensionListElmt(model, extIndex == 1);
+		extIndex++;
+		startTime = clock();
 	});
+	logNoMoreExts(startTime);
 	this->formatter.writeExtensionListEnd();
+	logAllExtsTime(globalStartTime);
 }
 
 
@@ -74,7 +81,7 @@ std::vector<std::vector<bool>> DefaultRangeBasedSemanticsSolver::computeAllExten
 		for(int j=0; j<this->varMap.nVars(); ++j) {
 			if(!oldModels[i][j]) cl.push_back(j+1);
 		}
-		for(int j=0; j<dynAssumps.size(); ++j) assumps.push_back(dynAssumps[j]);
+		for(unsigned int j=0; j<dynAssumps.size(); ++j) assumps.push_back(dynAssumps[j]);
 		auto blockingSel = solver->addSelectedClause(cl);
 		assumps.push_back(blockingSel);
 		solver->computeAllModels([this,callback,&extModels](std::vector<bool>& model){
@@ -98,6 +105,7 @@ std::vector<std::vector<bool>> DefaultRangeBasedSemanticsSolver::computeAllExten
 
 
 void DefaultRangeBasedSemanticsSolver::isCredulouslyAccepted() {
+	clock_t startTime = clock();
 	bool status = false;
 	int arg = varMap.getVar(this->acceptanceQueryArgument);
 	std::vector<std::vector<bool> > models = computeAllExtensions([this,arg,&status](std::vector<bool>& model){
@@ -107,10 +115,12 @@ void DefaultRangeBasedSemanticsSolver::isCredulouslyAccepted() {
 		}
 	});
 	this->formatter.writeArgAcceptance(status);
+	logAcceptanceCheckingTime(startTime);
 }
 
 
 void DefaultRangeBasedSemanticsSolver::isSkepticallyAccepted() {
+	clock_t startTime = clock();
 	bool status = true;
 	int arg = varMap.getVar(this->acceptanceQueryArgument);
 	std::vector<std::vector<bool> > models = computeAllExtensions([this,arg,&status](std::vector<bool>& model){
@@ -120,6 +130,7 @@ void DefaultRangeBasedSemanticsSolver::isSkepticallyAccepted() {
 		}
 	});
 	this->formatter.writeArgAcceptance(status);
+	logAcceptanceCheckingTime(startTime);
 }
 
 

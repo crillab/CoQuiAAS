@@ -6,12 +6,17 @@
 #include <sstream>
 #include <cstdarg>
 
-#include <boost/log/core.hpp>
-#include <boost/log/trivial.hpp>
-#include <boost/log/utility/setup/file.hpp>
-#include <boost/log/utility/setup/common_attributes.hpp>
-
 namespace CoQuiAAS {
+
+    typedef enum {
+        DISABLED,
+        TRACE,
+        DEBUG,
+        INFO,
+        WARNING,
+        ERROR,
+        FATAL
+    } LoggingLevel;
 
     class Logger {
 
@@ -24,83 +29,103 @@ namespace CoQuiAAS {
             return instance;
         }
 
-        void addFile(std::string file) {
-            if(!this->enabled) {
-                this->enabled = true;
-                boost::log::register_simple_formatter_factory<boost::log::trivial::severity_level, char>("Severity");
-                boost::log::add_common_attributes();
+        void setFile(std::string file) {
+            if(this->output) {
+                this->output->close();
+                delete this->output;
             }
-            boost::log::add_file_log(
-                boost::log::keywords::file_name = file,
-                boost::log::keywords::format = "[%TimeStamp%] [%ThreadID%] [%Severity%] %Message%"
-            );
+            this->output = new std::ofstream(file);
+            if(!this->output->good()) {
+                std::cerr << "FATAL: wrong logging file provided";
+                std::exit(1);
+            }
         }
 
         void trace(const char *format, ...) {
-            if(!this->enabled) return;
+            if(this->level < TRACE || !this->output) return;
             va_list args;
             va_start(args, format);
             vsnprintf(this->buffer, this->BUF_SIZE, format, args);
             va_end(args);
-            BOOST_LOG_TRIVIAL(trace) << this->buffer;
+            logBuffer("TRACE");
         }
 
         void debug(const char *format, ...) {
-            if(!this->enabled) return;
+            if(this->level < DEBUG || !this->output) return;
             va_list args;
             va_start(args, format);
             vsnprintf(this->buffer, this->BUF_SIZE, format, args);
             va_end(args);
-            BOOST_LOG_TRIVIAL(debug) << this->buffer;
+            logBuffer("DEBUG");
         }
 
         void info(const char *format, ...) {
-            if(!this->enabled) return;
+            if(this->level < INFO || !this->output) return;
             va_list args;
             va_start(args, format);
             vsnprintf(this->buffer, this->BUF_SIZE, format, args);
             va_end(args);
-            BOOST_LOG_TRIVIAL(info) << this->buffer;
+            logBuffer(" INFO");
         }
 
         void warning(const char *format, ...) {
-            if(!this->enabled) return;
+            if(this->level < WARNING || !this->output) return;
             va_list args;
             va_start(args, format);
             vsnprintf(this->buffer, this->BUF_SIZE, format, args);
             va_end(args);
-            BOOST_LOG_TRIVIAL(warning) << this->buffer;
+            logBuffer(" WARN");
         }
 
         void error(const char *format, ...) {
-            if(!this->enabled) return;
+            if(this->level < ERROR || !this->output) return;
             va_list args;
             va_start(args, format);
             vsnprintf(this->buffer, this->BUF_SIZE, format, args);
             va_end(args);
-            BOOST_LOG_TRIVIAL(error) << this->buffer;
+            logBuffer("ERROR");
         }
 
         void fatal(const char *format, ...) {
-            if(!this->enabled) return;
+            if(this->level < FATAL || !this->output) return;
             va_list args;
             va_start(args, format);
             vsnprintf(this->buffer, this->BUF_SIZE, format, args);
             va_end(args);
-            BOOST_LOG_TRIVIAL(fatal) << this->buffer;
+            logBuffer("FATAL");
         }
 
     private:
 
-        static const unsigned int BUF_SIZE = 2048;
+        static const unsigned int BUF_SIZE = 1 << 12;
+
+        char timeBuffer[BUF_SIZE];
 
         char buffer[BUF_SIZE];
 
         static Logger* instance;
 
-        bool enabled = false;
+        LoggingLevel level = INFO;
+
+        std::ofstream* output = NULL;
+
+        inline void logBuffer(std::string strLvl) {
+            time_t rawtime;
+            struct tm * timeinfo;
+            time(&rawtime);
+            timeinfo = localtime(&rawtime);
+            strftime(timeBuffer, BUF_SIZE, "%Y-%m-%d %H:%M:%S", timeinfo);
+            (*this->output) << "[" << timeBuffer << "] [" << strLvl << "] " << buffer << std::endl;
+        }
 
         Logger() {}
+
+        ~Logger() {
+            if(this->output) {
+                this->output->close();
+                delete this->output;
+            }
+        }
 
     };
 }

@@ -25,6 +25,7 @@ void DefaultCompleteSemanticsSolver::init() {
 
 
 void DefaultCompleteSemanticsSolver::computeOneExtension() {
+	clock_t startTime = clock();
 	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
 	solver->computeModel(dynAssumps);
 	if(!solver->hasAModel()) {
@@ -33,35 +34,45 @@ void DefaultCompleteSemanticsSolver::computeOneExtension() {
 	}
 	std::vector<bool> model = solver->getModel();
 	this->formatter.writeSingleExtension(model);
+	logSingleExtTime(startTime);
 }
 
 
 void DefaultCompleteSemanticsSolver::computeAllExtensions() {
+	clock_t globalStartTime = clock();
 	this->formatter.writeExtensionListBegin();
-	bool first = true;
-	bool* firstpt = &first;
 	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
-	solver->computeAllModels([this, firstpt](std::vector<bool>& model){
-		this->formatter.writeExtensionListElmt(model, *firstpt);
-		*firstpt = false;
+	int extIndex = 1;
+	clock_t startTime = clock();
+	solver->computeAllModels([this, &extIndex, &startTime](std::vector<bool>& model){
+		this->formatter.writeExtensionListElmt(model, extIndex == 1);
+		logOneExtTime(startTime, extIndex);
+		extIndex++;
+		startTime = clock();
 	}, dynAssumps);
+	logNoMoreExts(startTime);
 	this->formatter.writeExtensionListEnd();
+	logAllExtsTime(globalStartTime);
 }
 
 
 void DefaultCompleteSemanticsSolver::isCredulouslyAccepted() {
+	clock_t startTime = clock();
 	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
 	dynAssumps.push_back(varMap.getVar(this->acceptanceQueryArgument));
 	solver->computeModel(dynAssumps);
 	this->formatter.writeArgAcceptance(solver->hasAModel());
+	logAcceptanceCheckingTime(startTime);
 }
 
 
 void DefaultCompleteSemanticsSolver::isSkepticallyAccepted() {
+	clock_t startTime = clock();
 	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
 	dynAssumps.push_back(-varMap.getVar(this->acceptanceQueryArgument));
 	solver->computeModel(dynAssumps);
 	this->formatter.writeArgAcceptance(!solver->hasAModel());
+	logAcceptanceCheckingTime(startTime);
 }
 
 

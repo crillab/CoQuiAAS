@@ -89,11 +89,11 @@ protected:
 
 	void clearModels();
 
+	int realNVars = 0;
+
 private:
 
 	void buildSolver();
-
-	int realNVars = 0;
 
 };
 
