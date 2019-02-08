@@ -11,6 +11,7 @@
 #ifndef __VAR_MAP_H__
 #define __VAR_MAP_H__
 
+#include "Logger.h"
 #include <vector>
 #include <map>
 #include <iterator>

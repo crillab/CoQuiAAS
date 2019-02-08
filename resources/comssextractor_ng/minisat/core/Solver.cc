@@ -969,3 +969,13 @@ void Solver::garbageCollect()
            ca.size()*ClauseAllocator::Unit_Size, to.size()*ClauseAllocator::Unit_Size);
   to.moveTo(ca);
 }// garbageCollect
+
+void Solver::restoreLearnt(std::vector<Lit> learnt) {
+  vec<Lit> ps;
+  for(int i=0; i<learnt.size(); ++i) ps.push(learnt[i]);
+  CRef cr = ca.alloc(ps, true);
+  learnts.push(cr);
+  attachClause(cr);
+  claBumpActivity(ca[cr]);
+  //uncheckedEnqueue(learnt_clause[0], cr);   
+}

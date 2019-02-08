@@ -24,6 +24,7 @@
 #include <pthread.h>
 #include <signal.h>
 #include <tuple>
+#include <thread>
 
 #include "SolverFactory.h"
 #include "SemanticsProblemSolver.h"
@@ -33,6 +34,7 @@
 #include "ParserFactory.h"
 #include "SolverOutputFormatter.h"
 #include "SolverOutputFormatterFactory.h"
+#include "ConcurrentStrQueue.h"
 #include "Logger.h"
 
 
@@ -41,6 +43,8 @@ using namespace CoQuiAAS;
 
 pthread_t timeoutTh;
 clock_t clk;
+ConcurrentStrQueue outputQueue;
+static std::string QUEUE_END = "##QUEUE_END";
 
 
 inline bool undefinedArgument(std::string arg, VarMap& map){
@@ -55,6 +59,7 @@ void *handleTimeout(void *strSeconds);
 void manageTimeout(CommandLineHelper& clh);
 InstanceFormat manageInstanceFormat(CommandLineHelper& clh);
 std::ifstream manageInstanceFile(CommandLineHelper& clh);
+void printOutputQueue();
 
 
 int main(int argc, char** argv){
@@ -83,7 +88,9 @@ int main(int argc, char** argv){
 	// initialize the StatMap
 	setInitStats(clh, parser);
 	// request a semantic instance depending on the problem to compute
-	std::unique_ptr<SolverOutputFormatter> formatter = SolverOutputFormatterFactory::getInstance(clh.getOutputFormatter(), parser->getVarMap(), [] (std::string s) {std::cout << s; std::cout.flush();});
+	// std::unique_ptr<SolverOutputFormatter> formatter = SolverOutputFormatterFactory::getInstance(clh.getOutputFormatter(), parser->getVarMap(), [] (std::string s) {std::cout << s; std::cout.flush();});
+	std::thread outputThread(printOutputQueue);
+	std::unique_ptr<SolverOutputFormatter> formatter = SolverOutputFormatterFactory::getInstance(clh.getOutputFormatter(), parser->getVarMap(), [] (std::string s) {outputQueue.push(s);});
 	if(clh.getSemantics().getName() == SEM_UNDEFINED || clh.getTaskType() == TASK_UNDEFINED) {
 		Logger::getInstance()->fatal("unsupported task: %s", clh.getTask().c_str());
 		std::cerr << CommandLineHelper::USAGE << std::endl;
@@ -103,9 +110,11 @@ int main(int argc, char** argv){
 	problem->compute();
 	// display statistics (if StatMap is not "fake")
 
-	std::cout << std::endl;
 	Logger::getInstance()->info("global computation time: %.3fs", (double)(clock()-clk)/CLOCKS_PER_SEC);
 	Logger::getInstance()->info("CoQuiAAS end");
+	outputQueue.push(QUEUE_END);
+	outputThread.join();
+	std::cout << std::endl;
 	return 0;
 }
 
@@ -167,6 +176,16 @@ void setFinalStats(CommandLineHelper& clh, std::unique_ptr<IParser> const &parse
 	statMap->setStat("computation time (s)",(double)(clock()-clk)/CLOCKS_PER_SEC);
 	statMap->printStats(stdout);
 	fflush(stdout);
+}
+
+
+void printOutputQueue() {
+	while(true) {
+        std::string elmt = outputQueue.pop();
+		if(elmt == QUEUE_END) break;
+        std::cout << elmt;
+		std::cout.flush();
+    }
 }
 
 

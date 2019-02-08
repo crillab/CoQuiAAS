@@ -63,6 +63,10 @@ public:
 	virtual void resetAllMss();
 	virtual void resetModels();
 
+	inline void setStoreLearnts(bool flag) {
+		shouldStoreLearnts = flag;
+	}
+
 private:
 
 	CoMSSExtract *mcsFinder = NULL;
@@ -77,7 +81,15 @@ private:
 
 	bool shouldStopMssEnum = false;
 
+	std::vector<std::vector<Minisat::Lit> > learnts;
+
 	void toCmpClause(std::vector<int> &clause, CMP::vec<CMP::Lit>& cmpCl);
+
+	void buildEnumerator(int maxCount);
+
+	void storeLearnts(int nVarsAtCall);
+
+	bool shouldStoreLearnts = true;
 
 	static std::vector<int> extractMssFromCoMss(CMP::vec<CMP::Lit>& coMss, int nSoftCstrs) {
 		std::vector<int> tmpmss;

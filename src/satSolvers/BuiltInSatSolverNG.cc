@@ -26,6 +26,7 @@ BuiltInSatSolverNG::BuiltInSatSolverNG() {
 void BuiltInSatSolverNG::buildSolver() {
 	vec<Lit> ps;
 	if(!this->solver) {
+		Logger::getInstance()->debug("building a new instance of Minisat");
 		this->solver = new MiniSatSolver();
 		this->solver->slv->phase_saving = 0;
 		for(int i=0; i<this->formula.nVars(); ++i) {

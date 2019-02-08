@@ -20,6 +20,7 @@
 #include "cmp/ifaces/SatSolver.h"
 #include "cmp/utils/wcnf.h"
 #include "minisat/MiniSatSolver.h"
+#include "Logger.h"
 
 
 namespace CoQuiAAS {

@@ -7,6 +7,7 @@
 
 
 #include "DefaultPreferredSemanticsSolver.h"
+#include "BuiltInMssSolverNG.h"
 
 
 using namespace CoQuiAAS;
@@ -17,6 +18,7 @@ DefaultPreferredSemanticsSolver::DefaultPreferredSemanticsSolver(std::shared_ptr
 
 
 void DefaultPreferredSemanticsSolver::init() {
+	this->solver->setStoreLearnts(false);
 	this->helper = new MssEncodingHelper(solver, attacks, varMap);
 	switch(taskType) {
 	case TASK_CRED_INF:
@@ -40,6 +42,8 @@ void DefaultPreferredSemanticsSolver::computeOneExtension() {
 	}
 	std::vector<int> mss = solver->getMss();
 	this->formatter.writeSingleExtension(mss);
+	solver->resetAllMss();
+	solver->resetModels();
 	logSingleExtTime(startTime);
 }
 
@@ -55,6 +59,8 @@ void DefaultPreferredSemanticsSolver::computeAllExtensions() {
 		extIndex++;
 		startTime = clock();
 	}, dynAssumps);
+	solver->resetAllMss();
+	solver->resetModels();
 	logNoMoreExts(startTime);
 	this->formatter.writeExtensionListEnd();
 	logAllExtsTime(globalStartTime);
@@ -67,6 +73,7 @@ void DefaultPreferredSemanticsSolver::isCredulouslyAccepted() {
 	dynAssumps.push_back(varMap.getVar(this->acceptanceQueryArgument));
 	solver->computeModel(dynAssumps);
 	this->formatter.writeArgAcceptance(solver->hasAModel());
+	solver->resetModels();
 	logAcceptanceCheckingTime(startTime);
 }
 
@@ -82,6 +89,8 @@ void DefaultPreferredSemanticsSolver::isSkepticallyAccepted() {
 			this->solver->stopMssEnum();
 		}
 	}, dynAssumps);
+	solver->resetAllMss();
+	solver->resetModels();
 	this->formatter.writeArgAcceptance(status);
 	logAcceptanceCheckingTime(startTime);
 }

@@ -5,6 +5,9 @@
 #include <fstream>
 #include <sstream>
 #include <cstdarg>
+#include <thread>
+
+#include "ConcurrentStrQueue.h"
 
 namespace CoQuiAAS {
 
@@ -109,16 +112,30 @@ namespace CoQuiAAS {
 
         std::ofstream* output = NULL;
 
+        ConcurrentStrQueue queue;
+
         inline void logBuffer(std::string strLvl) {
             time_t rawtime;
             struct tm * timeinfo;
             time(&rawtime);
             timeinfo = localtime(&rawtime);
             strftime(timeBuffer, BUF_SIZE, "%Y-%m-%d %H:%M:%S", timeinfo);
-            (*this->output) << "[" << timeBuffer << "] [" << strLvl << "] " << buffer << std::endl;
+            std::stringstream sstream;
+            sstream << "[" << timeBuffer << "] [" << strLvl << "] " << buffer;
+            queue.push(sstream.str());
         }
 
-        Logger() {}
+        static void writeMessages() {
+            Logger* l = Logger::getInstance();
+            while(true) {
+                std::string elmt = l->queue.pop();
+                (*l->output) << elmt << std::endl;
+            }
+        }
+
+        Logger() {
+            std::thread(writeMessages).detach();
+        }
 
         ~Logger() {
             if(this->output) {

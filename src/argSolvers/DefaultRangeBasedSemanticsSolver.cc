@@ -55,10 +55,14 @@ std::vector<std::vector<bool>> DefaultRangeBasedSemanticsSolver::computeAllExten
 		msses.push_back(mss);
 		oldModels.push_back(model);
 		if(callback != NULL) callback(model);
-		if(this->stopEnum) solver->stopMssEnum();
+		if(this->stopEnum) {
+			Logger::getInstance()->trace("Range-based solver was required to stop enumeration process");
+			solver->stopMssEnum();
+		}
 	}, dynAssumps);
 	solver->resetAllMss();
 	solver->resetModels();
+	Logger::getInstance()->trace("MSS enumerator found %d MSSes for range-based solver", msses.size());
 	if(this->stopEnum) return extModels;
 	int nVars = varMap.nVars();
 	std::vector<int> selectors;
@@ -68,6 +72,7 @@ std::vector<std::vector<bool>> DefaultRangeBasedSemanticsSolver::computeAllExten
 		cl.push_back(i+1+nVars);
 		selectors.push_back(solver->addSelectedClause(cl));
 	}
+	int oldExtModelsSize = 0;
 	for(int i=0; i<(signed)msses.size(); ++i) {
 		extModels.push_back(oldModels[i]);
 		std::vector<int> assumps;
@@ -87,12 +92,17 @@ std::vector<std::vector<bool>> DefaultRangeBasedSemanticsSolver::computeAllExten
 		solver->computeAllModels([this,callback,&extModels](std::vector<bool>& model){
 			extModels.push_back(model);
 			if(callback != NULL) callback(model);
-			if(this->stopEnum) solver->stopMssEnum();
+			if(this->stopEnum) {
+				solver->stopMssEnum();
+				Logger::getInstance()->trace("Range-based solver was required to stop enumeration process");
+			}
 		}, assumps);
 		std::vector<int> unitCl;
 		unitCl.push_back(-blockingSel);
 		solver->addClause(unitCl);
 		solver->resetModels();
+		Logger::getInstance()->trace("Range-based solver found %d extension models for MSS %d", extModels.size()-oldExtModelsSize, i+1);
+		oldExtModelsSize = extModels.size();
 		if(this->stopEnum) break;
 	}
 	for(int i=0; i<(signed)selectors.size(); ++i) {
@@ -111,6 +121,7 @@ void DefaultRangeBasedSemanticsSolver::isCredulouslyAccepted() {
 	std::vector<std::vector<bool> > models = computeAllExtensions([this,arg,&status](std::vector<bool>& model){
 		if(model[arg-1]) {
 			status = true;
+			Logger::getInstance()->trace("Credulous acceptance was demonstrated; stopping MSS enumeration for range-based solver");
 			this->stopEnum = true;
 		}
 	});
@@ -126,6 +137,7 @@ void DefaultRangeBasedSemanticsSolver::isSkepticallyAccepted() {
 	std::vector<std::vector<bool> > models = computeAllExtensions([this,arg,&status](std::vector<bool>& model){
 		if(!model[arg-1]) {
 			status = false;
+			Logger::getInstance()->trace("Skeptical non-acceptance was demonstrated; stopping MSS enumeration for range-based solver");
 			this->stopEnum = true;
 		}
 	});

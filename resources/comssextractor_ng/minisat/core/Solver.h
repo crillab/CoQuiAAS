@@ -23,6 +23,8 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 #ifndef Minisat_Solver_h
 #define Minisat_Solver_h
 
+#include <vector>
+
 #include "minisat/utils/System.h"
 #include "minisat/mtl/Vec.h"
 
@@ -78,6 +80,8 @@ public:
     bool    addClause_(vec<Lit>& ps);      // Add a clause to the solver without making 
                                                                 // superflous internal copy. Will
                                                                 // change the passed vector 'ps'.
+
+    void restoreLearnt(std::vector<Lit> learnt);
 
     // Solving:
     //

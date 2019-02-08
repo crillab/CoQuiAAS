@@ -39,6 +39,8 @@ public:
 
 	virtual void stopMssEnum() = 0;
 
+	virtual void setStoreLearnts(bool flag) {}
+
 	static std::vector<int> extractMssFromCoMss(Minisat::vec<int>& coMss, int nSoftCstrs) {
 		std::vector<int> tmpmss;
 		for(int j=1; j<=nSoftCstrs; ++j) tmpmss.push_back(j);
