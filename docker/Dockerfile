@@ -25,7 +25,7 @@ RUN rm -rf /coquiaas/coquiaas-2.0/
 #
 # Adding LBX.
 #
-ADD lbx/lbx /coquiaas/lbx
+# ADD lbx/lbx /coquiaas/lbx
 
 #
 # Adding wrapper.sh and setting it as entrypoint.
