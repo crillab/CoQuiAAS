@@ -30,4 +30,5 @@
 /doc/Makefile
 /libtool
 
-./docker
+./docker/**
+

@@ -422,20 +422,20 @@ public:
 
     inline void printStats()
     {
-      double cpu_time = cpuTime();
-      double mem_used = memUsedPeak();
+      // double cpu_time = cpuTime();
+      // double mem_used = memUsedPeak();
 
-      printf("c \n");
-      printf("c restarts              : %"PRIu64"\n", starts);
-      printf("c conflicts             : %-12"PRIu64"   (%.0f /sec)\n", conflicts   , conflicts/cpu_time);
-      printf("c decisions             : %-12"PRIu64"   (%4.2f %% random) (%.0f /sec)\n",
-             decisions, (float)rnd_decisions*100 / (float)decisions, decisions   /cpu_time);
-      printf("c propagations          : %-12"PRIu64"   (%.0f /sec)\n", propagations, propagations/cpu_time);
-      printf("c conflict literals     : %-12"PRIu64"   (%4.2f %% deleted)\n",
-             tot_literals, (max_literals - tot_literals)*100 / (double)max_literals);
-      if (mem_used != 0) printf("c Memory used           : %.2f MB\n", mem_used);
-      printf("c CPU time              : %g s\n", cpu_time);
-      printf("c \n");
+      // printf("c \n");
+      // printf("c restarts              : %"PRIu64"\n", starts);
+      // printf("c conflicts             : %-12"PRIu64"   (%.0f /sec)\n", conflicts   , conflicts/cpu_time);
+      // printf("c decisions             : %-12"PRIu64"   (%4.2f %% random) (%.0f /sec)\n",
+      //        decisions, (float)rnd_decisions*100 / (float)decisions, decisions   /cpu_time);
+      // printf("c propagations          : %-12"PRIu64"   (%.0f /sec)\n", propagations, propagations/cpu_time);
+      // printf("c conflict literals     : %-12"PRIu64"   (%4.2f %% deleted)\n",
+      //        tot_literals, (max_literals - tot_literals)*100 / (double)max_literals);
+      // if (mem_used != 0) printf("c Memory used           : %.2f MB\n", mem_used);
+      // printf("c CPU time              : %g s\n", cpu_time);
+      // printf("c \n");
     }
 
     inline bool originalVar(Var v) {return (v < nbInitVariable);}

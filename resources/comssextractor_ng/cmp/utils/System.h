@@ -1,7 +1,7 @@
 #ifndef CMP_System_h
 #define CMP_System_h
 
-#if defined(__linux__)
+#if defined(__linux__) && defined __GLIBC__
 #include <fpu_control.h>
 #endif
 
