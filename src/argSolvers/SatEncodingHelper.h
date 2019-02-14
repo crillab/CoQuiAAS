@@ -45,7 +45,7 @@ private:
 
 	std::shared_ptr<SatSolver> solver;
 
-	int lookForDynAttackerReplacement(int attacked, int attacker);
+	int lookForDynAttackerReplacement(std::string attacked, std::string attacker);
 
 	void reserveDynVars(bool reserveNotAttackedRepl);
 
@@ -60,7 +60,7 @@ protected:
 	VarMap &varMap;
 
 	// (argFrom, argTo, fromReplInEnc, notAttackedReplInEnc, assump)
-	std::vector<std::tuple<int, int, int, int, int> > dynVars;
+	std::vector<std::tuple<std::string, std::string, int, int, int> > dynVars;
 
 	int nbVars;
 };

@@ -2,7 +2,7 @@
 
 using namespace CoQuiAAS;
 
-ICCMA19SolverOutputFormatter::ICCMA19SolverOutputFormatter(VarMap &varMap, void (*displayFct)(std::string)) : SolverOutputFormatter(displayFct), vmap(varMap) {
+ICCMA19SolverOutputFormatter::ICCMA19SolverOutputFormatter(VarMap &varMap, void (*displayFct)(std::string)) : SolverOutputFormatter(displayFct, varMap) {
     // nothing to do here
 }
 
@@ -15,7 +15,7 @@ void ICCMA19SolverOutputFormatter::writeNoExt() {
 }
 
 void ICCMA19SolverOutputFormatter::writeSingleExtension(std::vector<bool>& model) {
-    this->displayFct(argArray(model, this->vmap));
+    this->displayFct(argArray(model));
 }
 
 std::string ICCMA19SolverOutputFormatter::formatSequenceOfExtensions(std::vector<std::string> exts) {
@@ -30,7 +30,7 @@ std::string ICCMA19SolverOutputFormatter::formatSequenceOfExtensions(std::vector
 }
 
 void ICCMA19SolverOutputFormatter::writeSingleExtension(std::vector<int>& lits) {
-    this->displayFct(argArray(lits, this->vmap));
+    this->displayFct(argArray(lits));
 }
 
 void ICCMA19SolverOutputFormatter::writeExtensionListBegin() {
@@ -38,11 +38,11 @@ void ICCMA19SolverOutputFormatter::writeExtensionListBegin() {
 }
 
 void ICCMA19SolverOutputFormatter::writeExtensionListElmt(std::vector<bool>& model, bool isFirst) {
-    this->displayFct("\n"+argArray(model, this->vmap));
+    this->displayFct("\n"+argArray(model));
 }
 
 void ICCMA19SolverOutputFormatter::writeExtensionListElmt(std::vector<int>& lits, bool isFirst) {
-    this->displayFct("\n"+argArray(lits, this->vmap));
+    this->displayFct("\n"+argArray(lits));
 }
 
 void ICCMA19SolverOutputFormatter::writeExtensionListEnd() {

@@ -44,6 +44,8 @@ public:
 
 	virtual std::vector<int>& propagatedAtDecisionLvlZero(std::vector<int> assumps);
 
+	std::vector<int>& propagatedAtDecisionLvlZero(std::vector<int> assumps, bool includeNegs);
+
 	virtual bool isPropagatedAtDecisionLvlZero(int lit);
 
 	virtual bool isPropagatedAtDecisionLvlZero(int lit, std::vector<int> assumps);

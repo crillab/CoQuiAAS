@@ -67,7 +67,7 @@ protected:
 
 	SolverOutputFormatter &formatter;
 
-	std::string acceptanceQueryArgument;
+	std::string acceptanceQueryArgument = "";
 
 	int dynStep = -1;
 

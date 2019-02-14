@@ -13,15 +13,16 @@ namespace CoQuiAAS {
 
         protected:
         
-        SolverOutputFormatter(void (*displayFct)(std::string)) {
+        SolverOutputFormatter(void (*displayFct)(std::string), VarMap& vmap) {
             this->displayFct = displayFct;
+            this->vmap = &vmap;
         }
 
         std::string acceptance_status_str(bool status);
 
-        std::string argArray(std::vector<bool>& model, VarMap& vmap);
+        std::string argArray(std::vector<bool>& model);
 
-        std::string argArray(std::vector<int>& lits, VarMap& vmap);
+        std::string argArray(std::vector<int>& lits);
 
         const std::string YES_STR = "YES";
 
@@ -29,7 +30,13 @@ namespace CoQuiAAS {
 
         void (*displayFct)(std::string);
 
+        VarMap* vmap;
+
         public:
+
+        inline void setVarMap(VarMap& vmap) {
+            this->vmap = &vmap;
+        }
 
         virtual void writeArgAcceptance(bool status) = 0;
 

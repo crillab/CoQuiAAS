@@ -42,6 +42,8 @@ class VarMap {
    */
   void addEntry(std::string name);
 
+  void addEntry(std::vector<std::string> names);
+
   /**
    * \fn getName
    * \brief Gives the name of a Boolean variable
@@ -49,6 +51,8 @@ class VarMap {
    * \return the name corresponding to var
    */
   std::string getName(int var);
+
+  std::vector<std::string> getNames();
 
   /**
    * \fn getVar

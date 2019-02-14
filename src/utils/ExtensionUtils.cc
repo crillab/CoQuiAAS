@@ -26,11 +26,11 @@ std::vector<int> ExtensionUtils::groundedExtension() {
 		didSomething = false;
 		for(unsigned int i=0; i<candidates.size(); ++i) {
 			int var = candidates[i];
-			std::vector<int> attacksTo = *attacks.getAttacksTo(var);
+			std::vector<std::string>& attacksTo = attacks.getAttacksTo(attacks.getVarMap().getName(var));
 			bool argDefeated = false;
 			bool argAttacked = false;
 			for(unsigned int j=0; j<attacksTo.size(); ++j) {
-				int attacker = attacksTo[j];
+				int attacker = attacks.getVarMap().getVar(attacksTo[j]);
 				if(defeated[attacker-1]) continue;
 				argAttacked = true;
 				if(inExt[attacker-1]) {
@@ -67,10 +67,10 @@ bool ExtensionUtils::isMaxRange(std::vector<int>& extension) {
 	}
 	for(unsigned int i=0; i<inExt.size(); ++i) {
 		if(inExt[i]) continue;
-		std::vector<int> attackers = *attacks.getAttacksTo(i+1);
+		std::vector<std::string>& attackers = attacks.getAttacksTo(attacks.getVarMap().getName(i+1));
 		bool attacked = false;
 		for(unsigned int j=0; j<attackers.size(); ++j) {
-			if(inExt[attackers[j]-1]) {
+			if(inExt[attacks.getVarMap().getVar(attackers[j])-1]) {
 				attacked = true;
 				break;
 			}

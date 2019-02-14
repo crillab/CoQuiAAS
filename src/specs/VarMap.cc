@@ -29,8 +29,29 @@ void VarMap::addEntry(std::string name) {
 }
 
 
+void VarMap::addEntry(std::vector<std::string> names) {
+  intVariables.push_back(++nvars);
+  std::stringstream sstream;
+  for(unsigned int i=0; i<names.size(); ++i) {
+    if(i>0) sstream << ",";
+    std::string name = names[i];
+    sstream << name;
+    nameToVar[name] = nvars;
+  }
+  varToName[nvars] = sstream.str();
+}
+
+
 std::string VarMap::getName(int var) {
   return varToName[var>0 ? var : -var];
+}
+
+std::vector<std::string> VarMap::getNames() {
+  std::vector<std::string> names;
+  for(std::map<std::string,int>::iterator it = nameToVar.begin(); it != nameToVar.end(); ++it) {
+    names.push_back(it->first);
+  }
+  return names;
 }
 
 int VarMap::getVar(std::string name) {

@@ -85,6 +85,11 @@ std::vector<int>& BuiltInSatSolverNG::propagatedAtDecisionLvlZero() {
 
 
 std::vector<int>& BuiltInSatSolverNG::propagatedAtDecisionLvlZero(std::vector<int> assumps) {
+	return propagatedAtDecisionLvlZero(assumps, false);
+}
+
+
+std::vector<int>& BuiltInSatSolverNG::propagatedAtDecisionLvlZero(std::vector<int> assumps, bool includeNegLits) {
 	buildSolver();
 	for (int c = solver->slv->trail.size()-1; c >= 0; c--) solver->slv->assigns[Minisat::var(solver->slv->trail[c])] = Minisat::lbool((uint8_t)2);
     solver->slv->qhead = 0;
@@ -100,6 +105,8 @@ std::vector<int>& BuiltInSatSolverNG::propagatedAtDecisionLvlZero(std::vector<in
 	for (int i = 0; i < solver->slv->nAssigns(); i++) {
 		if (!Minisat::sign(solver->slv->trail[i])) {
 			propagated.push_back(Minisat::var(solver->slv->trail[i])+1);
+		} else if(includeNegLits) {
+			propagated.push_back(-Minisat::var(solver->slv->trail[i])-1);
 		}
 	}
 	return propagated;

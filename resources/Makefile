@@ -138,7 +138,7 @@ CPPFLAGS =  -I/usr/include -I/usr/include
 CXX = g++
 CXXCPP = g++ -E
 CXXDEPMODE = depmode=gcc3
-CXXFLAGS =  -std=c++11 -Wno-literal-suffix -g -O3 -DCOQUIAAS_VERSION=3.0
+CXXFLAGS =  -std=c++14 -Wno-literal-suffix -g -O3 -DCOQUIAAS_VERSION=3.0
 CYGPATH_W = echo
 DEFS = -DHAVE_CONFIG_H
 DEPDIR = .deps

@@ -17,7 +17,11 @@ DefaultCompleteSemanticsSolver::DefaultCompleteSemanticsSolver(std::shared_ptr<S
 
 
 void DefaultCompleteSemanticsSolver::init() {
-	this->helper = new SatEncodingHelper(solver, attacks, varMap);
+	this->problemReducer = std::make_unique<CompleteEncodingSatProblemReducer>(varMap, attacks);
+	// this->helper = new SatEncodingHelper(solver, attacks, varMap);
+	VarMap &reducedMap = *this->problemReducer->getReducedMap().get();
+	this->formatter.setVarMap(reducedMap);
+	this->helper = new SatEncodingHelper(solver, attacks, reducedMap);
 	int disjId = this->helper->reserveDisjunctionVars();
 	this->helper->createAttackersDisjunctionVars(disjId);
 	this->helper->createCompleteEncodingConstraints(disjId);
@@ -59,7 +63,8 @@ void DefaultCompleteSemanticsSolver::computeAllExtensions() {
 void DefaultCompleteSemanticsSolver::isCredulouslyAccepted() {
 	clock_t startTime = clock();
 	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
-	dynAssumps.push_back(varMap.getVar(this->acceptanceQueryArgument));
+	int argAssump = this->problemReducer->getReducedMap()->getVar(this->problemReducer->translateAcceptanceQueryArgument(this->acceptanceQueryArgument));
+	dynAssumps.push_back(argAssump);
 	solver->computeModel(dynAssumps);
 	this->formatter.writeArgAcceptance(solver->hasAModel());
 	logAcceptanceCheckingTime(startTime);
@@ -69,7 +74,8 @@ void DefaultCompleteSemanticsSolver::isCredulouslyAccepted() {
 void DefaultCompleteSemanticsSolver::isSkepticallyAccepted() {
 	clock_t startTime = clock();
 	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
-	dynAssumps.push_back(-varMap.getVar(this->acceptanceQueryArgument));
+	int argAssump = -this->problemReducer->getReducedMap()->getVar(this->problemReducer->translateAcceptanceQueryArgument(this->acceptanceQueryArgument));
+	dynAssumps.push_back(argAssump);
 	solver->computeModel(dynAssumps);
 	this->formatter.writeArgAcceptance(!solver->hasAModel());
 	logAcceptanceCheckingTime(startTime);
