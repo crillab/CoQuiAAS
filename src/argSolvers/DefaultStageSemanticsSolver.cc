@@ -17,7 +17,11 @@ DefaultStageSemanticsSolver::DefaultStageSemanticsSolver(std::shared_ptr<MssSolv
 
 
 void DefaultStageSemanticsSolver::init() {
-	this->helper = new MssEncodingHelper(solver, attacks, varMap);
+	this->problemReducer = std::make_unique<ConflictFreenessEncodingSatProblemReducer>(varMap, attacks);
+	this->problemReducer->search();
+	VarMap& reducedVM = *this->problemReducer->getReducedMap().get();
+	this->formatter.setVarMap(reducedVM);
+	this->helper = new MssEncodingHelper(solver, attacks, reducedVM);
 	int disjId = this->helper->reserveDisjunctionVars();
 	this->helper->setMaxRangeNeeded(disjId);
 	this->helper->createAttackersDisjunctionVars(disjId);

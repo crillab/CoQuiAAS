@@ -41,6 +41,10 @@ public:
 
 	virtual ~SatEncodingHelper();
 
+	inline int getDisjunctionVar(std::string var) {
+		return this->disjunctionVars[var];
+	}
+
 private:
 
 	std::shared_ptr<SatSolver> solver;

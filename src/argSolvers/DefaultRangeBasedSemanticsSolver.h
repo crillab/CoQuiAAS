@@ -5,6 +5,7 @@
 #include "SemanticsProblemSolver.h"
 #include "MssEncodingHelper.h"
 #include "MssSolver.h"
+#include "SatProblemReducer.h"
 
 
 namespace CoQuiAAS {
@@ -34,6 +35,8 @@ protected:
 	MssEncodingHelper* helper;
 
 	bool stopEnum = false;
+
+	std::unique_ptr<SatProblemReducer> problemReducer;
 
 private:
 

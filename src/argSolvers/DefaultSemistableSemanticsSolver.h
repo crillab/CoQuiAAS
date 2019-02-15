@@ -10,6 +10,7 @@
 
 
 #include "DefaultRangeBasedSemanticsSolver.h"
+#include "DefaultCompleteSemanticsSolver.h"
 
 
 namespace CoQuiAAS {

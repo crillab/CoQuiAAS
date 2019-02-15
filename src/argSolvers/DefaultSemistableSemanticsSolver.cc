@@ -17,7 +17,11 @@ DefaultSemistableSemanticsSolver::DefaultSemistableSemanticsSolver(std::shared_p
 
 
 void DefaultSemistableSemanticsSolver::init() {
-	this->helper = new MssEncodingHelper(solver, attacks, varMap);
+	this->problemReducer = std::make_unique<CompleteEncodingSatProblemReducer>(varMap, attacks);
+	this->problemReducer->search();
+	VarMap &reducedMap = *this->problemReducer->getReducedMap().get();
+	this->formatter.setVarMap(reducedMap);
+	this->helper = new MssEncodingHelper(solver, attacks, reducedMap);
 	int disjId = this->helper->reserveDisjunctionVars();
 	this->helper->setMaxRangeNeeded(disjId);
 	this->helper->createAttackersDisjunctionVars(disjId);

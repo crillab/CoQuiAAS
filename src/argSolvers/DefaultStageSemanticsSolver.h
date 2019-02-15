@@ -12,6 +12,7 @@
 #include "DefaultRangeBasedSemanticsSolver.h"
 #include "MssEncodingHelper.h"
 #include "MssSolver.h"
+#include "ConflictFreenessEncodingSatProblemReducer.h"
 
 
 namespace CoQuiAAS {

@@ -8,7 +8,7 @@ DefaultRangeBasedSemanticsSolver::DefaultRangeBasedSemanticsSolver(std::shared_p
 	SemanticsProblemSolver(attacks, varMap, taskType, formatter), solver(solver) {
 	this->solver->setBlockingClauseFunction([this](std::vector<bool>& model) -> std::vector<int> {
 		std::vector<int> intCl;
-		for(int i=0; i<this->varMap.nVars(); ++i) {
+		for(int i=0; i<this->problemReducer->getReducedMap()->nVars(); ++i) {
 			if(model[i]) intCl.push_back(-i-1);
 		}
 		return intCl;
@@ -21,7 +21,7 @@ void DefaultRangeBasedSemanticsSolver::computeOneExtension() {
 	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
 	solver->computeMss(dynAssumps);
 	if(!solver->hasAMss()) {
-		this->formatter.writeNoExt();
+		std::cerr << "problem is UNSAT (although is cannot)" << std::endl;
 		return;
 	}
 	this->formatter.writeSingleExtension(solver->getModel());
@@ -64,26 +64,28 @@ std::vector<std::vector<bool>> DefaultRangeBasedSemanticsSolver::computeAllExten
 	solver->resetModels();
 	Logger::getInstance()->trace("MSS enumerator found %d MSSes for range-based solver", msses.size());
 	if(this->stopEnum) return extModels;
-	int nVars = varMap.nVars();
+	std::shared_ptr<VarMap> reducedVM = this->problemReducer->getReducedMap();
+	std::vector<std::string> varNames = reducedVM->getNames();
 	std::vector<int> selectors;
-	for(int i=0; i<nVars; ++i) {
+	for(unsigned int i=0; i<varNames.size(); ++i) {
 		std::vector<int> cl;
-		cl.push_back(i+1);
-		cl.push_back(i+1+nVars);
+		std::string varName = varNames[i];
+		cl.push_back(reducedVM->getVar(varName));
+		cl.push_back(this->helper->getDisjunctionVar(varName));
 		selectors.push_back(solver->addSelectedClause(cl));
 	}
 	int oldExtModelsSize = 0;
 	for(int i=0; i<(signed)msses.size(); ++i) {
 		extModels.push_back(oldModels[i]);
 		std::vector<int> assumps;
-		for(int j=0; j<nVars; ++j) {
+		for(unsigned int j=0; j<selectors.size(); ++j) {
 			assumps.push_back(-selectors[j]);
 		}
 		for(int j=0; j<(signed)msses[i].size(); ++j) {
 			assumps[msses[i][j]-1] = selectors[msses[i][j]-1];
 		}
 		std::vector<int> cl;
-		for(int j=0; j<this->varMap.nVars(); ++j) {
+		for(int j=0; j<reducedVM->nVars(); ++j) {
 			if(!oldModels[i][j]) cl.push_back(j+1);
 		}
 		for(unsigned int j=0; j<dynAssumps.size(); ++j) assumps.push_back(dynAssumps[j]);
@@ -117,7 +119,7 @@ std::vector<std::vector<bool>> DefaultRangeBasedSemanticsSolver::computeAllExten
 void DefaultRangeBasedSemanticsSolver::isCredulouslyAccepted() {
 	clock_t startTime = clock();
 	bool status = false;
-	int arg = varMap.getVar(this->acceptanceQueryArgument);
+	int arg = this->problemReducer->getReducedMap()->getVar(this->problemReducer->translateAcceptanceQueryArgument(this->acceptanceQueryArgument));
 	std::vector<std::vector<bool> > models = computeAllExtensions([this,arg,&status](std::vector<bool>& model){
 		if(model[arg-1]) {
 			status = true;
@@ -133,7 +135,7 @@ void DefaultRangeBasedSemanticsSolver::isCredulouslyAccepted() {
 void DefaultRangeBasedSemanticsSolver::isSkepticallyAccepted() {
 	clock_t startTime = clock();
 	bool status = true;
-	int arg = varMap.getVar(this->acceptanceQueryArgument);
+	int arg = this->problemReducer->getReducedMap()->getVar(this->problemReducer->translateAcceptanceQueryArgument(this->acceptanceQueryArgument));
 	std::vector<std::vector<bool> > models = computeAllExtensions([this,arg,&status](std::vector<bool>& model){
 		if(!model[arg-1]) {
 			status = false;

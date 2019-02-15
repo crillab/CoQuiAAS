@@ -78,7 +78,7 @@ void BuiltInMssSolverNG::buildEnumerator(int maxCount) {
 	config.nb = maxCount;
 	this->mcsEnumerator = new CoMSSEnum(this->formula, config);
 	Logger::getInstance()->debug("restoring %d learnt clauses", learnts.size());
-	for(unsigned int i=0; i<this->learnts.size(); ++i) ((MiniSatSolver*) this->mcsEnumerator->exttor->getSatSolver())->slv->restoreLearnt(learnts[i]);
+	//for(unsigned int i=0; i<this->learnts.size(); ++i) ((MiniSatSolver*) this->mcsEnumerator->exttor->getSatSolver())->slv->restoreLearnt(learnts[i]);
 }
 
 
