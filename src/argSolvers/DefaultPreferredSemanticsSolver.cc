@@ -19,6 +19,7 @@ DefaultPreferredSemanticsSolver::DefaultPreferredSemanticsSolver(std::shared_ptr
 
 void DefaultPreferredSemanticsSolver::init() {
 	this->problemReducer = std::make_unique<CompleteEncodingSatProblemReducer>(varMap, attacks);
+	this->problemReducer->search();
 	VarMap &reducedMap = *this->problemReducer->getReducedMap().get();
 	this->formatter.setVarMap(reducedMap);
 	this->solver->setStoreLearnts(false);

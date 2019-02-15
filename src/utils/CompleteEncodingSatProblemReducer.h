@@ -1,63 +1,19 @@
-#ifndef __SAT_PROBLEM_REDUCER_H__
-#define __SAT_PROBLEM_REDUCER_H__
+#ifndef __CO_SAT_PROBLEM_REDUCER_H__
+#define __CO_SAT_PROBLEM_REDUCER_H__
 
-#include "BuiltInSatSolverNG.h"
-#include "SatEncodingHelper.h"
-#include "VarMap.h"
-#include "Attacks.h"
-
-#include <memory>
-
+#include "SatProblemReducer.h"
 
 namespace CoQuiAAS {
 
-class CompleteEncodingSatProblemReducer {
+class CompleteEncodingSatProblemReducer : public SatProblemReducer {
 
 public:
 
     CompleteEncodingSatProblemReducer(VarMap& initVarMap, Attacks& initAttacks);
 
-    inline std::vector<std::vector<int> >& getEqClasses() {
-        return this->eqClasses;
-    }
+protected:
 
-    inline std::shared_ptr<VarMap> getReducedMap() {
-        return this->reducedVarMap;
-    }
-
-    inline std::string translateAcceptanceQueryArgument(std::string arg) {
-        return this->initVarMap.getName(this->equivalentTo[this->initVarMap.getVar(arg)]);
-    }
-
-private:
-
-    void search();
-
-    void propagateAtDecisionLvlZero();
-
-    void lookForEquivalencesOf(int var);
-
-    void computePropagationsOf(int var);
-
-    void translateVarMap();
-
-    std::shared_ptr<BuiltInSatSolverNG> slv;
-
-    VarMap& initVarMap;
-
-    std::shared_ptr<VarMap> reducedVarMap;
-    
-    Attacks& initAttacks;
-
-    std::vector<bool> fixed;
-
-    std::vector<bool> fixedVal;
-
-    std::vector<int> equivalentTo;
-
-    std::vector<std::vector<int> > eqClasses;
-
-    std::vector<std::vector<int>* > propagated;
+    void init();
 
 };
 
