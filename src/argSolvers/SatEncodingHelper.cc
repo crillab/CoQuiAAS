@@ -122,7 +122,7 @@ void SatEncodingHelper::createStableEncodingConstraints() {
 	for(std::vector<std::string>::iterator itVars = vars.begin() ; itVars != vars.end(); ++itVars) {
 		int var = this->varMap.getVar(*itVars);
 		completeCl.push_back(var);
-		std::vector<std::string>& attacksToCurrentVar = attacks.getAttacksTo(varMap.getName(var));
+		std::vector<std::string>& attacksToCurrentVar = attacks.getAttacksTo(*itVars);
 		for(std::vector<std::string>::iterator itAttackers = attacksToCurrentVar.begin(); itAttackers != attacksToCurrentVar.end(); ++itAttackers) {
 			int attacker = lookForDynAttackerReplacement(*itVars, *itAttackers);
 			binaryCl.push_back(-(var));

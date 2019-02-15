@@ -16,7 +16,7 @@ DefaultStableSemanticsSolver::DefaultStableSemanticsSolver(std::shared_ptr<SatSo
 	SemanticsProblemSolver(attacks, varMap, taskType, formatter), solver(solver) {
 	this->solver->setBlockingClauseFunction([this](std::vector<bool>& model) -> std::vector<int> {
 		std::vector<int> intCl;
-		for(int i=0; i<this->varMap.nVars(); ++i) {
+		for(int i=0; i<this->problemReducer->getReducedMap()->nVars(); ++i) {
 			if(model[i]) intCl.push_back(-i-1);
 		}
 		return intCl;
@@ -25,7 +25,11 @@ DefaultStableSemanticsSolver::DefaultStableSemanticsSolver(std::shared_ptr<SatSo
 
 
 void DefaultStableSemanticsSolver::init() {
-	this->helper = new SatEncodingHelper(solver, attacks, varMap);
+	this->problemReducer = std::make_unique<StableEncodingSatProblemReducer>(varMap, attacks);
+	this->problemReducer->search();
+	VarMap &reducedMap = *this->problemReducer->getReducedMap().get();
+	this->formatter.setVarMap(reducedMap);
+	this->helper = new SatEncodingHelper(solver, attacks, reducedMap);
 	this->helper->createStableEncodingConstraints();
 }
 
@@ -64,7 +68,8 @@ void DefaultStableSemanticsSolver::computeAllExtensions() {
 void DefaultStableSemanticsSolver::isCredulouslyAccepted() {
 	clock_t startTime = clock();
 	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
-	dynAssumps.push_back(varMap.getVar(this->acceptanceQueryArgument));
+	int argAssump = this->problemReducer->getReducedMap()->getVar(this->problemReducer->translateAcceptanceQueryArgument(this->acceptanceQueryArgument));
+	dynAssumps.push_back(argAssump);
 	solver->computeModel(dynAssumps);
 	this->formatter.writeArgAcceptance(solver->hasAModel());
 	logAcceptanceCheckingTime(startTime);
@@ -74,7 +79,8 @@ void DefaultStableSemanticsSolver::isCredulouslyAccepted() {
 void DefaultStableSemanticsSolver::isSkepticallyAccepted() {
 	clock_t startTime = clock();
 	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
-	dynAssumps.push_back(-varMap.getVar(this->acceptanceQueryArgument));
+	int argAssump = -this->problemReducer->getReducedMap()->getVar(this->problemReducer->translateAcceptanceQueryArgument(this->acceptanceQueryArgument));
+	dynAssumps.push_back(argAssump);
 	solver->computeModel(dynAssumps);
 	this->formatter.writeArgAcceptance(!solver->hasAModel());
 	logAcceptanceCheckingTime(startTime);
