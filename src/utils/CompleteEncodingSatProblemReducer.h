@@ -29,12 +29,6 @@ public:
         return this->initVarMap.getName(this->equivalentTo[this->initVarMap.getVar(arg)]);
     }
 
-    /* inline std::shared_ptr<Attacks> getReducedAttacks() {
-        return this->reducedAttacks;
-    } */
-
-    // std::vector<bool> translateModel(std::vector<bool> initModel);
-
 private:
 
     void search();
@@ -47,8 +41,6 @@ private:
 
     void translateVarMap();
 
-    // void translateAttacks();
-
     std::shared_ptr<BuiltInSatSolverNG> slv;
 
     VarMap& initVarMap;
@@ -56,8 +48,6 @@ private:
     std::shared_ptr<VarMap> reducedVarMap;
     
     Attacks& initAttacks;
-
-    // std::shared_ptr<Attacks> reducedAttacks;
 
     std::vector<bool> fixed;
 

@@ -18,8 +18,11 @@ DefaultPreferredSemanticsSolver::DefaultPreferredSemanticsSolver(std::shared_ptr
 
 
 void DefaultPreferredSemanticsSolver::init() {
+	this->problemReducer = std::make_unique<CompleteEncodingSatProblemReducer>(varMap, attacks);
+	VarMap &reducedMap = *this->problemReducer->getReducedMap().get();
+	this->formatter.setVarMap(reducedMap);
 	this->solver->setStoreLearnts(false);
-	this->helper = new MssEncodingHelper(solver, attacks, varMap);
+	this->helper = new MssEncodingHelper(solver, attacks, reducedMap);
 	switch(taskType) {
 	case TASK_CRED_INF:
 		break;
@@ -70,7 +73,8 @@ void DefaultPreferredSemanticsSolver::computeAllExtensions() {
 void DefaultPreferredSemanticsSolver::isCredulouslyAccepted() {
 	clock_t startTime = clock();
 	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
-	dynAssumps.push_back(varMap.getVar(this->acceptanceQueryArgument));
+	int argAssump = this->problemReducer->getReducedMap()->getVar(this->problemReducer->translateAcceptanceQueryArgument(this->acceptanceQueryArgument));
+	dynAssumps.push_back(argAssump);
 	solver->computeModel(dynAssumps);
 	this->formatter.writeArgAcceptance(solver->hasAModel());
 	solver->resetModels();
@@ -82,7 +86,7 @@ void DefaultPreferredSemanticsSolver::isSkepticallyAccepted() {
 	clock_t startTime = clock();
 	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
 	bool status = true;
-	int arg = varMap.getVar(this->acceptanceQueryArgument);
+	int arg = this->problemReducer->getReducedMap()->getVar(this->problemReducer->translateAcceptanceQueryArgument(this->acceptanceQueryArgument));
 	this->solver->computeAllMss([this,arg,&status](std::vector<int>& mss, std::vector<bool>& model){
 		if(!model[arg-1]) {
 			status = false;

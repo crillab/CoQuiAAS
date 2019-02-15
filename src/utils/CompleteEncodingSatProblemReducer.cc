@@ -73,12 +73,7 @@ void CompleteEncodingSatProblemReducer::lookForEquivalencesOf(int var) {
         }
         if(eq) equivalencies.push_back(prop);
     }
-    /* std::cout << "eqClass: " << equivalencies[0];
-    for(unsigned int i=1; i<equivalencies.size(); ++i) {
-        this->equivalentTo[equivalencies[i]] = var;
-        std::cout << " " << equivalencies[i];
-    }
-    std::cout << std::endl;*/
+    for(unsigned int i=1; i<equivalencies.size(); ++i) this->equivalentTo[equivalencies[i]] = var;
     this->eqClasses.push_back(equivalencies);
 }
 
@@ -95,11 +90,6 @@ void CompleteEncodingSatProblemReducer::computePropagationsOf(int var) {
 
 void CompleteEncodingSatProblemReducer::translateVarMap() {
     this->reducedVarMap = std::make_shared<VarMap>();
-    /* for(unsigned int i=1; i<this->equivalentTo.size(); ++i) {
-        if(this->equivalentTo[i] == (signed) i) {
-            this->reducedVarMap->addEntry(this->initVarMap.getName(i));
-        }
-    } */
     for(unsigned int i=0; i<eqClasses.size(); ++i) {
         std::vector<int> eqClass = eqClasses[i];
         std::vector<std::string> names;
@@ -109,37 +99,3 @@ void CompleteEncodingSatProblemReducer::translateVarMap() {
         reducedVarMap->addEntry(names);
     }
 }
-
-
-/* void CompleteEncodingSatProblemReducer::translateAttacks() {
-    this->reducedAttacks = std::make_shared<Attacks>(*(this->reducedVarMap.get()));
-    for(unsigned int i=0; i<this->initVarMap.nVars(); ++i) {
-        int var = this->initVarMap.intVars()[i];
-        if(this->fixed[var] && this->fixedVal[var]) continue;
-        int newTo = this->equivalentTo[var];
-        std::vector<int>* initAttacks = this->initAttacks.getAttacksTo(var);
-        for(unsigned int j=0; j<initAttacks->size(); ++j) {
-            int from = (*initAttacks)[j];
-            int newFrom = this->equivalentTo[from];
-            printf("adding attack %s -> %s\n", this->initVarMap.getName(newFrom).c_str(), this->initVarMap.getName(newTo).c_str());
-            this->reducedAttacks->addAttack(this->initVarMap.getName(newFrom), this->initVarMap.getName(newTo));
-        }
-    }
-    std::vector<std::tuple<bool, int, int, bool> >& dynAttacks = this->initAttacks.getDynAttacks();
-    for(unsigned int i=0; i<dynAttacks.size(); ++i) {
-        std::tuple<bool, int, int, bool> t = dynAttacks[i];
-        int newFrom = this->equivalentTo[std::get<1>(t)];
-        int newTo = this->equivalentTo[std::get<2>(t)];
-        this->reducedAttacks->addDynAttack(std::get<0>(t), newFrom, newTo, std::get<3>(t));
-    }
-} */
-
-
-/* std::vector<bool> CompleteEncodingSatProblemReducer::translateModel(std::vector<bool> reducedModel) {
-    std::vector<bool> result(this->initVarMap.nVars());
-    for(unsigned int i=0; i<this->initVarMap.nVars(); ++i) {
-        string varName = this->initVarMap.getName(this->equivalentTo[this->initVarMap.intVars()[i]]);
-        result[i] = reducedModel[this->reducedVarMap->getVar(varName)-1];
-    }
-    return result;
-} */

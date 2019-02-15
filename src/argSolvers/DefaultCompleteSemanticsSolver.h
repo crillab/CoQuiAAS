@@ -12,7 +12,6 @@
 #include "SemanticsProblemSolver.h"
 #include "SatEncodingHelper.h"
 #include "SolverOutputFormatter.h"
-#include "BuiltInSatSolverNG.h"
 #include "CompleteEncodingSatProblemReducer.h"
 
 

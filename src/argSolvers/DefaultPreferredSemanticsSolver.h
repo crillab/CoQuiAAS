@@ -13,6 +13,7 @@
 #include "SemanticsProblemSolver.h"
 #include "MssEncodingHelper.h"
 #include "MssSolver.h"
+#include "CompleteEncodingSatProblemReducer.h"
 
 
 namespace CoQuiAAS {
@@ -40,6 +41,8 @@ private:
 	std::shared_ptr<MssSolver> solver;
 
 	MssEncodingHelper* helper;
+
+	std::unique_ptr<CompleteEncodingSatProblemReducer> problemReducer;
 };
 
 

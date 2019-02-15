@@ -63,6 +63,8 @@ protected:
 	std::vector<std::tuple<std::string, std::string, int, int, int> > dynVars;
 
 	int nbVars;
+
+	std::map<std::string, int> disjunctionVars;
 };
 
 
