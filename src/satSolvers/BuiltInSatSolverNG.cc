@@ -91,10 +91,7 @@ std::vector<int>& BuiltInSatSolverNG::propagatedAtDecisionLvlZero(std::vector<in
 
 std::vector<int>& BuiltInSatSolverNG::propagatedAtDecisionLvlZero(std::vector<int> assumps, bool includeNegLits) {
 	buildSolver();
-	for (int c = solver->slv->trail.size()-1; c >= 0; c--) solver->slv->assigns[Minisat::var(solver->slv->trail[c])] = Minisat::lbool((uint8_t)2);
-    solver->slv->qhead = 0;
-    solver->slv->trail.shrink(solver->slv->trail.size());
-    solver->slv->trail_lim.shrink(solver->slv->trail_lim.size());
+	resetSolverState();
 	propagated.clear();
 	solver->slv->useAsCompleteSolver();
 	for(unsigned int i=0; i<assumps.size(); ++i) {
@@ -110,6 +107,14 @@ std::vector<int>& BuiltInSatSolverNG::propagatedAtDecisionLvlZero(std::vector<in
 		}
 	}
 	return propagated;
+}
+
+
+void BuiltInSatSolverNG::resetSolverState() {
+	for (int c = solver->slv->trail.size()-1; c >= 0; c--) solver->slv->assigns[Minisat::var(solver->slv->trail[c])] = Minisat::lbool((uint8_t)2);
+    solver->slv->qhead = 0;
+    solver->slv->trail.shrink(solver->slv->trail.size());
+    solver->slv->trail_lim.shrink(solver->slv->trail_lim.size());
 }
 
 

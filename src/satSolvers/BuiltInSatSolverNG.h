@@ -98,6 +98,8 @@ private:
 
 	void buildSolver();
 
+	void resetSolverState();
+
 };
 
 }
