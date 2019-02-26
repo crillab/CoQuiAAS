@@ -100,9 +100,9 @@ void BuiltInMssSolverNG::computeSomeMsses(std::function<void(std::vector<int>&, 
 		vector<int> mss = extractMssFromCoMss(litMcs, this->nSoftCstrs);
 		vector<bool> mod;
 		for(unsigned int i=0; i<model.size(); ++i) mod.push_back(model[i] == l_True);
-		if(callback) callback(mss, mod);
 		this->mss.push_back(mss);
 		this->models.push_back(mod);
+		if(callback) callback(mss, mod);
 	});
 	storeLearnts(nVars);
 	Logger::getInstance()->debug("solver has %d learnt clauses", ((MiniSatSolver*) this->mcsEnumerator->exttor->getSatSolver())->slv->nLearnts());

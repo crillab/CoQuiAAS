@@ -16,9 +16,9 @@ MssEncodingHelper::MssEncodingHelper(std::shared_ptr<MssSolver> solver, Attacks&
 
 void MssEncodingHelper::setMaxExtensionNeeded() {
 	std::vector<std::string> vars = varMap.getNames();
-	for(std::vector<std::string>::iterator itVars = vars.begin() ; itVars != vars.end(); ++itVars) {
+	for(unsigned int i=0; i<this->varMap.nVars(); ++i) {
 		std::vector<int> softClause;
-		softClause.push_back(varMap.getVar(*itVars));
+		softClause.push_back(this->varMap.intVars()[i]);
 		solver->addSoftClause(softClause);
 	}
 }
