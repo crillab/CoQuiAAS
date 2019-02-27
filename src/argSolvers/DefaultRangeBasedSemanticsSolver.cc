@@ -50,21 +50,28 @@ std::vector<std::vector<bool>> DefaultRangeBasedSemanticsSolver::computeAllExten
 	std::vector<std::vector<int>> msses;
 	std::vector<std::vector<bool>> oldModels;
 	std::vector<std::vector<bool>> extModels;
+	std::shared_ptr<VarMap> reducedVM = this->problemReducer->getReducedMap();
 	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
-	solver->computeAllMss([this, callback, &msses, &oldModels](std::vector<int>& mss, std::vector<bool>& model){
+	solver->computeAllMss([this, callback, &msses, &oldModels, reducedVM](std::vector<int>& mss, std::vector<bool>& model){
 		msses.push_back(mss);
 		oldModels.push_back(model);
 		if(callback != NULL) callback(model);
+		bool emptyExt = true;
+		for(unsigned int i=0; i<reducedVM->nVars() && emptyExt; ++i) emptyExt &= !model[i];
 		if(this->stopEnum) {
 			Logger::getInstance()->trace("Range-based solver was required to stop enumeration process");
 			solver->stopMssEnum();
+		}
+		if(emptyExt) {
+			Logger::getInstance()->trace("Found an empty maximal MSS; stopping enumeration process");
+			solver->stopMssEnum();
+			this->stopEnum = true;
 		}
 	}, dynAssumps);
 	solver->resetAllMss();
 	solver->resetModels();
 	Logger::getInstance()->trace("MSS enumerator found %d MSSes for range-based solver", msses.size());
 	if(this->stopEnum) return extModels;
-	std::shared_ptr<VarMap> reducedVM = this->problemReducer->getReducedMap();
 	std::vector<std::string> varNames = reducedVM->getNames();
 	std::vector<int> selectors;
 	for(unsigned int i=0; i<varNames.size(); ++i) {

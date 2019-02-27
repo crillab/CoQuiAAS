@@ -42,6 +42,7 @@ void CoMSSEnum::run() {
 
 void CoMSSEnum::run(CMP::vec<CMP::Lit>& assumps, std::function<void(vec<int>&, vector<lbool>&)> callback)
 {
+  this->mustStopEnum = false;
   vec< vec<Lit> > unblocked_coMSSes;
   vec<Lit> coMss, mss, prev_coMss;
   bool emptyBlockClause = false;
@@ -62,6 +63,7 @@ void CoMSSEnum::run(CMP::vec<CMP::Lit>& assumps, std::function<void(vec<int>&, v
       vec<int> mcs;
       exttor->in2ex(coMss, mcs);
       callback(mcs, exttor->getSatSolver()->getModel());
+      if(this->mustStopEnum) return;
     }
     if(!coMss.size()) break;
 
@@ -75,6 +77,7 @@ void CoMSSEnum::run(CMP::vec<CMP::Lit>& assumps, std::function<void(vec<int>&, v
       vec<int> mcs;
       exttor->in2ex(coMss, mcs);
       callback(mcs, exttor->getSatSolver()->getModel());
+      if(this->mustStopEnum) return;
     }
 
     coMss.copyTo(prev_coMss);

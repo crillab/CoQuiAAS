@@ -54,6 +54,13 @@ class CoMSSEnum : public MetaSolver
     printf("c CPU time : %g s\n", cpuTime()); printf("c\n");
     printf("c\n");
   }
+
+  inline void stopEnum() {
+    this->mustStopEnum = true;
+  }
+
+ private:
+  bool mustStopEnum = false;
   
 };
 

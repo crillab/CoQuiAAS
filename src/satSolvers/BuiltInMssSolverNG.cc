@@ -103,9 +103,9 @@ void BuiltInMssSolverNG::computeSomeMsses(std::function<void(std::vector<int>&, 
 		this->mss.push_back(mss);
 		this->models.push_back(mod);
 		if(callback) callback(mss, mod);
+		if(this->shouldStopMssEnum) this->mcsEnumerator->stopEnum();
 	});
 	storeLearnts(nVars);
-	Logger::getInstance()->debug("solver has %d learnt clauses", ((MiniSatSolver*) this->mcsEnumerator->exttor->getSatSolver())->slv->nLearnts());
 }
 
 

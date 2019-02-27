@@ -76,7 +76,7 @@ protected:
 	}
 
 	inline void logOneExtTime(clock_t startTime, int extIndex) {
-		Logger::getInstance()->info("time spent to extension %d: %.3fs", extIndex, (double)(clock()-startTime)/CLOCKS_PER_SEC);
+		Logger::getInstance()->info("time spent to compute one extension %d: %.3fs", extIndex, (double)(clock()-startTime)/CLOCKS_PER_SEC);
 	}
 
 	inline void logNoMoreExts(clock_t startTime) {

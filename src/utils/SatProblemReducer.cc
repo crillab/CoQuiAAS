@@ -8,6 +8,7 @@ SatProblemReducer::SatProblemReducer(VarMap& initVarMap, Attacks& initAttacks): 
 }
 
 void SatProblemReducer::search() {
+    clock_t startTime = clock();
     init();
     int nVars = this->initVarMap.nVars();
     this->fixed = std::vector<bool>(1+nVars, false);
@@ -21,6 +22,8 @@ void SatProblemReducer::search() {
     }
     for(int i=0; i<=nVars; ++i) if(this->propagated[i]) delete this->propagated[i];
     translateVarMap();
+    Logger::getInstance()->info("time spent to reduce the problem: %.3fs", (double)(clock()-startTime)/CLOCKS_PER_SEC);
+    Logger::getInstance()->info("kept %d arguments out of %d", initVarMap.nVars(), reducedVarMap->nVars());
 }
 
 
