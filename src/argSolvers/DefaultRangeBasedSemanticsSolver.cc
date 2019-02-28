@@ -91,13 +91,26 @@ std::vector<std::vector<bool>> DefaultRangeBasedSemanticsSolver::computeAllExten
 		for(int j=0; j<(signed)msses[i].size(); ++j) {
 			assumps[msses[i][j]-1] = selectors[msses[i][j]-1];
 		}
+		for(unsigned int j=0; j<varNames.size(); ++j) {
+			if(assumps[j] == -selectors[j]) {
+				std::string varName = varNames[j];
+				assumps.push_back(-reducedVM->getVar(varName));
+				assumps.push_back(-this->helper->getDisjunctionVar(varName));
+			}
+		}
 		std::vector<int> cl;
 		for(int j=0; j<reducedVM->nVars(); ++j) {
 			if(!oldModels[i][j]) cl.push_back(j+1);
 		}
 		for(unsigned int j=0; j<dynAssumps.size(); ++j) assumps.push_back(dynAssumps[j]);
 		auto blockingSel = solver->addSelectedClause(cl);
+		cl.clear();
+		cl.push_back(-blockingSel);
 		assumps.push_back(blockingSel);
+		for(int j=0; j<reducedVM->nVars(); ++j) {
+			if(oldModels[i][j]) cl.push_back(-j-1);
+		}
+		solver->addClause(cl);
 		solver->computeAllModels([this,callback,&extModels](std::vector<bool>& model){
 			extModels.push_back(model);
 			if(callback != NULL) callback(model);
