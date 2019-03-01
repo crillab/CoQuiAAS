@@ -31,13 +31,8 @@ void DefaultCompleteSemanticsSolver::init() {
 void DefaultCompleteSemanticsSolver::computeOneExtension() {
 	clock_t startTime = clock();
 	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
-	solver->computeModel(dynAssumps);
-	if(!solver->hasAModel()) {
-		this->formatter.writeNoExt();
-		return;
-	}
-	std::vector<bool> model = solver->getModel();
-	this->formatter.writeSingleExtension(model);
+	std::vector<int>& propagated = solver->propagatedAtDecisionLvlZero(dynAssumps);
+	this->formatter.writeSingleExtension(propagated);
 	logSingleExtTime(startTime);
 }
 

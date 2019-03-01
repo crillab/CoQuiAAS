@@ -14,6 +14,7 @@
 #include <functional>
 #include "cmp/ifaces/SatSolver.h"
 #include "minisat/MiniSatSolver.h"
+#include "glucose/GlucoseSolver.h"
 
 
 namespace CoQuiAAS {
@@ -67,6 +68,14 @@ protected:
 		for(std::vector<int>::iterator it = intCl.begin(); it != intCl.end(); ++it) {
 			int lit = *it;
 			Minisat::Lit minisatLit = lit > 0 ? Minisat::mkLit(lit-1) : ~Minisat::mkLit(-lit-1);
+			minisatCl.push(minisatLit);
+		}
+	}
+
+	static void intClauseToBuiltInClause(std::vector<int>& intCl, Glucose::vec<Glucose::Lit>& minisatCl) {
+		for(std::vector<int>::iterator it = intCl.begin(); it != intCl.end(); ++it) {
+			int lit = *it;
+			Glucose::Lit minisatLit = lit > 0 ? Glucose::mkLit(lit-1) : ~Glucose::mkLit(-lit-1);
 			minisatCl.push(minisatLit);
 		}
 	}

@@ -7,14 +7,14 @@ using namespace CMP;
 
 class GlucoseSolver : public SatSolver
 {
- protected :
-  Glucose::Solver* slv;
 
   //TODO update model after calling to solve()
   
   //  friend class SatSolverFactory;
   
  public:
+ Glucose::Solver* slv;
+ 
   GlucoseSolver() {slv = new Glucose::Solver();}
   ~GlucoseSolver() {if(!slv) {delete slv; slv = NULL;}}
 

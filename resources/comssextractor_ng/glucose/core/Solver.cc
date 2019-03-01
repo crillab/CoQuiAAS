@@ -120,6 +120,7 @@ Solver::Solver() :
     , curRestart(1)
 
   , ok                 (true)
+  , isReallyUnsatWhateverTheAssumptions (false)
   , cla_inc            (1)
   , var_inc            (1)
   , watches            (WatcherDeleted(ca))
@@ -244,6 +245,7 @@ bool Solver::addClause_(vec<Lit>& ps)
     if (ps.size() == 0)
         return ok = false;
     else if (ps.size() == 1){
+        unitLits.push(ps[0]);
         uncheckedEnqueue(ps[0]);
         return ok = (propagate() == CRef_Undef);
     }else{
@@ -1017,6 +1019,7 @@ bool Solver::simplify()
 |________________________________________________________________________________________________@*/
 lbool Solver::search(int nof_conflicts)
 {
+    if(isReallyUnsatWhateverTheAssumptions) return l_False;
     assert(ok);
     int         backtrack_level;
     int         conflictC = 0;
@@ -1039,6 +1042,7 @@ lbool Solver::search(int nof_conflicts)
 	  // 	   (int)nbReduceDB, nLearnts(), (int)nbDL2,(int)nbRemovedClauses, progressEstimate()*100);
 	  // }
 	  if (decisionLevel() == 0) {
+      isReallyUnsatWhateverTheAssumptions = true;
 	    return l_False;
 	    
 	  }
@@ -1136,7 +1140,7 @@ lbool Solver::search(int nof_conflicts)
                 next = pickBranchLit();
 
                 if (next == lit_Undef){
-		  printf("c last restart ## conflicts  :  %d %d \n",conflictC,decisionLevel());
+		  //printf("c last restart ## conflicts  :  %d %d \n",conflictC,decisionLevel());
 		  // Model found:
 		  return l_True;
 		}
@@ -1165,6 +1169,7 @@ double Solver::progressEstimate() const
 }
 
 void Solver::printIncrementalStats() {
+  return;
 
   printf("c---------- Glucose Stats -------------------------\n");
   // printf("c restarts              : %lld\n", starts);

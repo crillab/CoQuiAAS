@@ -17,10 +17,18 @@
 #include "DefaultIdealSemanticsSolver.h"
 #include "DefaultDungTriathlonSolver.h"
 #include "BuiltInSatSolverNG.h"
+#include "BuiltInSatSolverNGGlucose.h"
 #include "ExternalSatSolver.h"
 #include "BuiltInMssSolverNG.h"
+#include "BuiltInMssSolverNGGlucose.h"
 #include "SolverOutputFormatter.h"
 #include "DynamicSemanticsSolverDecorator.h"
+
+#define __SF_USE_GLUCOSE
+
+#ifndef __SF_USE_GLUCOSE
+#define __SF_USE_MINISAT
+#endif
 
 
 namespace CoQuiAAS {
@@ -78,11 +86,21 @@ public:
 		if(additionalParams.find("-externalSatSolver") != additionalParams.end()) {
 			return std::shared_ptr<SatSolver>(std::make_shared<ExternalSatSolver>(additionalParams["-externalSatSolver"]));
 		}
+		#ifdef __SF_USE_MINISAT
 		return std::shared_ptr<SatSolver>(std::make_shared<BuiltInSatSolverNG>());
+		#endif
+		#ifdef __SF_USE_GLUCOSE
+		return std::shared_ptr<SatSolver>(std::make_shared<BuiltInSatSolverNGGlucose>());
+		#endif
 	}
 
 	static std::shared_ptr<MssSolver> createMssSolver(std::map<std::string,std::string>& additionalParams) {
+		#ifdef __SF_USE_MINISAT
 		return std::shared_ptr<MssSolver>(std::make_shared<BuiltInMssSolverNG>());
+		#endif
+		#ifdef __SF_USE_GLUCOSE
+		return std::shared_ptr<MssSolver>(std::make_shared<BuiltInMssSolverNGGlucose>());
+		#endif
 	}
 
 	static std::unique_ptr<SemanticsProblemSolver> groundedSolver(TaskType task, std::map<std::string,std::string>& additionalParams, Attacks &attacks, VarMap &varMap, SolverOutputFormatter &outputFormatter) {

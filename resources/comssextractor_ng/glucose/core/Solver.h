@@ -205,6 +205,7 @@ public:
     // Solver state:
     //
     int lastIndexRed;
+    bool isReallyUnsatWhateverTheAssumptions;
     bool                ok;               // If FALSE, the constraints are already unsatisfiable. No part of the solver state may be used!
     double              cla_inc;          // Amount to bump next clause with.
     vec<double>         activity;         // A heuristic measurement of the activity of a variable.
@@ -447,6 +448,24 @@ public:
     
     //void  printLits(vec<Lit>& v);
     Clause& getIth_clause(int i);
+
+
+    vec<Lit> unitLits;
+
+    inline void useAsCompleteSolver()
+    {
+      for(int i = 0 ; i<unitLits.size() ; i++)
+        { 
+          Lit l = unitLits[i];
+          ok = value(l) != l_False;
+          
+          if(!ok) return;
+          if(value(l) == l_Undef) uncheckedEnqueue(l);
+        }
+      
+      CRef cr = propagate();
+      ok = cr == CRef_Undef;
+    }
 };
 
 
