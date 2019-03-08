@@ -94,6 +94,7 @@ std::vector<int>& BuiltInSatSolverNGGlucose::propagatedAtDecisionLvlZero(std::ve
 	resetSolverState();
 	propagated.clear();
 	solver->slv->useAsCompleteSolver();
+	solver->slv->newDecisionLevel();
 	for(unsigned int i=0; i<assumps.size(); ++i) {
 		int assump = assumps[i];
 		solver->slv->enqueue(assump > 0 ? Glucose::mkLit(assump-1) : ~Glucose::mkLit(-assump-1));
@@ -106,6 +107,7 @@ std::vector<int>& BuiltInSatSolverNGGlucose::propagatedAtDecisionLvlZero(std::ve
 			propagated.push_back(-Glucose::var(solver->slv->trail[i])-1);
 		}
 	}
+	solver->slv->cancelUntil(0);
 	return propagated;
 }
 
@@ -185,6 +187,33 @@ void BuiltInSatSolverNGGlucose::computeAllModels(std::function<void(std::vector<
 void BuiltInSatSolverNGGlucose::computeAllModels(std::function<void(std::vector<bool>&)> callback, std::vector<int> &assumps) {
 	buildSolver();
 	clearModels();
+	for(;;) {
+		bool newModel = computeModel(assumps, false);
+		if(!newModel) break;
+        std::vector<bool> model = this->models[this->models.size()-1];
+        if(callback) callback(model);
+        std::vector<int> blockingCl = this->blockingClauseFunction(model);
+        int sel = addSelectedClause(blockingCl);
+		blockingSelectors.push_back(sel);
+		assumps.push_back(sel);
+	}
+	for(int i=0; i<(int) this->models.size(); ++i) {
+		std::vector<int> cl;
+		cl.push_back(-blockingSelectors[i]);
+		addClause(cl);
+	}
+}
+
+
+void BuiltInSatSolverNGGlucose::computeAllModels(std::function<void(std::vector<bool>&)> callback, std::vector<int> &assumps, std::vector<bool> knownModel) {
+	buildSolver();
+	clearModels();
+	this->models.push_back(knownModel);
+	if(callback) callback(knownModel);
+    std::vector<int> blockingCl = this->blockingClauseFunction(knownModel);
+    int sel = addSelectedClause(blockingCl);
+	blockingSelectors.push_back(sel);
+	assumps.push_back(sel);
 	for(;;) {
 		bool newModel = computeModel(assumps, false);
 		if(!newModel) break;

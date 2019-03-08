@@ -1195,6 +1195,9 @@ void Solver::printIncrementalStats() {
 lbool Solver::solve_(int restart_lim)
 {
 
+  // set solver in a "clean" state if it is reused after unit propagations
+  rebuildOrderHeap();
+
   if(incremental && certifiedUNSAT) {
     printf("Can not use incremental and certified unsat in the same time\n");
     exit(-1);

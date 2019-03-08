@@ -41,6 +41,8 @@ void DefaultCompleteSemanticsSolver::computeAllExtensions() {
 	clock_t globalStartTime = clock();
 	this->formatter.writeExtensionListBegin();
 	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
+	std::vector<int>& propagated = solver->propagatedAtDecisionLvlZero(dynAssumps);
+	std::vector<bool> grExt = SatSolver::toBoolModel(propagated, this->problemReducer->getReducedMap()->nVars());
 	int extIndex = 1;
 	clock_t startTime = clock();
 	solver->computeAllModels([this, &extIndex, &startTime](std::vector<bool>& model){
@@ -48,7 +50,7 @@ void DefaultCompleteSemanticsSolver::computeAllExtensions() {
 		logOneExtTime(startTime, extIndex);
 		extIndex++;
 		startTime = clock();
-	}, dynAssumps);
+	}, dynAssumps, grExt);
 	logNoMoreExts(startTime);
 	this->formatter.writeExtensionListEnd();
 	logAllExtsTime(globalStartTime);
@@ -59,9 +61,27 @@ void DefaultCompleteSemanticsSolver::isCredulouslyAccepted() {
 	clock_t startTime = clock();
 	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
 	int argAssump = this->problemReducer->getReducedMap()->getVar(this->problemReducer->translateAcceptanceQueryArgument(this->acceptanceQueryArgument));
-	dynAssumps.push_back(argAssump);
-	solver->computeModel(dynAssumps);
-	this->formatter.writeArgAcceptance(solver->hasAModel());
+	std::vector<int>& propagated = solver->propagatedAtDecisionLvlZero(dynAssumps);
+	bool isPropagated = false;
+	bool propagatedValue = false;
+	for(unsigned int i=0; i<propagated.size(); ++i) {
+		if(propagated[i] == argAssump) {
+			isPropagated = true;
+			propagatedValue = true;
+			break;
+		} else if(propagated[i] == -argAssump) {
+			isPropagated = true;
+			propagatedValue = false;
+			break;
+		}
+	}
+	if(isPropagated) {
+		this->formatter.writeArgAcceptance(propagatedValue);
+	} else {
+		dynAssumps.push_back(argAssump);
+		solver->computeModel(dynAssumps);
+		this->formatter.writeArgAcceptance(solver->hasAModel());
+	}
 	logAcceptanceCheckingTime(startTime);
 }
 
@@ -69,10 +89,18 @@ void DefaultCompleteSemanticsSolver::isCredulouslyAccepted() {
 void DefaultCompleteSemanticsSolver::isSkepticallyAccepted() {
 	clock_t startTime = clock();
 	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
-	int argAssump = -this->problemReducer->getReducedMap()->getVar(this->problemReducer->translateAcceptanceQueryArgument(this->acceptanceQueryArgument));
-	dynAssumps.push_back(argAssump);
-	solver->computeModel(dynAssumps);
-	this->formatter.writeArgAcceptance(!solver->hasAModel());
+	int argAssump = this->problemReducer->getReducedMap()->getVar(this->problemReducer->translateAcceptanceQueryArgument(this->acceptanceQueryArgument));
+	std::vector<int>& propagated = solver->propagatedAtDecisionLvlZero(dynAssumps);
+	bool isPropagatedToTrue = false;
+	for(unsigned int i=0; i<propagated.size(); ++i) {
+		if(propagated[i] == argAssump) {
+			isPropagatedToTrue = true;
+			break;
+		} else if(propagated[i] == -argAssump) {
+			break;
+		}
+	}
+	this->formatter.writeArgAcceptance(isPropagatedToTrue);
 	logAcceptanceCheckingTime(startTime);
 }
 

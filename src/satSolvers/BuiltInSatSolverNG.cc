@@ -203,6 +203,33 @@ void BuiltInSatSolverNG::computeAllModels(std::function<void(std::vector<bool>&)
 }
 
 
+void BuiltInSatSolverNG::computeAllModels(std::function<void(std::vector<bool>&)> callback, std::vector<int> &assumps, std::vector<bool> knownModel) {
+	buildSolver();
+	clearModels();
+	this->models.push_back(knownModel);
+	if(callback) callback(knownModel);
+    std::vector<int> blockingCl = this->blockingClauseFunction(knownModel);
+    int sel = addSelectedClause(blockingCl);
+	blockingSelectors.push_back(sel);
+	assumps.push_back(sel);
+	for(;;) {
+		bool newModel = computeModel(assumps, false);
+		if(!newModel) break;
+        std::vector<bool> model = this->models[this->models.size()-1];
+        if(callback) callback(model);
+        std::vector<int> blockingCl = this->blockingClauseFunction(model);
+        int sel = addSelectedClause(blockingCl);
+		blockingSelectors.push_back(sel);
+		assumps.push_back(sel);
+	}
+	for(int i=0; i<(int) this->models.size(); ++i) {
+		std::vector<int> cl;
+		cl.push_back(-blockingSelectors[i]);
+		addClause(cl);
+	}
+}
+
+
 bool BuiltInSatSolverNG::hasAModel() {
 	return this->models.size() > 0;
 }

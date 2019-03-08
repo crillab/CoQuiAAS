@@ -202,6 +202,10 @@ void BuiltInMssSolverNG::computeAllModels(std::function<void(std::vector<bool>&)
 	BuiltInSatSolverNG::computeAllModels(callback, assumps);
 }
 
+void BuiltInMssSolverNG::computeAllModels(std::function<void(std::vector<bool>&)> callback, std::vector<int> &assumps, std::vector<bool> knownModel){
+	BuiltInMssSolverNG::computeAllModels(callback, assumps, knownModel);
+}
+
 
 bool BuiltInMssSolverNG::hasAModel() {
 	return BuiltInSatSolverNG::hasAModel();

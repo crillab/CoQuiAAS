@@ -60,6 +60,8 @@ public:
 
 	virtual void computeAllModels(std::function<void(std::vector<bool>&)> callback, std::vector<int> &assumps);
 
+	virtual void computeAllModels(std::function<void(std::vector<bool>&)> callback, std::vector<int> &assumps, std::vector<bool> knownModel);
+
 	virtual bool hasAModel();
 
 	virtual std::vector<bool>& getModel();

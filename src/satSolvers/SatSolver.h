@@ -48,6 +48,8 @@ public:
 
 	virtual void computeAllModels(std::function<void(std::vector<bool>&)> callback, std::vector<int> &assumps) = 0;
 
+	virtual void computeAllModels(std::function<void(std::vector<bool>&)> callback, std::vector<int> &assumps, std::vector<bool> knownModel) = 0;
+
 	virtual bool hasAModel() = 0;
 
 	virtual std::vector<bool>& getModel() = 0;
@@ -60,6 +62,15 @@ public:
 
 	void setBlockingClauseFunction(std::function<std::vector<int>(std::vector<bool>&)> function) {
 		this->blockingClauseFunction = function;
+	}
+
+	static std::vector<bool> toBoolModel(std::vector<int> model, int nArgs) {
+		std::vector<bool> boolModel(nArgs, false);
+		for(unsigned int i=0; i<model.size(); ++i) {
+			int var = model[i] > 0 ? model[i] : -model[i];
+			boolModel[var-1] = model[i] > 0;
+		}
+		return boolModel;
 	}
 
 protected:

@@ -202,6 +202,10 @@ void BuiltInMssSolverNGGlucose::computeAllModels(std::function<void(std::vector<
 	BuiltInSatSolverNGGlucose::computeAllModels(callback, assumps);
 }
 
+void BuiltInMssSolverNGGlucose::computeAllModels(std::function<void(std::vector<bool>&)> callback, std::vector<int> &assumps, std::vector<bool> knownModel){
+	BuiltInMssSolverNGGlucose::computeAllModels(callback, assumps, knownModel);
+}
+
 
 bool BuiltInMssSolverNGGlucose::hasAModel() {
 	return BuiltInSatSolverNGGlucose::hasAModel();

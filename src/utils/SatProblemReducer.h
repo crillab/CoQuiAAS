@@ -27,6 +27,16 @@ public:
         return this->initVarMap.getName(this->equivalentTo[this->initVarMap.getVar(arg)]);
     }
 
+    inline bool isFixedFalse(std::string arg) {
+        int var = this->initVarMap.getVar(arg);
+        return this->fixed[var] && !this->fixedVal[var];
+    }
+
+    inline bool isFixedTrue(std::string arg) {
+        int var = this->initVarMap.getVar(arg);
+        return this->fixed[var] && this->fixedVal[var];
+    }
+
 protected:
 
     virtual void init() = 0;

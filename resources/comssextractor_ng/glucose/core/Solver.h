@@ -348,6 +348,33 @@ public:
     bool    solve   (const vec<Lit>& assumps, const vec<Lit>& mss);
     bool    solve   (const int lim);
     
+  inline void printTrail()
+  {
+    printf("trail: ");
+    for(int i = 0 ; i<trail.size() ; i++) printf("%s%d ", sign(trail[i]) ? "-" : "",  var(trail[i]) + 1);
+    printf("\n");  
+  }
+
+  inline void printClauses()
+  {
+    for(int i = 0 ; i<clauses.size() ; i++)
+      {
+        Clause &c = ca[clauses[i]];
+        for(int j = 0 ; j<c.size() ; j++) printf("%s%d ", sign(c[j]) ? "-" : "",  var(c[j]) + 1);
+        printf("\n");
+    }
+  }
+
+  inline void printLearnts()
+  {
+    for(int i = 0 ; i<learnts.size() ; i++)
+    {
+      Clause &c = ca[learnts[i]];
+      for(int j = 0 ; j<c.size() ; j++) printf("%s%d ", sign(c[j]) ? "-" : "",  var(c[j]) + 1);
+      printf("\n");
+    }
+  }
+
     inline void restartUntil(int v)
     {
       cancelUntil(0);
