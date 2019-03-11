@@ -90,15 +90,34 @@ void DefaultIdealSemanticsSolver::computeAllExtensions() {
 
 void DefaultIdealSemanticsSolver::isCredulouslyAccepted() {
 	clock_t startTime = clock();
-	std::vector<int> mss = justComputeOneExtension();
 	int arg = this->problemReducer->getReducedMap()->getVar(this->problemReducer->translateAcceptanceQueryArgument(this->acceptanceQueryArgument));
-	for(unsigned int j=0; j<mss.size(); ++j) {
-		if(mss[j] == arg) {
-			this->formatter.writeArgAcceptance(true);
-			return;
+	bool status = false;
+	std::vector<int>& propagated = solver->propagatedAtDecisionLvlZero();
+	bool isPropagated = false;
+	bool propagatedValue = false;
+	for(unsigned int i=0; i<propagated.size(); ++i) {
+		if(propagated[i] == arg) {
+			isPropagated = true;
+			propagatedValue = true;
+			break;
+		} else if(propagated[i] == -arg) {
+			isPropagated = true;
+			propagatedValue = false;
+			break;
 		}
 	}
-	this->formatter.writeArgAcceptance(false);
+	if(isPropagated) {
+		status = propagatedValue;
+	} else {
+		std::vector<int> mss = justComputeOneExtension();
+		for(unsigned int j=0; j<mss.size(); ++j) {
+			if(mss[j] == arg) {
+				status = true;
+				break;
+			}
+		}
+	}
+	this->formatter.writeArgAcceptance(status);
 	logAcceptanceCheckingTime(startTime);
 }
 

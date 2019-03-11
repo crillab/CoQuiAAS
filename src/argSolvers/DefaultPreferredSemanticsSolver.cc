@@ -58,8 +58,22 @@ void DefaultPreferredSemanticsSolver::computeAllExtensions() {
 	this->formatter.writeExtensionListBegin();
 	int extIndex = 1;
 	clock_t startTime = clock();
-	solver->computeAllMss([this, &extIndex, &startTime](std::vector<int>& mss, std::vector<bool>& model){
+	std::vector<int>& propagated = solver->propagatedAtDecisionLvlZero(dynAssumps);
+	std::vector<bool> grExt = SatSolver::toBoolModel(propagated, this->problemReducer->getReducedMap()->nVars());
+	solver->computeAllMss([this, &extIndex, &startTime, grExt](std::vector<int>& mss, std::vector<bool>& model){
 		this->formatter.writeExtensionListElmt(mss, extIndex == 1);
+		if(extIndex == 1) {
+			bool isGrounded = true;
+			for(unsigned int i=0; i<this->problemReducer->getReducedMap()->nVars(); ++i) {
+				if(grExt[i] != model[i]) {
+					isGrounded = false;
+					break;
+				}
+			}
+			if(isGrounded) {
+				solver->stopMssEnum();
+			}
+		}
 		extIndex++;
 		startTime = clock();
 	}, dynAssumps);
@@ -75,9 +89,27 @@ void DefaultPreferredSemanticsSolver::isCredulouslyAccepted() {
 	clock_t startTime = clock();
 	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
 	int argAssump = this->problemReducer->getReducedMap()->getVar(this->problemReducer->translateAcceptanceQueryArgument(this->acceptanceQueryArgument));
-	dynAssumps.push_back(argAssump);
-	solver->computeModel(dynAssumps);
-	this->formatter.writeArgAcceptance(solver->hasAModel());
+	std::vector<int>& propagated = solver->propagatedAtDecisionLvlZero(dynAssumps);
+	bool isPropagated = false;
+	bool propagatedValue = false;
+	for(unsigned int i=0; i<propagated.size(); ++i) {
+		if(propagated[i] == argAssump) {
+			isPropagated = true;
+			propagatedValue = true;
+			break;
+		} else if(propagated[i] == -argAssump) {
+			isPropagated = true;
+			propagatedValue = false;
+			break;
+		}
+	}
+	if(isPropagated) {
+		this->formatter.writeArgAcceptance(propagatedValue);
+	} else {
+		dynAssumps.push_back(argAssump);
+		solver->computeModel(dynAssumps);
+		this->formatter.writeArgAcceptance(solver->hasAModel());
+	}
 	solver->resetModels();
 	logAcceptanceCheckingTime(startTime);
 }
@@ -88,14 +120,32 @@ void DefaultPreferredSemanticsSolver::isSkepticallyAccepted() {
 	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
 	bool status = true;
 	int arg = this->problemReducer->getReducedMap()->getVar(this->problemReducer->translateAcceptanceQueryArgument(this->acceptanceQueryArgument));
-	this->solver->computeAllMss([this,arg,&status](std::vector<int>& mss, std::vector<bool>& model){
-		if(!model[arg-1]) {
-			status = false;
-			this->solver->stopMssEnum();
+	std::vector<int>& propagated = solver->propagatedAtDecisionLvlZero(dynAssumps);
+	bool isPropagated = false;
+	bool propagatedValue = false;
+	for(unsigned int i=0; i<propagated.size(); ++i) {
+		if(propagated[i] == arg) {
+			isPropagated = true;
+			propagatedValue = true;
+			break;
+		} else if(propagated[i] == -arg) {
+			isPropagated = true;
+			propagatedValue = false;
+			break;
 		}
-	}, dynAssumps);
-	solver->resetAllMss();
-	solver->resetModels();
+	}
+	if(isPropagated) {
+		status = propagatedValue;
+	} else {
+		this->solver->computeAllMss([this,arg,&status](std::vector<int>& mss, std::vector<bool>& model){
+			if(!model[arg-1]) {
+				status = false;
+				this->solver->stopMssEnum();
+			}
+		}, dynAssumps);
+		solver->resetAllMss();
+		solver->resetModels();
+	}
 	this->formatter.writeArgAcceptance(status);
 	logAcceptanceCheckingTime(startTime);
 }

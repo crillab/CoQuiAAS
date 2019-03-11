@@ -26,7 +26,7 @@ BuiltInSatSolverNGGlucose::BuiltInSatSolverNGGlucose() {
 void BuiltInSatSolverNGGlucose::buildSolver() {
 	vec<Lit> ps;
 	if(!this->solver) {
-		Logger::getInstance()->debug("building a new instance of Glucose");
+		Logger::getInstance()->debug("building a new instance of Glucose with %d vars and %d constraints", this->formula.nVars()+this->newFormula.nVars(), this->formula.nHards()+this->newFormula.nHards());
 		this->solver = new GlucoseSolver();
 		this->solver->slv->phase_saving = 0;
 		for(int i=0; i<this->formula.nVars(); ++i) {
@@ -45,6 +45,10 @@ void BuiltInSatSolverNGGlucose::buildSolver() {
 		this->newFormula.getHard(i, ps);
 		this->formula.addHard(ps);
 		this->solver->addClause(ps);
+	}
+	for(int i=0; i<this->newFormula.nSofts() ;++i) {
+		this->newFormula.getSoft(i, ps);
+		this->formula.addSoft(ps, this->formula.nSofts());
 	}
 	this->newFormula = WCNF();
 }

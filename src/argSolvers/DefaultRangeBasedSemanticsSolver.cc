@@ -34,7 +34,22 @@ void DefaultRangeBasedSemanticsSolver::computeAllExtensions() {
 	this->formatter.writeExtensionListBegin();
 	int extIndex = 1;
 	clock_t startTime = clock();
-	std::vector<std::vector<bool> > models = computeAllExtensions([this, &extIndex, &startTime](std::vector<bool>& model) {
+	std::vector<int>& propagated = solver->propagatedAtDecisionLvlZero();
+	std::vector<bool> grExt = SatSolver::toBoolModel(propagated, this->problemReducer->getReducedMap()->nVars());
+	std::vector<std::vector<bool> > models = computeAllExtensions([this, &extIndex, &startTime, grExt](std::vector<bool>& model) {
+		if(extIndex == 1) {
+			bool isGrounded = true;
+			for(unsigned int i=0; i<this->problemReducer->getReducedMap()->nVars(); ++i) {
+				if(grExt[i] != model[i]) {
+					isGrounded = false;
+					break;
+				}
+			}
+			if(isGrounded) {
+				this->stopEnum = true;
+				solver->stopMssEnum();
+			}
+		}
 		this->formatter.writeExtensionListElmt(model, extIndex == 1);
 		extIndex++;
 		startTime = clock();
@@ -140,13 +155,31 @@ void DefaultRangeBasedSemanticsSolver::isCredulouslyAccepted() {
 	clock_t startTime = clock();
 	bool status = false;
 	int arg = this->problemReducer->getReducedMap()->getVar(this->problemReducer->translateAcceptanceQueryArgument(this->acceptanceQueryArgument));
-	std::vector<std::vector<bool> > models = computeAllExtensions([this,arg,&status](std::vector<bool>& model){
-		if(model[arg-1]) {
-			status = true;
-			Logger::getInstance()->trace("Credulous acceptance was demonstrated; stopping MSS enumeration for range-based solver");
-			this->stopEnum = true;
+	std::vector<int>& propagated = solver->propagatedAtDecisionLvlZero();
+	bool isPropagated = false;
+	bool propagatedValue = false;
+	for(unsigned int i=0; i<propagated.size(); ++i) {
+		if(propagated[i] == arg) {
+			isPropagated = true;
+			propagatedValue = true;
+			break;
+		} else if(propagated[i] == -arg) {
+			isPropagated = true;
+			propagatedValue = false;
+			break;
 		}
-	});
+	}
+	if(isPropagated) {
+		status = propagatedValue;
+	} else {
+		std::vector<std::vector<bool> > models = computeAllExtensions([this,arg,&status](std::vector<bool>& model){
+			if(model[arg-1]) {
+				status = true;
+				Logger::getInstance()->trace("Credulous acceptance was demonstrated; stopping MSS enumeration for range-based solver");
+				this->stopEnum = true;
+			}
+		});
+	}
 	this->formatter.writeArgAcceptance(status);
 	logAcceptanceCheckingTime(startTime);
 }
@@ -156,13 +189,31 @@ void DefaultRangeBasedSemanticsSolver::isSkepticallyAccepted() {
 	clock_t startTime = clock();
 	bool status = true;
 	int arg = this->problemReducer->getReducedMap()->getVar(this->problemReducer->translateAcceptanceQueryArgument(this->acceptanceQueryArgument));
-	std::vector<std::vector<bool> > models = computeAllExtensions([this,arg,&status](std::vector<bool>& model){
-		if(!model[arg-1]) {
-			status = false;
-			Logger::getInstance()->trace("Skeptical non-acceptance was demonstrated; stopping MSS enumeration for range-based solver");
-			this->stopEnum = true;
+	std::vector<int>& propagated = solver->propagatedAtDecisionLvlZero();
+	bool isPropagated = false;
+	bool propagatedValue = false;
+	for(unsigned int i=0; i<propagated.size(); ++i) {
+		if(propagated[i] == arg) {
+			isPropagated = true;
+			propagatedValue = true;
+			break;
+		} else if(propagated[i] == -arg) {
+			isPropagated = true;
+			propagatedValue = false;
+			break;
 		}
-	});
+	}
+	if(isPropagated) {
+		status = propagatedValue;
+	} else {
+		std::vector<std::vector<bool> > models = computeAllExtensions([this,arg,&status](std::vector<bool>& model){
+			if(!model[arg-1]) {
+				status = false;
+				Logger::getInstance()->trace("Skeptical non-acceptance was demonstrated; stopping MSS enumeration for range-based solver");
+				this->stopEnum = true;
+			}
+		});
+	}
 	this->formatter.writeArgAcceptance(status);
 	logAcceptanceCheckingTime(startTime);
 }

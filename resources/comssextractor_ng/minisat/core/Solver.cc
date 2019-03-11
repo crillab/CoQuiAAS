@@ -806,6 +806,8 @@ static double luby(double y, int x){
 // NOTE: assumptions passed in member-variable 'assumptions'.
 lbool Solver::solve_(int limitRestart)
 {
+  rebuildOrderHeap();
+
   model.clear();
   conflict.clear();
   if (!ok || foundUnsat) return l_False;
