@@ -126,7 +126,7 @@ class VarMap {
   
   
  private:
-  std::map<int, std::string> varToName; /**< Mapping from Boolean variables to their names */
+  std::vector<std::string> varToName;
   std::vector<int> intVariables;
   std::map<std::string, int> nameToVar; /**< Mapping from the names to the Boolean variables */
   int nvars; /**< The number of variables */
