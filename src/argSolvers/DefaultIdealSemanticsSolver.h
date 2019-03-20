@@ -37,13 +37,15 @@ public:
 
 private:
 
-	std::vector<int> justComputeOneExtension();
+	std::vector<int> justComputeOneExtension(std::function<void(std::vector<int>&)> prExtCallback);
 
 	std::shared_ptr<MssSolver> solver;
 
 	MssEncodingHelper* helper;
 
 	std::unique_ptr<CompleteEncodingSatProblemReducer> problemReducer;
+
+	bool stopSearch = false;
 };
 
 

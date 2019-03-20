@@ -102,6 +102,8 @@ private:
 
 	void resetSolverState();
 
+	CMP::vec<CMP::Lit> cmpCl;
+
 };
 
 }

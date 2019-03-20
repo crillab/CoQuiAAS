@@ -31,40 +31,49 @@ void DefaultIdealSemanticsSolver::init() {
 
 void DefaultIdealSemanticsSolver::computeOneExtension() {
 	clock_t startTime = clock();
-	std::vector<int> mss = justComputeOneExtension();
+	std::vector<int> mss = justComputeOneExtension(NULL);
 	this->formatter.writeSingleExtension(mss);
 	logSingleExtTime(startTime);
 }
 
 
-std::vector<int> DefaultIdealSemanticsSolver::justComputeOneExtension() {
+std::vector<int> DefaultIdealSemanticsSolver::justComputeOneExtension(std::function<void(std::vector<int>&)> prExtCallback) {
+	this->stopSearch = false;
 	int nVars = this->problemReducer->getReducedMap()->nVars();
 	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
 	std::vector<std::vector<int> > allMss;
 	std::vector<bool> argAllowed(nVars, true);
-	bool noAllowedArgs = false;
-	solver->computeAllMss([this, &allMss, &argAllowed, &noAllowedArgs](std::vector<int>& mss, std::vector<bool>& model){
+	std::vector<int>& propagated = solver->propagatedAtDecisionLvlZero();
+	std::vector<bool> grExt = SatSolver::toBoolModel(propagated, this->problemReducer->getReducedMap()->nVars());
+	bool isGrounded = false;
+	solver->computeAllMss([this, &allMss, &argAllowed, prExtCallback, grExt, &isGrounded](std::vector<int>& mss, std::vector<bool>& model){
 		allMss.push_back(mss);
+		if(prExtCallback) prExtCallback(mss);
+		if(this->stopSearch) this->solver->stopMssEnum();
 		std::vector<bool> argInMss(argAllowed.size(), false);
-		bool noneAllowed = true;
 		for(unsigned int j=0; j<mss.size(); ++j) {
 			argInMss[mss[j]-1] = true;
 		}
+		bool onlyGrAllowed = true;
 		for(unsigned int j=0; j<argAllowed.size(); ++j) {
 			bool allowed = argAllowed[j]&argInMss[j];
 			argAllowed[j] = allowed;
-			noneAllowed &= !allowed;
+			onlyGrAllowed &= (!allowed | grExt[j]);
 		}
-		if(noneAllowed) {
+		if(onlyGrAllowed) {
+			isGrounded = true;
 			this->solver->stopMssEnum();
-			noAllowedArgs = true;
 		}
 	}, dynAssumps);
-	if(allMss.size() == 1) return allMss[0];
-	if(noAllowedArgs) {
-		std::vector<int> empty;
-		return empty;
+	if(isGrounded) {
+		std::vector<int> gr;
+		for(unsigned int i=0; i<grExt.size(); ++i) {
+			if(grExt[i]) gr.push_back(1+i);
+		}
+		return gr;
 	}
+	if(this->stopSearch) return allMss[0];
+	if(allMss.size() == 1) return allMss[0];
 	std::vector<int> assumps;
 	for(int i=0; i<nVars; ++i) {
 		if(!argAllowed[i]) {
@@ -79,7 +88,7 @@ std::vector<int> DefaultIdealSemanticsSolver::justComputeOneExtension() {
 
 void DefaultIdealSemanticsSolver::computeAllExtensions() {
 	clock_t startTime = clock();
-	std::vector<int> mss = justComputeOneExtension();
+	std::vector<int> mss = justComputeOneExtension(NULL);
 	this->formatter.writeExtensionListBegin();
 	this->formatter.writeExtensionListElmt(mss, true);
 	this->formatter.writeExtensionListEnd();
@@ -109,11 +118,27 @@ void DefaultIdealSemanticsSolver::isCredulouslyAccepted() {
 	if(isPropagated) {
 		status = propagatedValue;
 	} else {
-		std::vector<int> mss = justComputeOneExtension();
-		for(unsigned int j=0; j<mss.size(); ++j) {
-			if(mss[j] == arg) {
-				status = true;
-				break;
+		bool shouldSearch = true;
+		std::vector<int> ext = justComputeOneExtension([this,arg,&shouldSearch,&status](std::vector<int>& mss){
+			bool localStatus = false;
+			for(unsigned int j=0; j<mss.size(); ++j) {
+				if(mss[j] == arg) {
+					localStatus = true;
+					break;
+				}
+			}
+			if(!localStatus) {
+				shouldSearch = false;
+				status = false;
+				this->stopSearch = true;
+			}
+		});
+		if(shouldSearch) {
+			for(unsigned int j=0; j<ext.size(); ++j) {
+				if(ext[j] == arg) {
+					status = true;
+					break;
+				}
 			}
 		}
 	}

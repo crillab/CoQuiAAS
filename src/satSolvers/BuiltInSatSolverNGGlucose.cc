@@ -20,6 +20,7 @@ BuiltInSatSolverNGGlucose::BuiltInSatSolverNGGlucose() {
 		}
 		return intCl;
 	});
+	this->cmpCl.capacity(1<<10);
 }
 
 
@@ -66,7 +67,6 @@ void BuiltInSatSolverNGGlucose::addVariables(int nVars, bool auxVar) {
 
 
 bool BuiltInSatSolverNGGlucose::addClause(std::vector<int> &clause) {
-	CMP::vec<CMP::Lit> cmpCl;
 	toCmpClause(clause, cmpCl);
 	this->newFormula.addHard(cmpCl);
 	return true;
@@ -189,9 +189,11 @@ void BuiltInSatSolverNGGlucose::computeAllModels(std::function<void(std::vector<
 
 
 void BuiltInSatSolverNGGlucose::computeAllModels(std::function<void(std::vector<bool>&)> callback, std::vector<int> &assumps) {
+	this->shouldStopModelEnum = false;
 	buildSolver();
 	clearModels();
 	for(;;) {
+		if(this->shouldStopModelEnum) break;
 		bool newModel = computeModel(assumps, false);
 		if(!newModel) break;
         std::vector<bool> model = this->models[this->models.size()-1];
@@ -210,6 +212,7 @@ void BuiltInSatSolverNGGlucose::computeAllModels(std::function<void(std::vector<
 
 
 void BuiltInSatSolverNGGlucose::computeAllModels(std::function<void(std::vector<bool>&)> callback, std::vector<int> &assumps, std::vector<bool> knownModel) {
+	this->shouldStopModelEnum = false;
 	buildSolver();
 	clearModels();
 	this->models.push_back(knownModel);
@@ -219,6 +222,7 @@ void BuiltInSatSolverNGGlucose::computeAllModels(std::function<void(std::vector<
 	blockingSelectors.push_back(sel);
 	assumps.push_back(sel);
 	for(;;) {
+		if(this->shouldStopModelEnum) break;
 		bool newModel = computeModel(assumps, false);
 		if(!newModel) break;
         std::vector<bool> model = this->models[this->models.size()-1];
@@ -255,13 +259,9 @@ void BuiltInSatSolverNGGlucose::resetModels() {
 }
 
 void BuiltInSatSolverNGGlucose::toCmpClause(std::vector<int> &clause, CMP::vec<CMP::Lit>& cmpCl) {
-	int size = clause.size();
-	cmpCl.capacity(size);
-	cmpCl.clear();
-	for(int i=0; i<size; ++i) {
-		int lit = clause[i];
-		cmpCl.push(lit > 0 ? CMP::mkLit(lit-1) : ~CMP::mkLit(-lit-1));
-	}
+	cmpCl.shrink_(cmpCl.size());
+	cmpCl.capacity(clause.size());
+	for(std::vector<int>::iterator it = clause.begin(); it != clause.end(); ++it) cmpCl.push(*it > 0 ? CMP::mkLit(*it-1) : ~CMP::mkLit(-*it-1));
 }
 
 BuiltInSatSolverNGGlucose::~BuiltInSatSolverNGGlucose() {

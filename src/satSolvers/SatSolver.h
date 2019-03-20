@@ -68,12 +68,19 @@ public:
 		std::vector<bool> boolModel(nArgs, false);
 		for(unsigned int i=0; i<model.size(); ++i) {
 			int var = model[i] > 0 ? model[i] : -model[i];
+			if(var > nArgs) continue;
 			boolModel[var-1] = model[i] > 0;
 		}
 		return boolModel;
 	}
 
+	void stopModelEnum() {
+		this->shouldStopModelEnum = true;
+	}
+
 protected:
+
+	bool shouldStopModelEnum = false;
 
 	static void intClauseToBuiltInClause(std::vector<int>& intCl, Minisat::vec<Minisat::Lit>& minisatCl) {
 		for(std::vector<int>::iterator it = intCl.begin(); it != intCl.end(); ++it) {

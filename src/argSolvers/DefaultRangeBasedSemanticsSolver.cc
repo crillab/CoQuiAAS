@@ -47,7 +47,6 @@ void DefaultRangeBasedSemanticsSolver::computeAllExtensions() {
 			}
 			if(isGrounded) {
 				this->stopEnum = true;
-				solver->stopMssEnum();
 			}
 		}
 		this->formatter.writeExtensionListElmt(model, extIndex == 1);
@@ -130,7 +129,7 @@ std::vector<std::vector<bool>> DefaultRangeBasedSemanticsSolver::computeAllExten
 			extModels.push_back(model);
 			if(callback != NULL) callback(model);
 			if(this->stopEnum) {
-				solver->stopMssEnum();
+				solver->stopModelEnum();
 				Logger::getInstance()->trace("Range-based solver was required to stop enumeration process");
 			}
 		}, assumps);

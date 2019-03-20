@@ -43,14 +43,6 @@ class Attacks {
    */
   void addAttack(std::string from, std::string to);
 
-  /**
-   * \fn getAttacksTo
-   * \brief Gets the list of variables corresponding to the attackers of the parameter
-   * \param var : the variable
-   * \return the attackers of var
-   */
-  //std::vector<int> *getAttacksTo(int var);
-
   std::vector<std::string>& getAttacksTo(std::string var);
 
   /**
@@ -70,10 +62,6 @@ class Attacks {
   std::vector<std::tuple<bool, std::string, std::string, bool> >& getDynAttacks();
 
   void addDynAttack(bool add, std::string from, std::string to);
-
-  /* inline void addDynAttack(bool add, int from, int to, bool wasPresent) {
-    this->dynAttacks.push_back(std::make_tuple(add, from, to, wasPresent));
-  } */
 
   VarMap &getVarMap();
 

@@ -20,17 +20,15 @@ Attacks::Attacks(VarMap& vm) : varMap(vm) {
 
 
 void Attacks::addAttack(std::string from, std::string to) {
-  for(unsigned int i=0; i<attacks[to].size(); ++i) if(attacks[to][i] == from) return;
-  attacks[to].push_back(from);
+  std::vector<std::string>& attacksTo = attacks[to];
+  //for(unsigned int i=0; i<attacksTo.size(); ++i) if(attacksTo[i] == from) return;
+  //for(std::vector<std::string>::iterator it = attacksTo.begin(); it != attacksTo.end(); ++it) if(*it == from) return;
+  attacksTo.push_back(from);
   ++nbAttacks;
-  if (attacks[to].size() > nMaxAttacks) nMaxAttacks = attacks[to].size();
+  if (attacksTo.size() > nMaxAttacks) nMaxAttacks = attacksTo.size();
   if(!from.compare(to))
     varMap.setSelfAttacking(from,true);
 }
-
-/* std::vector<int> *Attacks::getAttacksTo(int var) {
-  return &attacks[varMap.getName(var)];
-} */
 
 std::vector<std::string>& Attacks::getAttacksTo(std::string var) {
   return this->attacks[var];
