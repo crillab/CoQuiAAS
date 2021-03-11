@@ -178,14 +178,29 @@ void setFinalStats(CommandLineHelper& clh, std::unique_ptr<IParser> const &parse
 	fflush(stdout);
 }
 
+static char OUT_BUF[1<<20];
+void *flushOutBuffer(void *data);
 
 void printOutputQueue() {
+	pthread_t flushTh;
+	pthread_create(&flushTh, NULL, flushOutBuffer, NULL);
+	pthread_detach(flushTh);
+	setvbuf(stdout, OUT_BUF, _IOFBF, 1<<20);
 	while(true) {
-        std::string elmt = outputQueue.pop();
+		std::string elmt = outputQueue.pop();
 		if(elmt == QUEUE_END) break;
-        std::cout << elmt;
+		std::cout << elmt;
+	}
+	std::cout.flush();
+	pthread_cancel(flushTh);
+}
+
+void *flushOutBuffer(void *data) {
+	while(true) {
+		sleep(5);
 		std::cout.flush();
-    }
+	}
+	return NULL;
 }
 
 
