@@ -20,7 +20,7 @@ AM_INIT_AUTOMAKE(subdir-objects)
 
 AC_PROG_LIBTOOL
 
-: ${CXXFLAGS= -std=c++14 -Wno-literal-suffix -g -O3 -DCOQUIAAS_VERSION="3.0"}
+: ${CXXFLAGS= -std=c++14 -O3 -DCOQUIAAS_VERSION="3.0"}
 AC_PROG_CXX
 
 AX_CHECK_ZLIB
