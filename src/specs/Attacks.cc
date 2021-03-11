@@ -21,8 +21,6 @@ Attacks::Attacks(VarMap& vm) : varMap(vm) {
 
 void Attacks::addAttack(std::string from, std::string to) {
   std::vector<std::string>& attacksTo = attacks[to];
-  //for(unsigned int i=0; i<attacksTo.size(); ++i) if(attacksTo[i] == from) return;
-  //for(std::vector<std::string>::iterator it = attacksTo.begin(); it != attacksTo.end(); ++it) if(*it == from) return;
   attacksTo.push_back(from);
   ++nbAttacks;
   if (attacksTo.size() > nMaxAttacks) nMaxAttacks = attacksTo.size();
