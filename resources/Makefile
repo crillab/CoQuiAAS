@@ -138,7 +138,7 @@ CPPFLAGS =  -I/usr/include -I/usr/include
 CXX = g++
 CXXCPP = g++ -E
 CXXDEPMODE = depmode=gcc3
-CXXFLAGS =  -std=c++14 -O3 -DCOQUIAAS_VERSION=3.0
+CXXFLAGS =  -std=c++14 -O3 -DCOQUIAAS_VERSION=3.0.1
 CYGPATH_W = echo
 DEFS = -DHAVE_CONFIG_H
 DEPDIR = .deps
@@ -179,17 +179,17 @@ OTOOL64 =
 PACKAGE = coquiaas
 PACKAGE_BUGREPORT = lonca@cril.fr
 PACKAGE_NAME = CoQuiAAS
-PACKAGE_STRING = CoQuiAAS 3.0
+PACKAGE_STRING = CoQuiAAS 3.0.1
 PACKAGE_TARNAME = coquiaas
 PACKAGE_URL = 
-PACKAGE_VERSION = 3.0
+PACKAGE_VERSION = 3.0.1
 PATH_SEPARATOR = :
 RANLIB = ranlib
 SED = /bin/sed
 SET_MAKE = 
 SHELL = /bin/bash
 STRIP = strip
-VERSION = 3.0
+VERSION = 3.0.1
 abs_builddir = /home/lonca/projects/CoQuiAAS/resources
 abs_srcdir = /home/lonca/projects/CoQuiAAS/resources
 abs_top_builddir = /home/lonca/projects/CoQuiAAS

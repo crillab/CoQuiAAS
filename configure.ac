@@ -1,5 +1,5 @@
 AC_PREREQ(2.59)
-AC_INIT(CoQuiAAS, 3.0, lonca@cril.fr)
+AC_INIT(CoQuiAAS, 3.0.1, lonca@cril.fr)
 
 PACKAGE=CoQuiAAS
 VERSION=3.0
@@ -20,7 +20,7 @@ AM_INIT_AUTOMAKE(subdir-objects)
 
 AC_PROG_LIBTOOL
 
-: ${CXXFLAGS= -std=c++14 -O3 -DCOQUIAAS_VERSION="3.0"}
+: ${CXXFLAGS= -std=c++14 -O3 -DCOQUIAAS_VERSION="3.0.1"}
 AC_PROG_CXX
 
 AX_CHECK_ZLIB
