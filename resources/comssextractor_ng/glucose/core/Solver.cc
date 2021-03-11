@@ -962,9 +962,10 @@ void Solver::removeSatisfied(vec<CRef>& cs)
 void Solver::rebuildOrderHeap()
 {
     vec<Var> vs;
-    for (Var v = 0; v < nVars(); v++)
+    vs.capacity(nVars());
+    for (Var v = nVars()-1; v >= 0; v--) 
         if (decision[v] && value(v) == l_Undef)
-            vs.push(v);
+          vs.push(v);     
     order_heap.build(vs);
 }
 
