@@ -88,7 +88,7 @@ $(BUILD_DIR)/profile/%.o:			CMP_CXXFLAGS +=$(CMP_PRF) -pg
 
 ## Build-type Link-flags:
 $(BUILD_DIR)/profile/bin/$(CMP):		CMP_LDFLAGS += -pg
-$(BUILD_DIR)/release/bin/$(CMP):		CMP_LDFLAGS += --static $(CMP_RELSYM)
+$(BUILD_DIR)/release/bin/$(CMP):		CMP_LDFLAGS += $(CMP_RELSYM)
 
 
 ## Executable dependencies
