@@ -26,7 +26,7 @@ namespace CoQuiAAS {
     public:
 
         static Logger* getInstance() {
-            if(instance == NULL) {
+            if(instance == nullptr) {
                 instance = new Logger();
             }
             return instance;
@@ -110,7 +110,7 @@ namespace CoQuiAAS {
 
         LoggingLevel level = INFO;
 
-        std::ofstream* output = NULL;
+        std::ofstream* output = nullptr;
 
         ConcurrentStrQueue queue;
 

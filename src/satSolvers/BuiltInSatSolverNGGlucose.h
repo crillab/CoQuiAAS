@@ -74,7 +74,7 @@ public:
 
 protected:
 
-	GlucoseSolver* solver = NULL;
+	GlucoseSolver* solver = nullptr;
 
 	WCNF formula;
 

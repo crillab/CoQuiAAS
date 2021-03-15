@@ -74,7 +74,7 @@ bool ExternalMaxSatSolver::handleForkAncestor(int pipe[]) {
 	if(computingModel) {
 		return ExternalSatSolver::handleForkAncestor(pipe);
 	}
-	wait(NULL);
+	wait(nullptr);
 	close(pipe[1]);
 	FILE *childOutFile = fdopen(pipe[0],"r");
 	char buffer[EXTERNAL_SAT_BUFFER_SIZE];

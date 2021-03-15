@@ -16,7 +16,7 @@ void SatProblemReducer::search() {
     for(int i=0; i<=nVars; ++i) this->equivalentTo.push_back(i);
     this->eqClasses.clear();
     propagateAtDecisionLvlZero();
-    for(int i=0; i<=nVars; ++i) this->propagated.push_back(NULL);
+    for(int i=0; i<=nVars; ++i) this->propagated.push_back(nullptr);
     for(int i=1; i<=nVars; ++i) {
         if(!this->fixed[i]) lookForEquivalencesOf(i);
     }

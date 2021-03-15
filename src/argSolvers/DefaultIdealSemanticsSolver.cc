@@ -31,7 +31,7 @@ void DefaultIdealSemanticsSolver::init() {
 
 void DefaultIdealSemanticsSolver::computeOneExtension() {
 	clock_t startTime = clock();
-	std::vector<int> mss = justComputeOneExtension(NULL);
+	std::vector<int> mss = justComputeOneExtension(nullptr);
 	this->formatter.writeSingleExtension(mss);
 	logSingleExtTime(startTime);
 }
@@ -88,7 +88,7 @@ std::vector<int> DefaultIdealSemanticsSolver::justComputeOneExtension(std::funct
 
 void DefaultIdealSemanticsSolver::computeAllExtensions() {
 	clock_t startTime = clock();
-	std::vector<int> mss = justComputeOneExtension(NULL);
+	std::vector<int> mss = justComputeOneExtension(nullptr);
 	this->formatter.writeExtensionListBegin();
 	this->formatter.writeExtensionListElmt(mss, true);
 	this->formatter.writeExtensionListEnd();

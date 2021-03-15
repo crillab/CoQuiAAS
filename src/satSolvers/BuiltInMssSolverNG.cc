@@ -36,7 +36,7 @@ bool BuiltInMssSolverNG::computeMss() {
 }
 
 bool BuiltInMssSolverNG::computeMss(std::vector<int> &assumps) {
-	computeSomeMsses(NULL, assumps, 1);
+	computeSomeMsses(nullptr, assumps, 1);
 	return true;
 }
 

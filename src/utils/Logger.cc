@@ -2,4 +2,4 @@
 
 using namespace CoQuiAAS;
 
-Logger* Logger::instance = NULL;
+Logger* Logger::instance = nullptr;

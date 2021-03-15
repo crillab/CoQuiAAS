@@ -40,7 +40,7 @@ void DefaultDungTriathlonSolver::computeAllExtensions() {
 	ExtensionUtils extUtils(attacks);
 	std::vector<int> propagated = extUtils.groundedExtension();
 	this->formatter.writeD3GrExts(propagated);
-	solver->computeAllMss(NULL);
+	solver->computeAllMss(nullptr);
 	std::vector<std::vector<int>> stExts;
 	std::vector<std::vector<int> > allMss = solver->getAllMss();
 	int nMss = (signed) allMss.size();

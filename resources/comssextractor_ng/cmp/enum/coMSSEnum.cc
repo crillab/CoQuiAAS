@@ -36,7 +36,7 @@ bool CoMSSEnum::blockDown(vec<Lit>& coMss)
 
 void CoMSSEnum::run() {
   vec<Lit> assumps;
-  CoMSSEnum::run(assumps, NULL);
+  CoMSSEnum::run(assumps, nullptr);
 }
 
 
@@ -59,7 +59,7 @@ void CoMSSEnum::run(CMP::vec<CMP::Lit>& assumps, std::function<void(vec<int>&, v
 
     if(max > 10 && exttor->rotate()) (*exttor)(mss, coMss); else (*exttor)(coMss);
 
-    if(!coMss.size() && callback != NULL) {
+    if(!coMss.size() && callback != nullptr) {
       vec<int> mcs;
       exttor->in2ex(coMss, mcs);
       callback(mcs, exttor->getSatSolver()->getModel());
@@ -73,7 +73,7 @@ void CoMSSEnum::run(CMP::vec<CMP::Lit>& assumps, std::function<void(vec<int>&, v
         exttor->printModel(coMss);
     }
 
-    if(callback != NULL) {
+    if(callback != nullptr) {
       vec<int> mcs;
       exttor->in2ex(coMss, mcs);
       callback(mcs, exttor->getSatSolver()->getModel());

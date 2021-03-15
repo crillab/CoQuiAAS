@@ -70,9 +70,9 @@ public:
 
 private:
 
-	CoMSSExtract *mcsFinder = NULL;
+	CoMSSExtract *mcsFinder = nullptr;
 
-	CoMSSEnum *mcsEnumerator = NULL;
+	CoMSSEnum *mcsEnumerator = nullptr;
 
 	std::vector<std::vector<int> > mss;
 

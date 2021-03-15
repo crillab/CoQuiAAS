@@ -69,7 +69,7 @@ std::vector<std::vector<bool>> DefaultRangeBasedSemanticsSolver::computeAllExten
 	solver->computeAllMss([this, callback, &msses, &oldModels, reducedVM](std::vector<int>& mss, std::vector<bool>& model){
 		msses.push_back(mss);
 		oldModels.push_back(model);
-		if(callback != NULL) callback(model);
+		if(callback != nullptr) callback(model);
 		bool emptyExt = true;
 		for(unsigned int i=0; i<reducedVM->nVars() && emptyExt; ++i) emptyExt &= !model[i];
 		if(this->stopEnum) {
@@ -127,7 +127,7 @@ std::vector<std::vector<bool>> DefaultRangeBasedSemanticsSolver::computeAllExten
 		solver->addClause(cl);
 		solver->computeAllModels([this,callback,&extModels](std::vector<bool>& model){
 			extModels.push_back(model);
-			if(callback != NULL) callback(model);
+			if(callback != nullptr) callback(model);
 			if(this->stopEnum) {
 				solver->stopModelEnum();
 				Logger::getInstance()->trace("Range-based solver was required to stop enumeration process");

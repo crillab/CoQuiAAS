@@ -36,7 +36,7 @@ bool BuiltInMssSolverNGGlucose::computeMss() {
 }
 
 bool BuiltInMssSolverNGGlucose::computeMss(std::vector<int> &assumps) {
-	computeSomeMsses(NULL, assumps, 1);
+	computeSomeMsses(nullptr, assumps, 1);
 	return true;
 }
 

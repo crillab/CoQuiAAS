@@ -122,8 +122,8 @@ int main(int argc, char** argv){
 void manageTimeout(CommandLineHelper& clh) {
 	if(clh.getAdditionalParams().find("-timeout") != clh.getAdditionalParams().end()) {
 		std::string strTimeout = clh.getAdditionalParameter("-timeout");
-		Logger::getInstance()->info("timeout set to %s seconds", strTimeout);
-		pthread_create(&timeoutTh, NULL, handleTimeout, &strTimeout);
+		Logger::getInstance()->info("timeout set to %s seconds", strTimeout.c_str());
+		pthread_create(&timeoutTh, nullptr, handleTimeout, &strTimeout);
 		pthread_detach(timeoutTh);
 	} else {
 		Logger::getInstance()->info("no timeout set");
@@ -149,7 +149,7 @@ std::ifstream manageInstanceFile(CommandLineHelper& clh) {
 		std::cerr << CommandLineHelper::USAGE << std::endl;
 		exit(1);
 	}
-	char *absPath = realpath(clh.getInstanceFile().c_str(), NULL);
+	char *absPath = realpath(clh.getInstanceFile().c_str(), nullptr);
 	Logger::getInstance()->info("input file is %s", absPath);
 	free(absPath);
 	return file;
@@ -183,7 +183,7 @@ void *flushOutBuffer(void *data);
 
 void printOutputQueue() {
 	pthread_t flushTh;
-	pthread_create(&flushTh, NULL, flushOutBuffer, NULL);
+	pthread_create(&flushTh, nullptr, flushOutBuffer, nullptr);
 	pthread_detach(flushTh);
 	setvbuf(stdout, OUT_BUF, _IOFBF, 1<<20);
 	while(true) {
@@ -200,7 +200,7 @@ void *flushOutBuffer(void *data) {
 		sleep(5);
 		std::cout.flush();
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -216,23 +216,23 @@ void *handleTimeout(void *strSeconds) {
 		statMap->setStat("timeout (s)", "INVALID_VAL");
 		retVal = 1;
 		pthread_exit(&retVal);
-		return NULL;
+		return nullptr;
 	}
 	statMap->setStat("timeout (s)", nSec);
 	memset(&sigact, 0, sizeof(struct sigaction));
 	sigact.sa_handler = sigIntHandler;
 	sigemptyset(&sigact.sa_mask);
 	sigact.sa_flags = 0;
-	sigaction(SIGINT, &sigact, NULL);
-	sigaction(SIGTERM, &sigact, NULL);
+	sigaction(SIGINT, &sigact, nullptr);
+	sigaction(SIGTERM, &sigact, nullptr);
 #ifdef SIGXCPU
-	sigaction(SIGXCPU, &sigact, NULL);
+	sigaction(SIGXCPU, &sigact, nullptr);
 #endif
 
 	sleep(nSec);
 	if(-1==kill(getpid(), SIGINT)) perror("kill (SIGINT)");
 	pthread_exit(&retVal);
-	return NULL;
+	return nullptr;
 }
 
 

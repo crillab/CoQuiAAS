@@ -47,7 +47,7 @@ bool LbxCoMssSolver::computeMss() {
 bool LbxCoMssSolver::computeMss(std::vector<int> &assumps) {
 	clearMss();
 	std::string instance = writeInstanceForMSS(assumps);
-	int ret = launchExternalSolver(instance, false, NULL, NULL);
+	int ret = launchExternalSolver(instance, false, nullptr, nullptr);
 	unlink(instance.c_str());
 	return ret;
 }
@@ -63,7 +63,7 @@ void LbxCoMssSolver::computeAllMss(std::function<void(std::vector<int>&)> callba
 	clearMss();
 	this->shouldStopMssEnum = false;
 	std::string instance = writeInstanceForMSS(assumps);
-	launchExternalSolver(instance, true, callback, NULL);
+	launchExternalSolver(instance, true, callback, nullptr);
 	unlink(instance.c_str());
 }
 
@@ -166,9 +166,9 @@ void LbxCoMssSolver::handleForkChild(std::string instanceFile, bool allModels, i
 	}
 	close(pfds[0]);
 	if(allModels) {
-		execl(this->lbxPath.c_str(), this->lbxPath.c_str(), "-wm", instanceFile.c_str(), NULL);
+		execl(this->lbxPath.c_str(), this->lbxPath.c_str(), "-wm", instanceFile.c_str(), nullptr);
 	} else {
-		execl(this->lbxPath.c_str(), this->lbxPath.c_str(), "-wm", "-num", "1", instanceFile.c_str(), NULL);
+		execl(this->lbxPath.c_str(), this->lbxPath.c_str(), "-wm", "-num", "1", instanceFile.c_str(), nullptr);
 	}
 	perror("CoQuiAAS");
 	std::cerr << "this error may occur in case lbx has not been found; check its path is \"" << this->lbxPath << "\"" << std::endl;
@@ -177,7 +177,7 @@ void LbxCoMssSolver::handleForkChild(std::string instanceFile, bool allModels, i
 
 
 bool LbxCoMssSolver::handleForkAncestor(int childId, int pipe[], std::function<void(std::vector<int>&)> mssCallback, std::function<void(std::vector<bool>&)> modelCallback) {
-	wait(NULL);
+	wait(nullptr);
 	close(pipe[1]);
 	bool ret = false;
 	FILE *childOutFile = fdopen(pipe[0], "r");
@@ -335,7 +335,7 @@ bool LbxCoMssSolver::computeModel(std::vector<int> &assumps) {
 	auto oldNSoftCstrs = this->nSoftCstrs;
 	this->nSoftCstrs = 2*realNumberOfVars;
 	std::string instance = writeInstanceForSAT(assumps, this->realNumberOfVars);
-	int ret = launchExternalSolver(instance, false, NULL, NULL);
+	int ret = launchExternalSolver(instance, false, nullptr, nullptr);
 	unlink(instance.c_str());
 	this->nSoftCstrs = oldNSoftCstrs;
 	return ret;
@@ -353,7 +353,7 @@ void LbxCoMssSolver::computeAllModels(std::function<void(std::vector<bool>&)> ca
 	auto oldNSoftCstrs = this->nSoftCstrs;
 	this->nSoftCstrs = 2*realNumberOfVars;
 	std::string instance = writeInstanceForSAT(assumps, this->realNumberOfVars);
-	launchExternalSolver(instance, true, NULL, callback);
+	launchExternalSolver(instance, true, nullptr, callback);
 	unlink(instance.c_str());
 	this->nSoftCstrs = oldNSoftCstrs;
 }

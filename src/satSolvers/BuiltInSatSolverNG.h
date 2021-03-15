@@ -74,7 +74,7 @@ public:
 
 protected:
 
-	MiniSatSolver* solver = NULL;
+	MiniSatSolver* solver = nullptr;
 
 	WCNF formula;
 
