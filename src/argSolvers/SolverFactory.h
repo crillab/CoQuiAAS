@@ -16,14 +16,19 @@
 #include "DefaultPreferredSemanticsSolver.h"
 #include "DefaultIdealSemanticsSolver.h"
 #include "DefaultDungTriathlonSolver.h"
-#include "BuiltInSatSolver.h"
+#include "BuiltInSatSolverNG.h"
+#include "BuiltInSatSolverNGGlucose.h"
 #include "ExternalSatSolver.h"
-#include "BuiltInMssSolver.h"
-#include "LbxCoMssSolver.h"
-#include "ExternalMaxSatSolver.h"
-#include "ExternalCoMssSolver.h"
+#include "BuiltInMssSolverNG.h"
+#include "BuiltInMssSolverNGGlucose.h"
 #include "SolverOutputFormatter.h"
 #include "DynamicSemanticsSolverDecorator.h"
+
+#define __SF_USE_GLUCOSE
+
+#ifndef __SF_USE_GLUCOSE
+#define __SF_USE_MINISAT
+#endif
 
 
 namespace CoQuiAAS {
@@ -81,26 +86,21 @@ public:
 		if(additionalParams.find("-externalSatSolver") != additionalParams.end()) {
 			return std::shared_ptr<SatSolver>(std::make_shared<ExternalSatSolver>(additionalParams["-externalSatSolver"]));
 		}
-		return std::shared_ptr<SatSolver>(std::make_shared<BuiltInSatSolver>());
+		#ifdef __SF_USE_MINISAT
+		return std::shared_ptr<SatSolver>(std::make_shared<BuiltInSatSolverNG>());
+		#endif
+		#ifdef __SF_USE_GLUCOSE
+		return std::shared_ptr<SatSolver>(std::make_shared<BuiltInSatSolverNGGlucose>());
+		#endif
 	}
 
 	static std::shared_ptr<MssSolver> createMssSolver(std::map<std::string,std::string>& additionalParams) {
-		if(additionalParams.find("-lbx") != additionalParams.end()) {
-			return std::shared_ptr<MssSolver>(std::make_shared<LbxCoMssSolver>(additionalParams["-lbx"]));
-		}
-		if(additionalParams.find("-comssextractor") != additionalParams.end()) {
-			return std::shared_ptr<MssSolver>(std::make_shared<ExternalCoMssSolver>(additionalParams["-comssextractor"]));
-		}
-		std::cerr << "ERROR:: no builtin coMSS solver" << std::endl;
-		std::exit(1);
-	}
-
-	static std::shared_ptr<MaxSatSolver> createMaxSatSolver(std::map<std::string,std::string>& additionalParams) {
-		if(additionalParams.find("-externalMaxSatSolver") != additionalParams.end()) {
-			return std::shared_ptr<MaxSatSolver>(std::make_shared<ExternalMaxSatSolver>(additionalParams["-externalMaxSatSolver"]));
-		}
-		std::cerr << "ERROR:: no builtin MaxSAT solver" << std::endl;
-		std::exit(1);
+		#ifdef __SF_USE_MINISAT
+		return std::shared_ptr<MssSolver>(std::make_shared<BuiltInMssSolverNG>());
+		#endif
+		#ifdef __SF_USE_GLUCOSE
+		return std::shared_ptr<MssSolver>(std::make_shared<BuiltInMssSolverNGGlucose>());
+		#endif
 	}
 
 	static std::unique_ptr<SemanticsProblemSolver> groundedSolver(TaskType task, std::map<std::string,std::string>& additionalParams, Attacks &attacks, VarMap &varMap, SolverOutputFormatter &outputFormatter) {

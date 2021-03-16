@@ -9,39 +9,26 @@
 #define SRC_ARGSOLVERS_DEFAULTSEMISTABLESEMANTICSSOLVER_H_
 
 
-#include "SemanticsProblemSolver.h"
-#include "core/Solver.h"
-#include "MssEncodingHelper.h"
-#include "MssSolver.h"
+#include "DefaultRangeBasedSemanticsSolver.h"
+#include "DefaultCompleteSemanticsSolver.h"
 
 
 namespace CoQuiAAS {
 
 
-class DefaultSemistableSemanticsSolver : public SemanticsProblemSolver {
+class DefaultSemistableSemanticsSolver : public DefaultRangeBasedSemanticsSolver {
 
 public:
 	DefaultSemistableSemanticsSolver(std::shared_ptr<MssSolver> solver, Attacks &attacks, VarMap &varMap, TaskType taskType, SolverOutputFormatter &formatter);
 
-	void init();
+	virtual void init();
 
-	void computeOneExtension();
+	void computeAllExtensions(){DefaultRangeBasedSemanticsSolver::computeAllExtensions();};
 
-	void computeAllExtensions();
+	void isCredulouslyAccepted(){DefaultRangeBasedSemanticsSolver::isCredulouslyAccepted();};
 
-	void isCredulouslyAccepted();
+	void isSkepticallyAccepted(){DefaultRangeBasedSemanticsSolver::isSkepticallyAccepted();};
 
-	void isSkepticallyAccepted();
-
-	virtual ~DefaultSemistableSemanticsSolver();
-
-private:
-
-	std::shared_ptr<MssSolver> solver;
-
-	std::vector<std::vector<bool>> computeAllSstExtensions(std::function<void(std::vector<bool>&)> callback);
-
-	bool stopEnum = false;
 };
 
 

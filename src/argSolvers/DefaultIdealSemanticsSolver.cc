@@ -17,65 +17,133 @@ DefaultIdealSemanticsSolver::DefaultIdealSemanticsSolver(std::shared_ptr<MssSolv
 
 
 void DefaultIdealSemanticsSolver::init() {
-	MssEncodingHelper helper(solver, attacks, varMap);
-	helper.setMaxExtensionNeeded();
-	int disjId = helper.reserveDisjunctionVars();
-	helper.createAttackersDisjunctionVars(disjId);
-	helper.createCompleteEncodingConstraints(disjId);
+	this->problemReducer = std::make_unique<CompleteEncodingSatProblemReducer>(varMap, attacks);
+	this->problemReducer->search();
+	VarMap &reducedMap = *this->problemReducer->getReducedMap().get();
+	this->formatter.setVarMap(reducedMap);
+	this->helper = new MssEncodingHelper(solver, attacks, reducedMap);
+	this->helper->setMaxExtensionNeeded();
+	int disjId = this->helper->reserveDisjunctionVars();
+	this->helper->createAttackersDisjunctionVars(disjId);
+	this->helper->createCompleteEncodingConstraints(disjId);
 }
 
 
 void DefaultIdealSemanticsSolver::computeOneExtension() {
-	std::vector<int> mss = justComputeOneExtension();
+	clock_t startTime = clock();
+	std::vector<int> mss = justComputeOneExtension(nullptr);
 	this->formatter.writeSingleExtension(mss);
+	logSingleExtTime(startTime);
 }
 
 
-std::vector<int> DefaultIdealSemanticsSolver::justComputeOneExtension() {
-	solver->computeAllMss(NULL);
-	std::vector<std::vector<int> > allMss = solver->getAllMss();
-	std::vector<bool> argAllowed(varMap.nVars(), true);
-	int nMss = (signed) allMss.size();
-	for(int i=0; i<nMss; ++i) {
-		std::vector<int> mss = allMss[i];
-		std::vector<bool> argInMss(varMap.nVars(), false);
-		int mssSize = (int) mss.size();
-		for(int j=0; j<mssSize; ++j) {
+std::vector<int> DefaultIdealSemanticsSolver::justComputeOneExtension(std::function<void(std::vector<int>&)> prExtCallback) {
+	this->stopSearch = false;
+	int nVars = this->problemReducer->getReducedMap()->nVars();
+	std::vector<int> dynAssumps = this->helper->dynAssumps(this->dynStep);
+	std::vector<std::vector<int> > allMss;
+	std::vector<bool> argAllowed(nVars, true);
+	std::vector<int>& propagated = solver->propagatedAtDecisionLvlZero();
+	std::vector<bool> grExt = SatSolver::toBoolModel(propagated, this->problemReducer->getReducedMap()->nVars());
+	bool isGrounded = false;
+	solver->computeAllMss([this, &allMss, &argAllowed, prExtCallback, grExt, &isGrounded](std::vector<int>& mss, std::vector<bool>& model){
+		allMss.push_back(mss);
+		if(prExtCallback) prExtCallback(mss);
+		if(this->stopSearch) this->solver->stopMssEnum();
+		std::vector<bool> argInMss(argAllowed.size(), false);
+		for(unsigned int j=0; j<mss.size(); ++j) {
 			argInMss[mss[j]-1] = true;
 		}
-		for(int j=0; j<varMap.nVars(); ++j) {
-			argAllowed[j] = argAllowed[j]&argInMss[j];
+		bool onlyGrAllowed = true;
+		for(unsigned int j=0; j<argAllowed.size(); ++j) {
+			bool allowed = argAllowed[j]&argInMss[j];
+			argAllowed[j] = allowed;
+			onlyGrAllowed &= (!allowed | grExt[j]);
 		}
+		if(onlyGrAllowed) {
+			isGrounded = true;
+			this->solver->stopMssEnum();
+		}
+	}, dynAssumps);
+	if(isGrounded) {
+		std::vector<int> gr;
+		for(unsigned int i=0; i<grExt.size(); ++i) {
+			if(grExt[i]) gr.push_back(1+i);
+		}
+		return gr;
 	}
+	if(this->stopSearch) return allMss[0];
+	if(allMss.size() == 1) return allMss[0];
 	std::vector<int> assumps;
-	for(int i=0; i<varMap.nVars(); ++i) {
+	for(int i=0; i<nVars; ++i) {
 		if(!argAllowed[i]) {
 			assumps.push_back(-i-1);
 		}
 	}
+	for(unsigned int i=0; i<dynAssumps.size(); ++i) assumps.push_back(dynAssumps[i]);
 	solver->computeMss(assumps);
 	return solver->getMss();
 }
 
 
 void DefaultIdealSemanticsSolver::computeAllExtensions() {
-	std::vector<int> mss = justComputeOneExtension();
+	clock_t startTime = clock();
+	std::vector<int> mss = justComputeOneExtension(nullptr);
 	this->formatter.writeExtensionListBegin();
 	this->formatter.writeExtensionListElmt(mss, true);
 	this->formatter.writeExtensionListEnd();
+	logOneExtTime(startTime, 1);
+	logNoMoreExts(startTime);
 }
 
 
 void DefaultIdealSemanticsSolver::isCredulouslyAccepted() {
-	std::vector<int> mss = justComputeOneExtension();
-	int arg = varMap.getVar(this->acceptanceQueryArgument);
-	for(unsigned int j=0; j<mss.size(); ++j) {
-		if(mss[j] == arg) {
-			this->formatter.writeArgAcceptance(true);
-			return;
+	clock_t startTime = clock();
+	int arg = this->problemReducer->getReducedMap()->getVar(this->problemReducer->translateAcceptanceQueryArgument(this->acceptanceQueryArgument));
+	bool status = false;
+	std::vector<int>& propagated = solver->propagatedAtDecisionLvlZero();
+	bool isPropagated = false;
+	bool propagatedValue = false;
+	for(unsigned int i=0; i<propagated.size(); ++i) {
+		if(propagated[i] == arg) {
+			isPropagated = true;
+			propagatedValue = true;
+			break;
+		} else if(propagated[i] == -arg) {
+			isPropagated = true;
+			propagatedValue = false;
+			break;
 		}
 	}
-	this->formatter.writeArgAcceptance(false);
+	if(isPropagated) {
+		status = propagatedValue;
+	} else {
+		bool shouldSearch = true;
+		std::vector<int> ext = justComputeOneExtension([this,arg,&shouldSearch,&status](std::vector<int>& mss){
+			bool localStatus = false;
+			for(unsigned int j=0; j<mss.size(); ++j) {
+				if(mss[j] == arg) {
+					localStatus = true;
+					break;
+				}
+			}
+			if(!localStatus) {
+				shouldSearch = false;
+				status = false;
+				this->stopSearch = true;
+			}
+		});
+		if(shouldSearch) {
+			for(unsigned int j=0; j<ext.size(); ++j) {
+				if(ext[j] == arg) {
+					status = true;
+					break;
+				}
+			}
+		}
+	}
+	this->formatter.writeArgAcceptance(status);
+	logAcceptanceCheckingTime(startTime);
 }
 
 

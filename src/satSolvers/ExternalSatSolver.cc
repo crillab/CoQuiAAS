@@ -133,7 +133,7 @@ bool ExternalSatSolver::launchExternalSolver(std::string instanceFile) {
 
 bool ExternalSatSolver::handleForkAncestor(int pfds[]) {
 	int modelFound = false;
-	wait(NULL);
+	wait(nullptr);
 	close(pfds[1]);
 	FILE *childOutFile = fdopen(pfds[0],"r");
 	char buffer[EXTERNAL_SAT_BUFFER_SIZE];
@@ -194,7 +194,7 @@ void ExternalSatSolver::handleForkChild(std::string instanceFile, int pfds[]) {
 		else
 			args[i] = ctokens[i];
 	}
-	args[ctokens.size()] = (char*)NULL;
+	args[ctokens.size()] = (char*)nullptr;
 	close(1);
 	if(-1==dup(pfds[1])) {
 		perror("launchExternalSolver::dup");
@@ -219,6 +219,29 @@ void ExternalSatSolver::computeAllModels(std::function<void(std::vector<bool>&)>
 		bool modelFound = computeModel(assumps, false);
 		if(!modelFound) break;
 		callback(this->models[this->models.size()-1]);
+		int sel = addBlockingClause();
+		blockingSelectors.push_back(sel);
+		assumps.push_back(sel);
+	}
+	for(int i=0; i<(int) this->models.size(); ++i) {
+		std::vector<int> cl;
+		cl.push_back(-blockingSelectors[i]);
+		addClause(cl);
+	}
+}
+
+
+void ExternalSatSolver::computeAllModels(std::function<void(std::vector<bool>&)> callback, std::vector<int> &assumps, std::vector<bool> knownModel) {
+	this->models.clear();
+	this->models.push_back(knownModel);
+	if(callback) callback(knownModel);
+    int sel = addBlockingClause();
+		blockingSelectors.push_back(sel);
+		assumps.push_back(sel);
+	for(;;) {
+		bool modelFound = computeModel(assumps, false);
+		if(!modelFound) break;
+		if(callback) callback(this->models[this->models.size()-1]);
 		int sel = addBlockingClause();
 		blockingSelectors.push_back(sel);
 		assumps.push_back(sel);

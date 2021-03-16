@@ -68,6 +68,7 @@ void AspartixFormatParser::parseDynamics(std::istream *input) {
 	if(*input) {
 		std::string line;
 		while(getline(*input, line)) {
+			if(!line.size()) continue;
 			bool add;
 			if(line[0] == '-') add = false;
 			else if(line[0] == '+') add = true;

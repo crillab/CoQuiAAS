@@ -51,10 +51,6 @@ namespace CoQuiAAS {
 
         std::string formatSequenceOfExtensions(std::vector<std::string> exts);
 
-        private:
-
-        VarMap &vmap;
-
     };
 }
 

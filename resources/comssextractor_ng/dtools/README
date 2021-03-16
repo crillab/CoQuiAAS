@@ -1,0 +1,20 @@
+# Ne pas oublier de compiler cnfuzz (gcc -o cnfuzz cnfuzz.c -- qui se
+# trouve dans cnfuzzdd2009/) ainsi que minisat (qui se trouve dans
+# minisatSolver/) et de mettre les deux exécutables dans le répertoire
+# courant.
+
+# Pour verifier un coMSS
+./debugCoMSS.sh -check /tmp/simple.res  simple.cnf
+./debugCoMSS4PMS.sh -check /tmp/simple.res  simple.wcnf
+
+# Pour rechercher un bug  :
+./debugCoMSS.sh -debug "./cmp_static -extractCoMss" simple.cnf
+./debugCoMSS4PMS.sh -debug "./cmp_static -extractCoMss" simple.wcnf
+./searchBugCoMSS.sh -cnf|-wcnf "./cmp_static -extractCoMss"
+
+# Pour cherche un bug d'enumeration de tous les coMSSes:
+./debugEnumMCSes.sh -debug "./cmp_static -enumMCSes" simple.*cnf
+./searchBugEnumMCSes.sh -cnf|-wcnf "./cmp_static -enumMCSes"
+
+# Pour trouver une instance plus petite à partir d'une plus grosse qui bug
+./qbfdd.py --no-qdimacs -v BENCHNAME "./debugCoMSS.sh -debug './cmp_static -extractCoMss' "

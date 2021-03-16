@@ -43,13 +43,7 @@ class Attacks {
    */
   void addAttack(std::string from, std::string to);
 
-  /**
-   * \fn getAttacksTo
-   * \brief Gets the list of variables corresponding to the attackers of the parameter
-   * \param var : the variable
-   * \return the attackers of var
-   */
-  std::vector<int> *getAttacksTo(int var);
+  std::vector<std::string>& getAttacksTo(std::string var);
 
   /**
    * \fn nAttacks
@@ -65,7 +59,7 @@ class Attacks {
    */
   unsigned int maxAttacks();
 
-  std::vector<std::tuple<bool, int, int, bool> >& getDynAttacks();
+  std::vector<std::tuple<bool, std::string, std::string, bool> >& getDynAttacks();
 
   void addDynAttack(bool add, std::string from, std::string to);
 
@@ -76,14 +70,14 @@ class Attacks {
   VarMap& varMap;
 
   /** The mapping from the arguments to their attackers */
-  std::map<int,std::vector<int> > attacks;
+  std::map<std::string,std::vector<std::string> > attacks;
 
  private:
   unsigned int nbAttacks;
   unsigned int nMaxAttacks;
 
   // add(true=+,false=-), from, to, initState
-  std::vector<std::tuple<bool, int, int, bool> > dynAttacks;
+  std::vector<std::tuple<bool, std::string, std::string, bool> > dynAttacks;
   
 };
 

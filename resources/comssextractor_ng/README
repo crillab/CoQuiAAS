@@ -1,0 +1,29 @@
+Building and installing
+----------------------
+
+
+================================================================================
+DIRECTORY OVERVIEW:
+
+cmp		CMP code
+mtl/            Mini Template Library
+utils/          Generic helper code (I/O, Parsing, CPU-time, etc)
+core/           A core version of the solver
+simp/           An extended solver with simplification capabilities
+README
+LICENSE
+
+================================================================================
+
+Compile and Build:
+-----------------
+
+make			----build a statically linked release version	
+make p		  	----build a statically linked profiling version
+make install		----build a static release version then install
+
+
+================================================================================
+EXAMPLES:
+
+> cmp -extractCoMss <cnf-file>

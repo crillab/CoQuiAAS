@@ -14,6 +14,7 @@
 #include <functional>
 
 #include <unistd.h>
+#include <signal.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 
@@ -74,6 +75,8 @@ public:
 	virtual void computeAllModels(std::function<void(std::vector<bool>&)> callback);
 
 	virtual void computeAllModels(std::function<void(std::vector<bool>&)> callback, std::vector<int> &assumps);
+
+	virtual void computeAllModels(std::function<void(std::vector<bool>&)> callback, std::vector<int> &assumps, std::vector<bool> knownModel);
 
 	virtual bool hasAModel();
 

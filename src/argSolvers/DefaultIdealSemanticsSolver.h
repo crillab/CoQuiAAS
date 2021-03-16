@@ -10,9 +10,9 @@
 
 
 #include "SemanticsProblemSolver.h"
-#include "core/Solver.h"
 #include "MssEncodingHelper.h"
 #include "MssSolver.h"
+#include "CompleteEncodingSatProblemReducer.h"
 
 
 namespace CoQuiAAS {
@@ -37,9 +37,15 @@ public:
 
 private:
 
-	std::vector<int> justComputeOneExtension();
+	std::vector<int> justComputeOneExtension(std::function<void(std::vector<int>&)> prExtCallback);
 
 	std::shared_ptr<MssSolver> solver;
+
+	MssEncodingHelper* helper;
+
+	std::unique_ptr<CompleteEncodingSatProblemReducer> problemReducer;
+
+	bool stopSearch = false;
 };
 
 

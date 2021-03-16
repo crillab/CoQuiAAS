@@ -1,30 +1,7 @@
 #include "CommandLineHelper.h"
+#include "Logger.h"
 
 
-#define CLH_MISS_FORMED_MSG "ERR:: WRONG USAGE\n\
-CoQuiAAS invocation:\n\
-  CoQuiAAS -p XX-YY [-a variable] -fo ZZ -f instanceFile [OPTIONS]\n\
-                  where XX-YYY in {D3} and -a is not present\n\
-                  or\n\
-                       where XX in {SE, EE, DC, DS}\n\
-                       where YY in {ST, CO, GR, PR, SST, STG, ID}\n\
-                       where \"-a variable\" must be present iff XX in {DC, DS}\n\
-                  where ZZ in {apx, cnf, tgf}\n\
-\n\
-  OPTIONS:\n\
-    -of XX : specify the output format where XX in {ICCMA17} (default: ICCMA17)\n\
-    -externalSatSolver \"satSolver FILE\" : launch an external SAT solver using the command \"satSolver FILE\" where FILE is replaced by a DIMACS cnf formatted file ; solver output must be compatible with SAT competitions output ; available for XX-ST and XX-CO problems\n\
-    -lbx \"path\" : launch an external lbx-like coMss solver located at \"path\" ; solver must handle \"-wm\" and \"-num n\" lbx options, and respect its input/output format ; mandatory for problems in the second level of the polynomial hierarchy\n\
-\n\
-show authors and version:\n\
-  CoQuiAAS\n\
-\n\
-show handled input formats:\n\
-  CoQuiAAS --formats\n\
-\n\
-show handled problems:\n\
-  CoQuiAAS --problems\n\
-"
 #ifndef COQUIAAS_VERSION
 #define CLH_CREDITS_MSG "CoQuiAAS\n\
 Compiled " __DATE__ " " __TIME__ "\n\
@@ -47,8 +24,33 @@ Jean-Marie Lagniez, Emmanuel Lonca, Jean-Guy Mailly -- {lagniez,lonca}@cril.fr, 
 
 #define FLAG_SET "FLAG_SET"
 
-
 using namespace CoQuiAAS;
+
+
+const std::string CommandLineHelper::USAGE = "ERR:: WRONG USAGE\n\
+CoQuiAAS invocation:\n\
+  CoQuiAAS -p XX-YY [-a variable] -fo ZZ -f instanceFile [OPTIONS]\n\
+                  where XX-YYY in {D3} and -a is not present\n\
+                  or\n\
+                       where XX in {SE, EE, DC, DS}\n\
+                       where YY in {ST, CO, GR, PR, SST, STG, ID}\n\
+                       where \"-a variable\" must be present iff XX in {DC, DS}\n\
+                  where ZZ in {apx, cnf, tgf}\n\
+\n\
+  OPTIONS:\n\
+    -of XX : specify the output format where XX in {ICCMA17} (default: ICCMA17)\n\
+    -externalSatSolver \"satSolver FILE\" : launch an external SAT solver using the command \"satSolver FILE\" where FILE is replaced by a DIMACS cnf formatted file ; solver output must be compatible with SAT competitions output ; available for XX-ST and XX-CO problems\n\
+    -lbx \"path\" : launch an external lbx-like coMss solver located at \"path\" ; solver must handle \"-wm\" and \"-num n\" lbx options, and respect its input/output format ; mandatory for problems in the second level of the polynomial hierarchy\n\
+\n\
+show authors and version:\n\
+  CoQuiAAS\n\
+\n\
+show handled input formats:\n\
+  CoQuiAAS --formats\n\
+\n\
+show handled problems:\n\
+  CoQuiAAS --problems\n\
+";
 
 
 CommandLineHelper::CommandLineHelper(int argc, char** argv) {
@@ -75,18 +77,24 @@ void CommandLineHelper::parseCommandLine() {
     }
     if(!args[i].compare("-p")) {
       if(!assertWellFormed(++i < args.size())) return;
+      task = args[i];
       taskType = SolverFactory::getTaskType(args[i]);
       sem = SolverFactory::getSemantics(args[i]);
       continue;
     }
     if(!args[i].compare("-fo")) {
       if(!assertWellFormed(++i < args.size())) return;
-      instanceFormat = ParserFactory::getInstanceFormat(args[i]);
+      instanceFormat = args[i];
       continue;
     }
     if(!args[i].compare("-of")) {
       if(!assertWellFormed(++i < args.size())) return;
       outputFormatter = args[i];
+      continue;
+    }
+    if(!args[i].compare("-log")) {
+      if(!assertWellFormed(++i < args.size())) return;
+      Logger::getInstance()->setFile(args[i]);
       continue;
     }
     if(!args[i].compare("--formats")) {
@@ -115,7 +123,6 @@ void CommandLineHelper::parseCommandLine() {
     }
     assertWellFormed(false);
   }
-  if (!errorOccured) assertWellFormed((taskType!=TASK_UNDEFINED) && (sem.getName()!=SEM_UNDEFINED) && (instanceFormat!=FORMAT_UNDEFINED) && (!instanceFile.empty()));
   if (!errorOccured) assertWellFormed((taskType!=TASK_CRED_INF) || (!additionalParams["-a"].empty()));
   if (!errorOccured) assertWellFormed((taskType!=TASK_SKEP_INF) || (!additionalParams["-a"].empty()));
 }
@@ -128,7 +135,7 @@ TaskType CommandLineHelper::getTaskType() {
   return taskType;
 }
 
-InstanceFormat CommandLineHelper::getInstanceFormat() {
+string CommandLineHelper::getInstanceFormat() {
   return instanceFormat;
 }
 
@@ -154,7 +161,7 @@ map<string,string>& CommandLineHelper::getAdditionalParams() {
 
 bool CommandLineHelper::assertWellFormed(bool test) {
   if(test) return true;
-  cerr << CLH_MISS_FORMED_MSG << endl;
+  cerr << CommandLineHelper::USAGE << endl;
   errorOccured = true;
   mustExit = true;
   return false;

@@ -26,33 +26,31 @@ int SatEncodingHelper::reserveVars(int n) {
 
 
 int SatEncodingHelper::reserveDisjunctionVars() {
-	int ret = reserveVars(varMap.intVars().size());
+	std::vector<std::string> vars = varMap.getNames();
+	for(std::vector<std::string>::iterator itVars = vars.begin() ; itVars != vars.end(); ++itVars) {
+		this->disjunctionVars[*itVars] = reserveVars(1);
+	}
 	reserveDynVarsForCompleteSemantics();
-	return ret;
+	return vars.size() ? this->disjunctionVars[vars[0]] : 0;
 }
 
 
-void SatEncodingHelper::createAttackersDisjunctionVars(int startId) {
-	std::vector<int, std::allocator<int> >& vars = varMap.intVars();
+void SatEncodingHelper::createAttackersDisjunctionVars(int startId0) {
+	std::vector<std::string> vars = varMap.getNames();
 	Minisat::vec<Minisat::Lit> binaryClause, naryClause;
 	std::vector<int> binaryCl, completeCl;
-	for(std::vector<int>::iterator itVars = vars.begin() ; itVars != vars.end(); ++itVars) {
-		int var = *itVars;
-		std::vector<int, std::allocator<int> >* attacksToCurrentVar = this->attacks.getAttacksTo(var);
+	for(std::vector<std::string>::iterator itVars = vars.begin() ; itVars != vars.end(); ++itVars) {
+		std::vector<std::string>& attacksToCurrentVar = this->attacks.getAttacksTo(*itVars);
+		int var = varMap.getVar(*itVars);
 		binaryCl.push_back(-var);
-		binaryCl.push_back(-(var+startId-1));
+		int disjVar = this->disjunctionVars[*itVars];
+		binaryCl.push_back(-disjVar);
 		solver->addClause(binaryCl); // (-a \lor -Pa)
 		binaryCl.clear();
-		completeCl.push_back(-(var+startId-1));
-		for(std::vector<int>::iterator itAttackers = attacksToCurrentVar->begin(); itAttackers != attacksToCurrentVar->end(); ++itAttackers) {
-			int attacker = *itAttackers;
-			for(unsigned int i=0; i<this->dynVars.size(); ++i) {
-				if(std::get<0>(this->dynVars[i]) == attacker && std::get<1>(this->dynVars[i]) == var) {
-					attacker = std::get<2>(this->dynVars[i]);
-					break;
-				}
-			}
-			binaryCl.push_back(var+startId-1);
+		completeCl.push_back(-disjVar);
+		for(std::vector<std::string>::iterator itAttackers = attacksToCurrentVar.begin(); itAttackers != attacksToCurrentVar.end(); ++itAttackers) {
+			int attacker = lookForDynAttackerReplacement(*itVars, *itAttackers);
+			binaryCl.push_back(disjVar);
 			binaryCl.push_back(-attacker);
 			solver->addClause(binaryCl); // Pa \lor -b
 			binaryCl.clear();
@@ -64,18 +62,17 @@ void SatEncodingHelper::createAttackersDisjunctionVars(int startId) {
 }
 
 
-void SatEncodingHelper::createCompleteEncodingConstraints(int startId) {
+void SatEncodingHelper::createCompleteEncodingConstraints(int startId0) {
 	std::vector<int> binaryCl, completeCl;
-	std::vector<int, std::allocator<int> >& vars = varMap.intVars();
-	for(std::vector<int>::iterator itVars = vars.begin() ; itVars != vars.end(); ++itVars) {
-		int var = *itVars;
-		std::vector<int, std::allocator<int> >* attacksToCurrentVar = attacks.getAttacksTo(var);
+	std::vector<std::string> vars = varMap.getNames();
+	for(std::vector<std::string>::iterator itVars = vars.begin() ; itVars != vars.end(); ++itVars) {
+		std::vector<std::string>& attacksToCurrentVar = attacks.getAttacksTo(*itVars);
+		int var = varMap.getVar(*itVars);
 		completeCl.push_back(var);
-		for(std::vector<int>::iterator itAttackers = attacksToCurrentVar->begin(); itAttackers != attacksToCurrentVar->end(); ++itAttackers) {
-			int attacker = *itAttackers;
-			int attackerDisjOfAttacker = attacker+startId-1;
+		for(std::vector<std::string>::iterator itAttackers = attacksToCurrentVar.begin(); itAttackers != attacksToCurrentVar.end(); ++itAttackers) {
+			int attackerDisjOfAttacker = this->disjunctionVars[*itAttackers];
 			for(unsigned int i=0; i<this->dynVars.size(); ++i) {
-				if(std::get<0>(this->dynVars[i]) == attacker && std::get<1>(this->dynVars[i]) == var) {
+				if(std::get<0>(this->dynVars[i]) == *itAttackers && std::get<1>(this->dynVars[i]) == *itVars) {
 					attackerDisjOfAttacker = -std::get<3>(this->dynVars[i]);
 					break;
 				}
@@ -94,13 +91,12 @@ void SatEncodingHelper::createCompleteEncodingConstraints(int startId) {
 
 void SatEncodingHelper::createConflictFreenessEncodingConstraints(int startId) {
 	std::vector<int> binaryCl;
-	std::vector<int, std::allocator<int> >& vars = varMap.intVars();
-	for(std::vector<int>::iterator itVars = vars.begin() ; itVars != vars.end(); ++itVars) {
-		int var = *itVars;
-		std::vector<int, std::allocator<int> >* attacksToCurrentVar = attacks.getAttacksTo(var);
-		for(std::vector<int>::iterator itAttackers = attacksToCurrentVar->begin(); itAttackers != attacksToCurrentVar->end(); ++itAttackers) {
-			int attacker = *itAttackers;
-			binaryCl.push_back(-var);
+	std::vector<std::string> vars = varMap.getNames();
+	for(std::vector<std::string>::iterator itVars = vars.begin() ; itVars != vars.end(); ++itVars) {
+		std::vector<std::string>& attacksToCurrentVar = this->attacks.getAttacksTo(*itVars);
+		for(std::vector<std::string>::iterator itAttackers = attacksToCurrentVar.begin(); itAttackers != attacksToCurrentVar.end(); ++itAttackers) {
+			int attacker = lookForDynAttackerReplacement(*itVars, *itAttackers);
+			binaryCl.push_back(-this->varMap.getVar(*itVars));
 			binaryCl.push_back(-attacker); // -a \lor -b
 			solver->addClause(binaryCl);
 			binaryCl.clear();
@@ -109,22 +105,26 @@ void SatEncodingHelper::createConflictFreenessEncodingConstraints(int startId) {
 }
 
 
+int SatEncodingHelper::lookForDynAttackerReplacement(std::string attacked, std::string attacker) {
+	for(unsigned int i=0; i<this->dynVars.size(); ++i) {
+		if(std::get<0>(this->dynVars[i]) == attacker && std::get<1>(this->dynVars[i]) == attacked) {
+			return std::get<2>(this->dynVars[i]);
+		}
+	}
+	return this->varMap.getVar(attacker);
+}
+
+
 void SatEncodingHelper::createStableEncodingConstraints() {
 	reserveDynVarsForStableSemantics();
 	std::vector<int> binaryCl, completeCl;
-	std::vector<int, std::allocator<int> >& vars = varMap.intVars();
-	for(std::vector<int>::iterator itVars = vars.begin() ; itVars != vars.end(); ++itVars) {
-		int var = *itVars;
+	std::vector<std::string> vars = varMap.getNames();
+	for(std::vector<std::string>::iterator itVars = vars.begin() ; itVars != vars.end(); ++itVars) {
+		int var = this->varMap.getVar(*itVars);
 		completeCl.push_back(var);
-		std::vector<int, std::allocator<int> >* attacksToCurrentVar = attacks.getAttacksTo(var);
-		for(std::vector<int>::iterator itAttackers = attacksToCurrentVar->begin(); itAttackers != attacksToCurrentVar->end(); ++itAttackers) {
-			int attacker = *itAttackers;
-			for(unsigned int i=0; i<this->dynVars.size(); ++i) {
-				if(std::get<0>(this->dynVars[i]) == attacker && std::get<1>(this->dynVars[i]) == var) {
-					attacker = std::get<2>(this->dynVars[i]);
-					break;
-				}
-			}
+		std::vector<std::string>& attacksToCurrentVar = attacks.getAttacksTo(*itVars);
+		for(std::vector<std::string>::iterator itAttackers = attacksToCurrentVar.begin(); itAttackers != attacksToCurrentVar.end(); ++itAttackers) {
+			int attacker = lookForDynAttackerReplacement(*itVars, *itAttackers);
 			binaryCl.push_back(-(var));
 			if(var != attacker) binaryCl.push_back(-(attacker));
 			solver->addClause(binaryCl); // -a \lor -b
@@ -138,6 +138,11 @@ void SatEncodingHelper::createStableEncodingConstraints() {
 
 
 void SatEncodingHelper::reserveDynVarsForCompleteSemantics() {
+	reserveDynVars(true);
+}
+
+
+void SatEncodingHelper::reserveDynVars(bool reserveNotAttackedRepl) {
 	auto dynAttacks = this->attacks.getDynAttacks();
 	for(unsigned int i=0; i<dynAttacks.size(); ++i) {
 		bool createNew = true;
@@ -148,13 +153,15 @@ void SatEncodingHelper::reserveDynVarsForCompleteSemantics() {
 			}
 		}
 		if(!createNew) continue;
-		int fromVar = std::get<1>(dynAttacks[i]);
-		int toVar = std::get<2>(dynAttacks[i]);
-		int fromRepl = reserveVars(3);
-		int notAttackedRepl = fromRepl + 1;
-		int assump = fromRepl + 2;
-		this->dynVars.push_back(std::make_tuple(fromVar, toVar, fromRepl, notAttackedRepl, assump));
+		std::string from = std::get<1>(dynAttacks[i]);
+		std::string to = std::get<2>(dynAttacks[i]);
+		int offset = reserveNotAttackedRepl ? 1 : 0;
+		int fromRepl = reserveVars(2 + offset);
+		int notAttackedRepl = reserveNotAttackedRepl ? fromRepl + 1 : 0;
+		int assump = fromRepl + 1 + offset;
+		this->dynVars.push_back(std::make_tuple(from, to, fromRepl, notAttackedRepl, assump));
 		std::vector<int> cl;
+		int fromVar = this->varMap.getVar(from);
 		// fromRepl
 		cl.push_back(-fromRepl);
 		cl.push_back(fromVar);
@@ -169,54 +176,27 @@ void SatEncodingHelper::reserveDynVarsForCompleteSemantics() {
 		cl.push_back(-assump);
 		solver->addClause(cl);
 		// notAttackedRepl
-		cl.clear();
-		cl.push_back(-notAttackedRepl);
-		cl.push_back(-fromVar-varMap.intVars().size());
-		solver->addClause(cl);
-		cl.clear();
-		cl.push_back(-notAttackedRepl);
-		cl.push_back(assump);
-		solver->addClause(cl);
-		cl.clear();
-		cl.push_back(notAttackedRepl);
-		cl.push_back(fromVar+varMap.intVars().size());
-		cl.push_back(-assump);
-		solver->addClause(cl);
+		if(reserveNotAttackedRepl) {
+			cl.clear();
+			cl.push_back(-notAttackedRepl);
+			cl.push_back(-this->disjunctionVars[from]);
+			solver->addClause(cl);
+			cl.clear();
+			cl.push_back(-notAttackedRepl);
+			cl.push_back(assump);
+			solver->addClause(cl);
+			cl.clear();
+			cl.push_back(notAttackedRepl);
+			cl.push_back(this->disjunctionVars[from]);
+			cl.push_back(-assump);
+			solver->addClause(cl);
+		}
 	}
 }
 
 
 void SatEncodingHelper::reserveDynVarsForStableSemantics() {
-	auto dynAttacks = this->attacks.getDynAttacks();
-	for(unsigned int i=0; i<dynAttacks.size(); ++i) {
-		bool createNew = true;
-		for(unsigned int j=0; j<this->dynVars.size(); ++j) {
-			if(std::get<1>(dynAttacks[i]) == std::get<0>(dynVars[j]) && std::get<2>(dynAttacks[i]) == std::get<1>(dynVars[j])) {
-				createNew = false;
-				break;
-			}
-		}
-		if(!createNew) continue;
-		int fromVar = std::get<1>(dynAttacks[i]);
-		int toVar = std::get<2>(dynAttacks[i]);
-		int fromRepl = reserveVars(2);
-		int assump = fromRepl + 1;
-		this->dynVars.push_back(std::make_tuple(fromVar, toVar, fromRepl, 0, assump));
-		std::vector<int> cl;
-		// fromRepl
-		cl.push_back(-fromRepl);
-		cl.push_back(fromVar);
-		solver->addClause(cl);
-		cl.clear();
-		cl.push_back(-fromRepl);
-		cl.push_back(assump);
-		solver->addClause(cl);
-		cl.clear();
-		cl.push_back(fromRepl);
-		cl.push_back(-fromVar);
-		cl.push_back(-assump);
-		solver->addClause(cl);
-	}
+	reserveDynVars(false);
 }
 
 

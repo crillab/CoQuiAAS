@@ -46,7 +46,7 @@ bool ExternalCoMssSolver::computeMss() {
 
 bool ExternalCoMssSolver::computeMss(std::vector<int> &assumps) {
 	std::string instance = writeInstanceForMSS(assumps);
-	int ret = launchExternalSolver(instance, false, NULL);
+	int ret = launchExternalSolver(instance, false, nullptr);
 	unlink(instance.c_str());
 	return ret;
 }
@@ -152,7 +152,7 @@ bool ExternalCoMssSolver::computeModel(std::vector<int> &assumps) {
 	auto oldNSoftCstrs = this->nSoftCstrs;
 	this->nSoftCstrs = 2*realNumberOfVars;
 	std::string instance = writeInstanceForSAT(assumps, this->realNumberOfVars);
-	int ret = launchExternalSolver(instance, false, NULL);
+	int ret = launchExternalSolver(instance, false, nullptr);
 	unlink(instance.c_str());
 	this->nSoftCstrs = oldNSoftCstrs;
 	return ret;
@@ -273,9 +273,9 @@ void ExternalCoMssSolver::handleForkChild(std::string instanceFile, bool allMode
   }
   close(pfds[0]);
   if(allModels) {
-    execl(this->path.c_str(), this->path.c_str(), "-enumBlocked", instanceFile.c_str(), "/dev/stdout", NULL);
+    execl(this->path.c_str(), this->path.c_str(), "-enumBlocked", instanceFile.c_str(), "/dev/stdout", nullptr);
   } else {
-    execl(this->path.c_str(), this->path.c_str(), "-extractCoMss", instanceFile.c_str(), "/dev/stdout", NULL);
+    execl(this->path.c_str(), this->path.c_str(), "-extractCoMss", instanceFile.c_str(), "/dev/stdout", nullptr);
   }
   perror("CoQuiAAS");
   std::cerr << "this error may occur in case coMssExtractor has not been found; check its path is \"" << this->path << "\"" << std::endl;
@@ -284,7 +284,7 @@ void ExternalCoMssSolver::handleForkChild(std::string instanceFile, bool allMode
 
 
 bool ExternalCoMssSolver::handleForkAncestor(int childId, int pipe[], bool allModels, bool extract) {
-  wait(NULL);
+  wait(nullptr);
   close(pipe[1]);
   bool ret = false;
   FILE *childOutFile = fdopen(pipe[0], "r");

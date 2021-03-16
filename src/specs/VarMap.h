@@ -11,6 +11,7 @@
 #ifndef __VAR_MAP_H__
 #define __VAR_MAP_H__
 
+#include "Logger.h"
 #include <vector>
 #include <map>
 #include <iterator>
@@ -41,6 +42,8 @@ class VarMap {
    */
   void addEntry(std::string name);
 
+  void addEntry(std::vector<std::string> names);
+
   /**
    * \fn getName
    * \brief Gives the name of a Boolean variable
@@ -48,6 +51,8 @@ class VarMap {
    * \return the name corresponding to var
    */
   std::string getName(int var);
+
+  std::vector<std::string> getNames();
 
   /**
    * \fn getVar
@@ -121,7 +126,7 @@ class VarMap {
   
   
  private:
-  std::map<int, std::string> varToName; /**< Mapping from Boolean variables to their names */
+  std::vector<std::string> varToName;
   std::vector<int> intVariables;
   std::map<std::string, int> nameToVar; /**< Mapping from the names to the Boolean variables */
   int nvars; /**< The number of variables */

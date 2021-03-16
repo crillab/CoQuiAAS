@@ -9,6 +9,7 @@
 #ifndef SRC_SOLVERS_SEMANTICSPROBLEMSOLVER_H_
 #define SRC_SOLVERS_SEMANTICSPROBLEMSOLVER_H_
 
+#include <ctime>
 #include <cstdlib>
 #include <iostream>
 
@@ -16,6 +17,7 @@
 #include "Attacks.h"
 #include "VarMap.h"
 #include "SolverOutputFormatter.h"
+#include "Logger.h"
 
 
 namespace CoQuiAAS {
@@ -65,9 +67,29 @@ protected:
 
 	SolverOutputFormatter &formatter;
 
-	std::string acceptanceQueryArgument;
+	std::string acceptanceQueryArgument = "";
 
 	int dynStep = -1;
+
+	inline void logSingleExtTime(clock_t startTime) {
+		Logger::getInstance()->info("time spent to compute one extension: %.3fs", (double)(clock()-startTime)/CLOCKS_PER_SEC);
+	}
+
+	inline void logOneExtTime(clock_t startTime, int extIndex) {
+		Logger::getInstance()->info("time spent to compute one extension %d: %.3fs", extIndex, (double)(clock()-startTime)/CLOCKS_PER_SEC);
+	}
+
+	inline void logNoMoreExts(clock_t startTime) {
+		Logger::getInstance()->info("time spent to check there is no more extension: %.3fs", (double)(clock()-startTime)/CLOCKS_PER_SEC);
+	}
+
+	inline void logAllExtsTime(clock_t startTime) {
+		Logger::getInstance()->info("time spent to compute all extensions: %.3fs", (double)(clock()-startTime)/CLOCKS_PER_SEC);
+	}
+
+	inline void logAcceptanceCheckingTime(clock_t startTime) {
+		Logger::getInstance()->info("time spent to check argument acceptance: %.3fs", (double)(clock()-startTime)/CLOCKS_PER_SEC);
+	}
 };
 
 

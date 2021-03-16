@@ -48,7 +48,7 @@ class CommandLineHelper {
    * \brief returns the instance format passed in main arguments
    * \return an InstanceFormat object representing the instance format
    */
-  InstanceFormat getInstanceFormat();
+  string getInstanceFormat();
 
   string getOutputFormatter();
 
@@ -96,15 +96,22 @@ class CommandLineHelper {
    */
   bool outputProblemAndExit();
 
+  inline std::string& getTask() {
+    return this->task;
+  }
+
+  static const std::string USAGE;
+
  private:
   vector<string> args;
   bool mustExit;
   bool errorOccured;
-  Semantics sem = Semantics(SEM_UNDEFINED, false);;
+  std::string task = "";
+  Semantics sem = Semantics(SEM_UNDEFINED, false);
   TaskType taskType;
-  InstanceFormat instanceFormat;
+  string instanceFormat = "";
   string outputFormatter = "";
-  string instanceFile;
+  string instanceFile = "";
   string dynamicsFile = "";
   map<string,string> additionalParams;
 

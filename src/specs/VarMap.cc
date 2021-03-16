@@ -17,20 +17,42 @@ using namespace CoQuiAAS;
 VarMap::VarMap() {
   nvars = 0;
   nbSelfAttacking = 0;
+  this->varToName.push_back("");
 }
 
 void VarMap::addEntry(std::string name) {
   if(!contains(name)){
 	intVariables.push_back(++nvars);
-    varToName[nvars] = name;
+    varToName.push_back(name);
     selfAttacking[nvars] = false ;
     nameToVar[name] = nvars;
   }
 }
 
 
+void VarMap::addEntry(std::vector<std::string> names) {
+  intVariables.push_back(++nvars);
+  std::stringstream sstream;
+  for(unsigned int i=0; i<names.size(); ++i) {
+    if(i>0) sstream << ",";
+    std::string name = names[i];
+    sstream << name;
+    nameToVar[name] = nvars;
+  }
+  varToName.push_back(sstream.str());
+}
+
+
 std::string VarMap::getName(int var) {
   return varToName[var>0 ? var : -var];
+}
+
+std::vector<std::string> VarMap::getNames() {
+  std::vector<std::string> names;
+  for(std::map<std::string,int>::iterator it = nameToVar.begin(); it != nameToVar.end(); ++it) {
+    names.push_back(it->first);
+  }
+  return names;
 }
 
 int VarMap::getVar(std::string name) {
@@ -51,7 +73,7 @@ std::vector<int>& VarMap::intVars() {
 }
 
 long VarMap::nVars() {
-  return varToName.size();
+  return varToName.size()-1;
 }
 
 bool VarMap::isSelfAttacking(int var){

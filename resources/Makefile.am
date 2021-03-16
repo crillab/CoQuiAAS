@@ -1,13 +1,13 @@
-.PHONY: comssextractor comssextractor-clean
+.PHONY: comssextractor-ng comssextractor-ng-clean
 
-all: comssextractor
-all-local: comssextractor
+all: comssextractor-ng
+all-local: comssextractor-ng
 
-clean: comssextractor-clean
-clean-local: comssextractor-clean
+clean: comssextractor-ng-clean
+clean-local: comssextractor-ng-clean
 
-comssextractor:
-	export MROOT="`pwd`/comssextractor" && make -C "$(top_srcdir)/resources/comssextractor/core" libs
+comssextractor-ng:
+	export MROOT="`pwd`/comssextractor_ng" && make -C "$(top_srcdir)/resources/comssextractor_ng"
 
-comssextractor-clean:
-	export MROOT="`pwd`/comssextractor" && make -C "$(top_srcdir)/resources/comssextractor/core" clean
+comssextractor-ng-clean:
+	export MROOT="`pwd`/comssextractor_ng" && make -C "$(top_srcdir)/resources/comssextractor_ng" clean

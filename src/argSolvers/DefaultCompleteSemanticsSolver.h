@@ -10,9 +10,9 @@
 
 
 #include "SemanticsProblemSolver.h"
-#include "core/Solver.h"
 #include "SatEncodingHelper.h"
 #include "SolverOutputFormatter.h"
+#include "CompleteEncodingSatProblemReducer.h"
 
 
 namespace CoQuiAAS {
@@ -41,6 +41,8 @@ private:
 	std::shared_ptr<SatSolver> solver;
 
 	SatEncodingHelper* helper;
+
+	std::unique_ptr<CompleteEncodingSatProblemReducer> problemReducer;
 };
 
 

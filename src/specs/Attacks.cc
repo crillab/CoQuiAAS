@@ -20,17 +20,16 @@ Attacks::Attacks(VarMap& vm) : varMap(vm) {
 
 
 void Attacks::addAttack(std::string from, std::string to) {
-  int fromVar = varMap.getVar(from);
-  int toVar = varMap.getVar(to);
-  attacks[toVar].push_back(fromVar);
+  std::vector<std::string>& attacksTo = attacks[to];
+  attacksTo.push_back(from);
   ++nbAttacks;
-  if (attacks[toVar].size() > nMaxAttacks) nMaxAttacks = attacks[toVar].size();
+  if (attacksTo.size() > nMaxAttacks) nMaxAttacks = attacksTo.size();
   if(!from.compare(to))
     varMap.setSelfAttacking(from,true);
 }
 
-std::vector<int> *Attacks::getAttacksTo(int var) {
-  return &attacks[var];
+std::vector<std::string>& Attacks::getAttacksTo(std::string var) {
+  return this->attacks[var];
 }
 
 unsigned int Attacks::nAttacks() {
@@ -45,19 +44,17 @@ VarMap &Attacks::getVarMap() {
 	return varMap;
 }
 
-std::vector<std::tuple<bool, int, int, bool> >& Attacks::getDynAttacks() {
+std::vector<std::tuple<bool, std::string, std::string, bool> >& Attacks::getDynAttacks() {
   return this->dynAttacks;
 }
 
 void Attacks::addDynAttack(bool add, std::string from, std::string to) {
-  int fromVar = varMap.getVar(from);
-  int toVar = varMap.getVar(to);
   bool wasPresent = false;
-  for(unsigned int i=0; i<attacks[toVar].size(); ++i) {
-    if(attacks[toVar][i] == fromVar) {
+  for(unsigned int i=0; i<attacks[to].size(); ++i) {
+    if(attacks[to][i] == from) {
       wasPresent = true;
       for(unsigned int j=0; j<this->dynAttacks.size(); ++j) {
-        if(std::get<1>(this->dynAttacks[j]) == fromVar && std::get<2>(this->dynAttacks[j]) == toVar) {
+        if(std::get<1>(this->dynAttacks[j]) == from && std::get<2>(this->dynAttacks[j]) == to) {
           wasPresent = std::get<3>(this->dynAttacks[j]);
           break;
         }
@@ -66,5 +63,5 @@ void Attacks::addDynAttack(bool add, std::string from, std::string to) {
     }
   }
   if(!wasPresent) addAttack(from, to);
-  this->dynAttacks.push_back(std::make_tuple(add, fromVar, toVar, wasPresent));
+  this->dynAttacks.push_back(std::make_tuple(add, from, to, wasPresent));
 }

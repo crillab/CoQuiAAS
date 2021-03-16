@@ -24,7 +24,9 @@
 /src/stamp-h1
 **/.deps/
 **/.dirstamp
+**/Makefile.in
 /Makefile
 /src/Makefile
 /doc/Makefile
 /libtool
+
