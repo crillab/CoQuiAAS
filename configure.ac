@@ -1,9 +1,6 @@
 AC_PREREQ(2.59)
 AC_INIT(CoQuiAAS, 3.0.1, lonca@cril.fr)
 
-PACKAGE=CoQuiAAS
-VERSION=3.0
-
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_HEADER([src/config.h])
 AC_CONFIG_MACRO_DIR([m4])
