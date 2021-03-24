@@ -161,7 +161,7 @@ void ExternalSatSolver::extractModel(char buffer[], FILE *childOutFile) {
 	bool minus = false;
 	for(; *pc != '\n'; ++pc) {
 		if(!*pc) {
-			fgets(buffer, EXTERNAL_SAT_BUFFER_SIZE, childOutFile);
+			if(!fgets(buffer, EXTERNAL_SAT_BUFFER_SIZE, childOutFile)) exit(2);
 			pc = buffer;
 		}
 		if((*pc == ' ' || *pc == '\t') && readingNb) {
