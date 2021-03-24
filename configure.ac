@@ -1,5 +1,5 @@
 AC_PREREQ(2.59)
-AC_INIT(CoQuiAAS, 3.0.2-dev, lonca@cril.fr)
+AC_INIT(CoQuiAAS, 3.0.2, lonca@cril.fr)
 
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_HEADER([src/config.h])
@@ -17,7 +17,7 @@ AM_INIT_AUTOMAKE(subdir-objects)
 
 AC_PROG_LIBTOOL
 
-: ${CXXFLAGS= -std=c++14 -O3 -DCOQUIAAS_VERSION="3.0.2-dev"}
+: ${CXXFLAGS= -std=c++14 -O3 -DCOQUIAAS_VERSION="3.0.2"}
 AC_PROG_CXX
 AX_CHECK_ZLIB
 
